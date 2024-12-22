@@ -1,0 +1,11 @@
+<res>
+   <item name="mahjong/Feng_BaiBan.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="mahjong/Feng_Bei.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="mahjong/Feng_Dong.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="mahjong/Feng_Fa.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="mahjong/Feng_Nan.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="mahjong/Feng_Xi.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="mahjong/Feng_Zhong.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="mahjong" type="" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="" type="" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
+</res>

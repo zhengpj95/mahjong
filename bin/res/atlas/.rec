@@ -1,0 +1,39 @@
+D .
+D common
+P 07B8FD00 bg0.png
+P 7D862B48 bg1.png
+D mahjong
+P 3895FCA2 feng1.png
+P 0556B1B0 feng2.png
+P 922EAFEF feng3.png
+P 86F1AC28 feng4.png
+P 1868E52A feng5.png
+P 07E31F47 feng6.png
+P B141D58D feng7.png
+P B81AA11C tiao1.png
+P 1D17833B tiao2.png
+P 47EBF52A tiao3.png
+P 4220C7B2 tiao4.png
+P 37EFC0E3 tiao5.png
+P 6CB3ED64 tiao6.png
+P 46933168 tiao7.png
+P F95AD03A tiao8.png
+P BBE185F3 tiao9.png
+P 91A53961 tong1.png
+P 662BE2B1 tong2.png
+P B9DBF89A tong3.png
+P 508E700B tong4.png
+P 730CF2F1 tong5.png
+P 6D8FB7CD tong6.png
+P 5F43638D tong7.png
+P 063C6F08 tong8.png
+P 9229859E tong9.png
+P F737FF01 wan1.png
+P 4FC93CB7 wan2.png
+P 377AC5D2 wan3.png
+P 80A61A49 wan4.png
+P B1D37847 wan5.png
+P 97E477FA wan6.png
+P AD6D3319 wan7.png
+P 0A435D25 wan8.png
+P F1BD731E wan9.png
