@@ -76,17 +76,20 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         preImg.skin = "";
       }
       console.log(11111, index, this._preIdx, curItemData, preItemData);
+      this._proxy.data.deleteCard(index);
+      this._proxy.data.deleteCard(this._preIdx);
       this._preIdx = -1;
+      // console.log(this._proxy.data.data);
     } else {
       this._preIdx = index;
     }
   }
 
-  private onClickMouseDown(item: BoxCard, index: number): void {
+  private onClickMouseDown(index: number): void {
     //
   }
 
-  private onClickMouseUp(item: BoxCard, index: number): void {
+  private onClickMouseUp(index: number): void {
     //
   }
 }

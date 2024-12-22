@@ -89,6 +89,23 @@
             const typeList = idStr.split("_");
             return `mahjong/${CardTypeName[typeList[0]] + typeList[1]}.png`;
         }
+        deleteCard(index) {
+            index += 1;
+            const row = index / 10 >> 0;
+            const col = index % 10 - 1;
+            if (!this.data || !this.data[row]) {
+                return false;
+            }
+            this.data[row][col] = "";
+            return true;
+        }
+        getDirectionList(index) {
+            const leftIdx = Math.max(0, index - 1);
+            const rightIdx = Math.max(index + 1, this.col - 1);
+            const topIdx = Math.max(0, index - this.col);
+            const bottomIdx = Math.max(index + this.col, this.row - 1);
+            return [topIdx, rightIdx, bottomIdx, leftIdx];
+        }
     }
     const CARD_NUMBER = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const CARD_TYPE_LIST = [1, 3];
@@ -170,7 +187,10 @@
                     preImg.skin = "";
                 }
                 console.log(11111, index, this._preIdx, curItemData, preItemData);
+                this._proxy.data.deleteCard(index);
+                this._proxy.data.deleteCard(this._preIdx);
                 this._preIdx = -1;
+                console.log(this._proxy.data.data);
             }
             else {
                 this._preIdx = index;

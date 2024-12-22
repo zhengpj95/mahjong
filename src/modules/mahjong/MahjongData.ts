@@ -66,6 +66,27 @@ export class MahjongData {
     const typeList = idStr.split("_");
     return `mahjong/${CardTypeName[typeList[0]] + typeList[1]}.png`;
   }
+
+  // 移除牌
+  public deleteCard(index: number): boolean {
+    index += 1;
+    const row = index / 10 >> 0;
+    const col = index % 10 - 1;
+    if (!this.data || !this.data[row]) {
+      return false;
+    }
+    this.data[row][col] = "";
+    return true;
+  }
+
+  // 获取点击的牌【上右下左】非空牌的序号 todo 非空牌
+  public getDirectionList(index: number): number[] {
+    const leftIdx = Math.max(0, index - 1);
+    const rightIdx = Math.max(index + 1, this.col - 1);
+    const topIdx = Math.max(0, index - this.col);
+    const bottomIdx = Math.max(index + this.col, this.row - 1);
+    return [topIdx, rightIdx, bottomIdx, leftIdx];
+  }
 }
 
 export const CARD_NUMBER: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
