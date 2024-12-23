@@ -1,5 +1,6 @@
-import {ui} from "../../ui/layaMaxUI";
-import {MahjongProxy} from "./MahjongProxy";
+import { ui } from "@ui/layaMaxUI";
+import { MahjongProxy } from "./MahjongProxy";
+import { MahjongCardData } from "./MahjongModel";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -43,21 +44,21 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onLoadedSuccess(): void {
-    console.log(11111);
+    console.log("11111 onLoadedSuccess");
     const list = this._proxy.data.getMahjongData();
     this._list.array = list.reduce((a, b) => a.concat(b));
+    console.log(list);
   }
 
   private onRenderListItem(item: BoxCard, index: number): void {
-    console.log(index);
     const img = <Image>item.getChildByName("boxCard").getChildByName("img");
-    const data: string = item.dataSource;
+    const data: MahjongCardData = item.dataSource;
     if (!data) {
       img.skin = "";
       return;
     }
     item.tag = data;
-    img.skin = this._proxy.data.getMahjongCardRes(data);
+    img.skin = data.getIcon();
 
     item.on(Event.CLICK, this, this.onClickItem, [index]);
     item.on(Event.MOUSE_DOWN, this, this.onClickMouseDown, [index]);

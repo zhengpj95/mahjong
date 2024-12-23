@@ -31,7 +31,17 @@
         })(modules = ui.modules || (ui.modules = {}));
     })(ui || (ui = {}));
 
-    class MahjongData {
+    const CARD_COUNT = 4;
+    const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const CARD_TYPE_LIST = [1, 2];
+    const FENG_TYPE_LIST = [5, 6];
+    const CardTypeName = {
+        [1]: "tong",
+        [3]: "wan",
+        [2]: "tiao",
+        [4]: "feng",
+    };
+    class MahjongModel {
         constructor() {
             this.row = 8;
             this.col = 10;
@@ -45,12 +55,12 @@
         getMahjongCardList() {
             const list = [];
             for (let type of CARD_TYPE_LIST) {
-                for (let num of CARD_NUMBER) {
-                    list.push(type + "_" + num);
+                for (let num of CARD_NUM_LIST) {
+                    list.push([type, num]);
                 }
             }
             for (let feng of FENG_TYPE_LIST) {
-                list.push(4 + "_" + feng);
+                list.push([4, feng]);
             }
             return list;
         }
@@ -69,25 +79,23 @@
         getRandomRowCol() {
             const list = this.getRowColStrList();
             const idx = Math.random() * list.length >> 0;
-            return list.splice(idx, 1)[0];
+            const listItem = list.splice(idx, 1)[0];
+            return listItem.split("_").map(item => +item);
         }
         getMahjongData() {
             const list = this.getMahjongCardList();
             for (let item of list) {
-                for (let i = 0; i < 4; i++) {
-                    const randomItem = this.getRandomRowCol();
-                    const randomItemAry = randomItem.split("_").map(item => +item);
+                for (let i = 0; i < CARD_COUNT; i++) {
+                    const randomItemAry = this.getRandomRowCol();
                     if (!this.data[randomItemAry[0]]) {
                         this.data[randomItemAry[0]] = [];
                     }
-                    this.data[randomItemAry[0]][randomItemAry[1]] = item;
+                    const cardData = new MahjongCardData();
+                    cardData.updateInfo(randomItemAry[0], randomItemAry[1], item);
+                    this.data[randomItemAry[0]][randomItemAry[1]] = cardData;
                 }
             }
             return this.data;
-        }
-        getMahjongCardRes(idStr) {
-            const typeList = idStr.split("_");
-            return `mahjong/${CardTypeName[typeList[0]] + typeList[1]}.png`;
         }
         deleteCard(index) {
             index += 1;
@@ -96,7 +104,7 @@
             if (!this.data || !this.data[row]) {
                 return false;
             }
-            this.data[row][col] = "";
+            this.data[row][col] = undefined;
             return true;
         }
         getDirectionList(index) {
@@ -107,15 +115,19 @@
             return [topIdx, rightIdx, bottomIdx, leftIdx];
         }
     }
-    const CARD_NUMBER = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    const CARD_TYPE_LIST = [1, 3];
-    const FENG_TYPE_LIST = [5, 6];
-    const CardTypeName = {
-        [1]: "tong",
-        [2]: "wan",
-        [3]: "tiao",
-        [4]: "feng",
-    };
+    class MahjongCardData {
+        updateInfo(row, col, data) {
+            this.row = row;
+            this.col = col;
+            this.cardData = data;
+        }
+        getIcon() {
+            if (!this.cardData) {
+                return "";
+            }
+            return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
+        }
+    }
 
     class MahjongProxy {
         constructor() {
@@ -129,7 +141,7 @@
         }
         get data() {
             if (!this._data) {
-                this._data = new MahjongData();
+                this._data = new MahjongModel();
             }
             return this._data;
         }
@@ -157,12 +169,12 @@
             this._preIdx = -1;
         }
         onLoadedSuccess() {
-            console.log(11111);
+            console.log("11111 onLoadedSuccess");
             const list = this._proxy.data.getMahjongData();
             this._list.array = list.reduce((a, b) => a.concat(b));
+            console.log(list);
         }
         onRenderListItem(item, index) {
-            console.log(index);
             const img = item.getChildByName("boxCard").getChildByName("img");
             const data = item.dataSource;
             if (!data) {
@@ -170,7 +182,7 @@
                 return;
             }
             item.tag = data;
-            img.skin = this._proxy.data.getMahjongCardRes(data);
+            img.skin = data.getIcon();
             item.on(Event.CLICK, this, this.onClickItem, [index]);
             item.on(Event.MOUSE_DOWN, this, this.onClickMouseDown, [index]);
             item.on(Event.MOUSE_UP, this, this.onClickMouseUp, [index]);
@@ -190,15 +202,14 @@
                 this._proxy.data.deleteCard(index);
                 this._proxy.data.deleteCard(this._preIdx);
                 this._preIdx = -1;
-                console.log(this._proxy.data.data);
             }
             else {
                 this._preIdx = index;
             }
         }
-        onClickMouseDown(item, index) {
+        onClickMouseDown(index) {
         }
-        onClickMouseUp(item, index) {
+        onClickMouseUp(index) {
         }
     }
 

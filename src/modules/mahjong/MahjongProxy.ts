@@ -1,19 +1,11 @@
-import {
-  CARD_NUMBER,
-  CARD_TYPE_LIST,
-  CardType,
-  CardTypeName,
-  FENG_TYPE_LIST,
-  FengType,
-  MahjongData
-} from "./MahjongData";
+import { MahjongModel } from "./MahjongModel";
 
 /**
  * @date 2024/12/22
  */
 export class MahjongProxy {
   private static _instance: MahjongProxy;
-  private _data: MahjongData;
+  private _data: MahjongModel;
 
   public static ins(): MahjongProxy {
     if (!this._instance) {
@@ -22,9 +14,9 @@ export class MahjongProxy {
     return this._instance;
   }
 
-  public get data(): MahjongData {
+  public get data(): MahjongModel {
     if (!this._data) {
-      this._data = new MahjongData();
+      this._data = new MahjongModel();
     }
     return this._data;
   }

@@ -3,7 +3,19 @@
     "module": "es6",
     "target": "es6",
     "noEmitHelpers": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "strict": false,
+    "noImplicitReturns": false,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "@def/*": [
+        "src/def/*"
+      ],
+      "@ui/*": [
+        "src/ui/*"
+      ]
+    }
   },
   "exclude": [
     "node_modules"
