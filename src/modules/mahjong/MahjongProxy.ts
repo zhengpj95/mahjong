@@ -5,23 +5,20 @@ import { MahjongModel } from "./MahjongModel";
  */
 export class MahjongProxy {
   private static _instance: MahjongProxy;
-  private _data: MahjongModel;
+  private _model: MahjongModel;
 
   public static ins(): MahjongProxy {
     if (!this._instance) {
       this._instance = new MahjongProxy();
+      window[this._instance.constructor.name] = this._instance;
     }
     return this._instance;
   }
 
-  public get data(): MahjongModel {
-    if (!this._data) {
-      this._data = new MahjongModel();
+  public get model(): MahjongModel {
+    if (!this._model) {
+      this._model = new MahjongModel();
     }
-    return this._data;
-  }
-
-  constructor() {
-    this.data.updateRowCol(8, 10);
+    return this._model;
   }
 }

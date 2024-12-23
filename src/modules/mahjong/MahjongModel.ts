@@ -22,7 +22,7 @@ export class MahjongModel {
   public col = 10;
   public data: MahjongCardData[][] = [];
 
-  public updateRowCol(row: number, col: number): void {
+  public updateRowCol(row: number = 8, col: number = 10): void {
     this.row = row;
     this.col = col;
     this.data = [];
@@ -119,5 +119,12 @@ export class MahjongCardData {
       return "";
     }
     return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
+  }
+
+  public checkSame(data: MahjongCardData): boolean {
+    if (!data || !data.cardData) {
+      return false;
+    }
+    return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
   }
 }

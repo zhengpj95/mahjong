@@ -47,7 +47,7 @@
             this.col = 10;
             this.data = [];
         }
-        updateRowCol(row, col) {
+        updateRowCol(row = 8, col = 10) {
             this.row = row;
             this.col = col;
             this.data = [];
@@ -127,23 +127,27 @@
             }
             return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
         }
+        checkSame(data) {
+            if (!data || !data.cardData) {
+                return false;
+            }
+            return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
+        }
     }
 
     class MahjongProxy {
-        constructor() {
-            this.data.updateRowCol(8, 10);
-        }
         static ins() {
             if (!this._instance) {
                 this._instance = new MahjongProxy();
+                window[this._instance.constructor.name] = this._instance;
             }
             return this._instance;
         }
-        get data() {
-            if (!this._data) {
-                this._data = new MahjongModel();
+        get model() {
+            if (!this._model) {
+                this._model = new MahjongModel();
             }
-            return this._data;
+            return this._model;
         }
     }
 
@@ -170,7 +174,7 @@
         }
         onLoadedSuccess() {
             console.log("11111 onLoadedSuccess");
-            const list = this._proxy.data.getMahjongData();
+            const list = this._proxy.model.getMahjongData();
             this._list.array = list.reduce((a, b) => a.concat(b));
             console.log(list);
         }
@@ -192,15 +196,15 @@
             if (this._preIdx > -1) {
                 const curItemData = this._list.getItem(index);
                 const preItemData = this._list.getItem(this._preIdx);
-                if (curItemData === preItemData) {
+                if (curItemData.checkSame(preItemData)) {
                     const curImg = this._list.getCell(index).getChildByName("boxCard").getChildByName("img");
                     curImg.skin = "";
                     const preImg = this._list.getCell(this._preIdx).getChildByName("boxCard").getChildByName("img");
                     preImg.skin = "";
+                    this._proxy.model.deleteCard(index);
+                    this._proxy.model.deleteCard(this._preIdx);
+                    console.log(11111, index, this._preIdx, curItemData, preItemData);
                 }
-                console.log(11111, index, this._preIdx, curItemData, preItemData);
-                this._proxy.data.deleteCard(index);
-                this._proxy.data.deleteCard(this._preIdx);
                 this._preIdx = -1;
             }
             else {

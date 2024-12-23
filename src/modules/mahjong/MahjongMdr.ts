@@ -45,7 +45,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   private onLoadedSuccess(): void {
     console.log("11111 onLoadedSuccess");
-    const list = this._proxy.data.getMahjongData();
+    const list = this._proxy.model.getMahjongData();
     this._list.array = list.reduce((a, b) => a.concat(b));
     console.log(list);
   }
@@ -68,19 +68,18 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   private onClickItem(index: number): void {
     if (this._preIdx > -1) {
-      const curItemData = this._list.getItem(index);
-      const preItemData = this._list.getItem(this._preIdx);
-      if (curItemData === preItemData) {
+      const curItemData: MahjongCardData = this._list.getItem(index);
+      const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
+      if (curItemData.checkSame(preItemData)) {
         const curImg = this._list.getCell(index).getChildByName("boxCard").getChildByName("img") as Image;
         curImg.skin = "";
         const preImg = this._list.getCell(this._preIdx).getChildByName("boxCard").getChildByName("img") as Image;
         preImg.skin = "";
+        this._proxy.model.deleteCard(index);
+        this._proxy.model.deleteCard(this._preIdx);
+        console.log(11111, index, this._preIdx, curItemData, preItemData);
       }
-      console.log(11111, index, this._preIdx, curItemData, preItemData);
-      this._proxy.data.deleteCard(index);
-      this._proxy.data.deleteCard(this._preIdx);
       this._preIdx = -1;
-      // console.log(this._proxy.data.data);
     } else {
       this._preIdx = index;
     }
