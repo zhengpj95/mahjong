@@ -100,6 +100,34 @@ export class MahjongModel {
     const bottomIdx = Math.max(index + this.col, this.row - 1);
     return [topIdx, rightIdx, bottomIdx, leftIdx];
   }
+
+  // dfs检查是否可以消除 todo
+  public checkDfs(startData: MahjongCardData, targetData: MahjongCardData): boolean {
+    if (!startData || !targetData || !startData.checkSame(targetData)) {
+      return false;
+    }
+    const startPoint = { row: startData.row + 1, col: startData.col + 1 };
+    const targetPoint = { row: targetData.row + 1, col: targetData.col + 1 };
+    const dfsAry: number[][] = [];
+    for (let i = 0; i < this.row + 2; i++) {
+      for (let j = 0; j < this.col + 2; j++) {
+        if (!dfsAry[i]) {
+          dfsAry[i] = [];
+        }
+        if (i === 0 || j === 0 || i === this.row + 1 || j === this.col + 1) {
+          dfsAry[i][j] = 0;
+        } else {
+          const cardData = this.data[i - 1][j - 1];
+          dfsAry[i][j] = cardData ? 1 : 0;
+        }
+      }
+    }
+    // 1.在隔壁
+    // 2.不在隔壁，则四周都是障碍1
+    // 3.不在隔壁，存在可dfs空间0
+    console.log(dfsAry);
+    return false;
+  }
 }
 
 /**单张麻将的数据*/

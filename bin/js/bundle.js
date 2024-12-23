@@ -114,6 +114,30 @@
             const bottomIdx = Math.max(index + this.col, this.row - 1);
             return [topIdx, rightIdx, bottomIdx, leftIdx];
         }
+        checkDfs(startData, targetData) {
+            if (!startData || !targetData || !startData.checkSame(targetData)) {
+                return false;
+            }
+            const startPoint = { row: startData.row + 1, col: startData.col + 1 };
+            const targetPoint = { row: targetData.row + 1, col: targetData.col + 1 };
+            const dfsAry = [];
+            for (let i = 0; i < this.row + 2; i++) {
+                for (let j = 0; j < this.col + 2; j++) {
+                    if (!dfsAry[i]) {
+                        dfsAry[i] = [];
+                    }
+                    if (i === 0 || j === 0 || i === this.row + 1 || j === this.col + 1) {
+                        dfsAry[i][j] = 0;
+                    }
+                    else {
+                        const cardData = this.data[i - 1][j - 1];
+                        dfsAry[i][j] = cardData ? 1 : 0;
+                    }
+                }
+            }
+            console.log(dfsAry);
+            return false;
+        }
     }
     class MahjongCardData {
         updateInfo(row, col, data) {
@@ -151,8 +175,41 @@
         }
     }
 
-    var Handler = Laya.Handler;
+    var TimeLine = Laya.TimeLine;
     var Event = Laya.Event;
+    class ComUtils {
+        static setTween(box, isTween = true, callback) {
+            if (!box) {
+                return undefined;
+            }
+            let timeLine = box["_timeLine_"];
+            if (timeLine) {
+                timeLine.reset();
+                if (!isTween) {
+                    timeLine.destroy();
+                    return undefined;
+                }
+            }
+            else {
+                box["_timeLine_"] = timeLine = new TimeLine();
+            }
+            timeLine.to(box, { rotation: 10 }, 100)
+                .to(box, { rotation: -10 }, 100)
+                .to(box, { rotation: 5 }, 100)
+                .to(box, { rotation: -5 }, 100)
+                .to(box, { rotation: 0 }, 50)
+                .play();
+            timeLine.on(Event.COMPLETE, this, () => {
+                if (callback) {
+                    callback.run();
+                }
+            });
+            return timeLine;
+        }
+    }
+
+    var Handler = Laya.Handler;
+    var Event$1 = Laya.Event;
     class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         constructor() {
             super();
@@ -187,29 +244,39 @@
             }
             item.tag = data;
             img.skin = data.getIcon();
-            item.on(Event.CLICK, this, this.onClickItem, [index]);
-            item.on(Event.MOUSE_DOWN, this, this.onClickMouseDown, [index]);
-            item.on(Event.MOUSE_UP, this, this.onClickMouseUp, [index]);
-            item.on(Event.MOUSE_OUT, this, this.onClickMouseUp, [index]);
+            item.on(Event$1.CLICK, this, this.onClickItem, [index]);
+            item.on(Event$1.MOUSE_DOWN, this, this.onClickMouseDown, [index]);
+            item.on(Event$1.MOUSE_UP, this, this.onClickMouseUp, [index]);
+            item.on(Event$1.MOUSE_OUT, this, this.onClickMouseUp, [index]);
         }
         onClickItem(index) {
-            if (this._preIdx > -1) {
+            if (this._preIdx > -1 && index !== this._preIdx) {
                 const curItemData = this._list.getItem(index);
                 const preItemData = this._list.getItem(this._preIdx);
+                const curItem = this._list.getCell(index).getChildByName("boxCard");
+                const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
                 if (curItemData.checkSame(preItemData)) {
-                    const curImg = this._list.getCell(index).getChildByName("boxCard").getChildByName("img");
-                    curImg.skin = "";
-                    const preImg = this._list.getCell(this._preIdx).getChildByName("boxCard").getChildByName("img");
-                    preImg.skin = "";
-                    this._proxy.model.deleteCard(index);
-                    this._proxy.model.deleteCard(this._preIdx);
-                    console.log(11111, index, this._preIdx, curItemData, preItemData);
+                    this.clearCardItem(curItem, index);
+                    this.clearCardItem(preItem, this._preIdx);
+                }
+                else {
+                    ComUtils.setTween(curItem);
+                    ComUtils.setTween(preItem);
                 }
                 this._preIdx = -1;
             }
             else {
                 this._preIdx = index;
+                const item = this._list.getCell(index).getChildByName("boxCard");
+                ComUtils.setTween(item);
             }
+        }
+        clearCardItem(box, index) {
+            ComUtils.setTween(box, true, Handler.create(this, () => {
+                const curImg = box.getChildByName("img");
+                curImg.skin = "";
+                this._proxy.model.deleteCard(index);
+            }));
         }
         onClickMouseDown(index) {
         }

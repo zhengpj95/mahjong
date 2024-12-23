@@ -1,6 +1,7 @@
 import { ui } from "@ui/layaMaxUI";
 import { MahjongProxy } from "./MahjongProxy";
 import { MahjongCardData } from "./MahjongModel";
+import ComUtils from "@base/utils/ComUtils";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -67,22 +68,33 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onClickItem(index: number): void {
-    if (this._preIdx > -1) {
+    if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
+      const curItem = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
+      const preItem = <BoxCard>this._list.getCell(this._preIdx).getChildByName("boxCard");
       if (curItemData.checkSame(preItemData)) {
-        const curImg = this._list.getCell(index).getChildByName("boxCard").getChildByName("img") as Image;
-        curImg.skin = "";
-        const preImg = this._list.getCell(this._preIdx).getChildByName("boxCard").getChildByName("img") as Image;
-        preImg.skin = "";
-        this._proxy.model.deleteCard(index);
-        this._proxy.model.deleteCard(this._preIdx);
-        console.log(11111, index, this._preIdx, curItemData, preItemData);
+        this.clearCardItem(curItem, index);
+        this.clearCardItem(preItem, this._preIdx);
+        // console.log(11111, index, this._preIdx, curItemData, preItemData);
+      } else {
+        ComUtils.setTween(curItem);
+        ComUtils.setTween(preItem);
       }
       this._preIdx = -1;
     } else {
       this._preIdx = index;
+      const item = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
+      ComUtils.setTween(item);
     }
+  }
+
+  private clearCardItem(box: BoxCard, index: number): void {
+    ComUtils.setTween(box, true, Handler.create(this, () => {
+      const curImg = box.getChildByName("img") as Image;
+      curImg.skin = "";
+      this._proxy.model.deleteCard(index);
+    }));
   }
 
   private onClickMouseDown(index: number): void {

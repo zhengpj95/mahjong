@@ -9,6 +9,9 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
+      "@base/*": [
+        "src/base/*"
+      ],
       "@def/*": [
         "src/def/*"
       ],
