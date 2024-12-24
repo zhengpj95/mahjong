@@ -98,13 +98,15 @@
             return this.data;
         }
         deleteCard(index) {
-            index += 1;
-            const row = index / 10 >> 0;
-            const col = index % 10 - 1;
+            const row = (index / 10 >> 0);
+            const col = index % 10;
             if (!this.data || !this.data[row]) {
                 return false;
             }
             this.data[row][col] = undefined;
+            if (this._dfsAry) {
+                this._dfsAry[row + 1][col + 1] = 0;
+            }
             return true;
         }
         getDirectionList(index) {
@@ -120,23 +122,57 @@
             }
             const startPoint = { row: startData.row + 1, col: startData.col + 1 };
             const targetPoint = { row: targetData.row + 1, col: targetData.col + 1 };
-            const dfsAry = [];
-            for (let i = 0; i < this.row + 2; i++) {
-                for (let j = 0; j < this.col + 2; j++) {
-                    if (!dfsAry[i]) {
-                        dfsAry[i] = [];
-                    }
-                    if (i === 0 || j === 0 || i === this.row + 1 || j === this.col + 1) {
-                        dfsAry[i][j] = 0;
-                    }
-                    else {
-                        const cardData = this.data[i - 1][j - 1];
-                        dfsAry[i][j] = cardData ? 1 : 0;
+            if (!this._dfsAry) {
+                const dfsAry = [];
+                for (let i = 0; i < this.row + 2; i++) {
+                    for (let j = 0; j < this.col + 2; j++) {
+                        if (!dfsAry[i]) {
+                            dfsAry[i] = [];
+                        }
+                        if (i === 0 || j === 0 || i === this.row + 1 || j === this.col + 1) {
+                            dfsAry[i][j] = 0;
+                        }
+                        else {
+                            const cardData = this.data[i - 1][j - 1];
+                            dfsAry[i][j] = cardData ? 1 : 0;
+                        }
                     }
                 }
+                this._dfsAry = dfsAry;
             }
-            console.log(dfsAry);
-            return false;
+            console.log("dfsAry : ", this._dfsAry);
+            console.log("carData: ", this.data);
+            return this.dfsFunc(this._dfsAry, startPoint, targetPoint);
+        }
+        dfsFunc(list, sPoint, tPoint) {
+            const sData = list[sPoint.row][sPoint.col];
+            const tData = list[tPoint.row][tPoint.col];
+            if (!sData || !tData) {
+                return false;
+            }
+            const visitMap = {};
+            const dfs = (row, col) => {
+                if (row < 0 || row > list.length - 1) {
+                    return false;
+                }
+                if (col < 0 || col > list[0].length - 1) {
+                    return false;
+                }
+                const visitId = row + "_" + col;
+                if (visitMap[visitId]) {
+                    return false;
+                }
+                visitMap[visitId] = true;
+                const data = list[row][col];
+                if (data && !(row === tPoint.row && col === tPoint.col)) {
+                    return false;
+                }
+                if (row === tPoint.row && col === tPoint.col) {
+                    return true;
+                }
+                return dfs(row - 1, col) || dfs(row + 1, col) || dfs(row, col - 1) || dfs(row, col + 1);
+            };
+            return dfs(sPoint.row - 1, sPoint.col) || dfs(sPoint.row + 1, sPoint.col) || dfs(sPoint.row, sPoint.col - 1) || dfs(sPoint.row, sPoint.col + 1);
         }
     }
     class MahjongCardData {
@@ -255,7 +291,7 @@
                 const preItemData = this._list.getItem(this._preIdx);
                 const curItem = this._list.getCell(index).getChildByName("boxCard");
                 const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
-                if (curItemData.checkSame(preItemData)) {
+                if (curItemData.checkSame(preItemData) && this._proxy.model.checkDfs(curItemData, preItemData)) {
                     this.clearCardItem(curItem, index);
                     this.clearCardItem(preItem, this._preIdx);
                 }
@@ -272,10 +308,11 @@
             }
         }
         clearCardItem(box, index) {
+            const idx = index;
             ComUtils.setTween(box, true, Handler.create(this, () => {
                 const curImg = box.getChildByName("img");
                 curImg.skin = "";
-                this._proxy.model.deleteCard(index);
+                this._proxy.model.deleteCard(idx);
             }));
         }
         onClickMouseDown(index) {
