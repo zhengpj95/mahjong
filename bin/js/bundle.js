@@ -331,10 +331,10 @@
     }
     GameConfig.width = 640;
     GameConfig.height = 1136;
-    GameConfig.scaleMode = "fixedauto";
+    GameConfig.scaleMode = "showall";
     GameConfig.screenMode = "none";
-    GameConfig.alignV = "top";
-    GameConfig.alignH = "left";
+    GameConfig.alignV = "middle";
+    GameConfig.alignH = "center";
     GameConfig.startScene = "modules/mahjong/Mahjong.scene";
     GameConfig.sceneRoot = "";
     GameConfig.debug = false;

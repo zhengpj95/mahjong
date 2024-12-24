@@ -6,10 +6,10 @@ import MahjongMdr from "./modules/mahjong/MahjongMdr"
 export default class GameConfig{
     static width:number=640;
     static height:number=1136;
-    static scaleMode:string="fixedauto";
+    static scaleMode:string="showall";
     static screenMode:string="none";
-    static alignV:string="top";
-    static alignH:string="left";
+    static alignV:string="middle";
+    static alignH:string="center";
     static startScene:any="modules/mahjong/Mahjong.scene";
     static sceneRoot:string="";
     static debug:boolean=false;
