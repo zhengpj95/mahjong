@@ -11,7 +11,7 @@ var Dialog=laya.ui.Dialog;]]>   </codeImportsJS>
    <uiType>2   </uiType>
    <uiExportPath>bin/ui.json   </uiExportPath>
    <boxTypes>Sprite,Box,List,Tab,RadioGroup,ViewStack,Panel,HBox,VBox,Tree   </boxTypes>
-   <pageTypes>Scene,View,Dialog   </pageTypes>
+   <pageTypes>View,Box,Scene,Dialog   </pageTypes>
    <shareResPath/>
    <codeType>1   </codeType>
    <resCanCompress/>
