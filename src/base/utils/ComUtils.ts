@@ -35,4 +35,13 @@ export default class ComUtils {
     });
     return timeLine;
   }
+
+  public static setScale(box: UIComponent, scale = 1): void {
+    if (!box) {
+      return;
+    }
+    if (box.scaleX !== scale) {
+      box.scaleX = box.scaleY = scale;
+    }
+  }
 }

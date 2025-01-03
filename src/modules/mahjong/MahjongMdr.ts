@@ -7,6 +7,7 @@ import Handler = Laya.Handler;
 import Box = Laya.Box;
 import Image = Laya.Image;
 import Event = Laya.Event;
+import SoundManager = Laya.SoundManager;
 
 type BoxCard = Box & {
   boxCard: Box & {
@@ -33,6 +34,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
 
     Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
+    SoundManager.autoStopMusic = false;
+    SoundManager.playMusic("audio/mixkit-tick-tock-clock-timer-music.wav", 0);
   }
 
   onOpened(param: any) {
@@ -68,24 +71,26 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onClickItem(index: number): void {
+    SoundManager.playSound("audio/mixkit-flop.wav");
     if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
       const curItem = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       const preItem = <BoxCard>this._list.getCell(this._preIdx).getChildByName("boxCard");
       if (curItemData.checkSame(preItemData) && this._proxy.model.checkDfs(curItemData, preItemData)) {
+        ComUtils.setScale(curItem, 0.45);
         this.clearCardItem(curItem, index);
         this.clearCardItem(preItem, this._preIdx);
-        // console.log(11111, index, this._preIdx, curItemData, preItemData);
       } else {
-        ComUtils.setTween(curItem);
-        ComUtils.setTween(preItem);
+        ComUtils.setScale(curItem, 0.4);
+        ComUtils.setScale(preItem, 0.4);
       }
       this._preIdx = -1;
     } else {
       this._preIdx = index;
       const item = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
-      ComUtils.setTween(item);
+      // ComUtils.setTween(item);
+      ComUtils.setScale(item, 0.45);
     }
   }
 
