@@ -125,7 +125,7 @@ export class MahjongModel {
       this._astarMgr = new AStarMgr(this._dfsAry);
     }
     const paths = this._astarMgr.findPath([startPoint.row, startPoint.col], [targetPoint.row, targetPoint.col]);
-    return paths ?? [];
+    return paths || [];
   }
 
   public canConnect(startData: MahjongCardData, targetData: MahjongCardData): boolean {
