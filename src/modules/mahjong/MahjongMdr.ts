@@ -77,7 +77,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
       const curItem = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       const preItem = <BoxCard>this._list.getCell(this._preIdx).getChildByName("boxCard");
-      if (curItemData.checkSame(preItemData) && this._proxy.model.checkDfs(curItemData, preItemData)) {
+      if (curItemData.checkSame(preItemData) && this._proxy.model.canConnect(curItemData, preItemData)) {
         ComUtils.setScale(curItem, 0.45);
         this.clearCardItem(curItem, index);
         this.clearCardItem(preItem, this._preIdx);

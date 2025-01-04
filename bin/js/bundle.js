@@ -31,6 +31,141 @@
         })(modules = ui.modules || (ui.modules = {}));
     })(ui || (ui = {}));
 
+    class PathNode {
+        constructor(position, g, h, parent = null, direction = null) {
+            this.position = position;
+            this.g = g;
+            this.h = h;
+            this.parent = parent;
+            this.direction = direction;
+            if (this.getTurnCount()) {
+                this.g += 1;
+            }
+        }
+        get f() {
+            return this.g + this.h;
+        }
+        getTurnCount() {
+            if (!this.parent || !this.parent.direction || !this.direction) {
+                return 0;
+            }
+            return this.direction.toString() !== this.parent.direction.toString() ? 1 : 0;
+        }
+    }
+    class AStar {
+        constructor(grid) {
+            this._grid = grid;
+        }
+        heuristic(a, b) {
+            return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+        }
+        getNeighbors(node, end) {
+            const [x, y] = node.position;
+            const directions = [
+                [0, 1], [1, 0], [0, -1], [-1, 0],
+            ];
+            const list = directions.map(([dx, dy]) => [[x + dx, y + dy], [dx, dy]]);
+            return list.filter(([pos]) => end[0] === pos[0] && end[1] === pos[1]
+                ? this._grid.isInBounds(pos[0], pos[1])
+                : this._grid.isValid(pos[0], pos[1]));
+        }
+        findPath(start, end) {
+            const openList = [];
+            const closedSet = new Set();
+            const startNode = new PathNode(start, 0, this.heuristic(start, end));
+            openList.push(startNode);
+            while (openList.length > 0) {
+                openList.sort((a, b) => (a.f + a.getTurnCount()) - (b.f + b.getTurnCount()));
+                const currentNode = openList.shift();
+                if (currentNode.position[0] === end[0] && currentNode.position[1] === end[1]) {
+                    const path = [];
+                    let node = currentNode;
+                    while (node) {
+                        path.unshift(node.position);
+                        node = node.parent;
+                    }
+                    return path;
+                }
+                closedSet.add(currentNode.position.toString());
+                const neighbors = this.getNeighbors(currentNode, end);
+                for (const [neighborPos, direction] of neighbors) {
+                    if (closedSet.has(neighborPos.toString())) {
+                        continue;
+                    }
+                    const g = currentNode.g + 1;
+                    const h = this.heuristic(neighborPos, end);
+                    const existingNode = openList.find(node => node.position[0] === neighborPos[0] && node.position[1] === neighborPos[1]);
+                    if (!existingNode || g < existingNode.g) {
+                        if (existingNode) {
+                            openList.splice(openList.indexOf(existingNode), 1);
+                        }
+                        openList.push(new PathNode(neighborPos, g, h, currentNode, direction));
+                    }
+                }
+            }
+            return [];
+        }
+    }
+
+    var CellType;
+    (function (CellType) {
+        CellType[CellType["WALKABLE"] = 0] = "WALKABLE";
+        CellType[CellType["OBSTACLE"] = 1] = "OBSTACLE";
+    })(CellType || (CellType = {}));
+
+    class Grid {
+        constructor(gridData) {
+            this._gridData = gridData;
+        }
+        isValid(x, y) {
+            return this.isInBounds(x, y) && this._gridData[x][y] === CellType.WALKABLE;
+        }
+        isInBounds(x, y) {
+            return x >= 0 && x < this.rows && y >= 0 && y < this.cols;
+        }
+        getValue(x, y) {
+            if (!this.isInBounds(x, y)) {
+                throw new Error(`Grid.getValue(${x}, ${y}) are out of bounds.`);
+            }
+            return this._gridData[x][y];
+        }
+        setValue(x, y, val) {
+            if (!this.isInBounds(x, y)) {
+                throw new Error(`Grid.getValue(${x}, ${y}) are out of bounds.`);
+            }
+            this._gridData[x][y] = val;
+            return true;
+        }
+        get cols() {
+            return this._gridData[0].length;
+        }
+        get rows() {
+            return this._gridData.length;
+        }
+    }
+
+    class AStarMgr {
+        constructor(data) {
+            this.createAStar(data);
+        }
+        createAStar(data) {
+            this._grid = new Grid(data);
+            this._astar = new AStar(this._grid);
+        }
+        updateGrid(point, value) {
+            if (this._grid) {
+                return this._grid.setValue(point[0], point[1], value);
+            }
+            return false;
+        }
+        findPath(start, end) {
+            if (this._astar) {
+                return this._astar.findPath(start, end);
+            }
+            return [];
+        }
+    }
+
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const CARD_TYPE_LIST = [1, 2];
@@ -109,13 +244,6 @@
             }
             return true;
         }
-        getDirectionList(index) {
-            const leftIdx = Math.max(0, index - 1);
-            const rightIdx = Math.max(index + 1, this.col - 1);
-            const topIdx = Math.max(0, index - this.col);
-            const bottomIdx = Math.max(index + this.col, this.row - 1);
-            return [topIdx, rightIdx, bottomIdx, leftIdx];
-        }
         checkDfs(startData, targetData) {
             if (!startData || !targetData || !startData.checkSame(targetData)) {
                 return false;
@@ -139,40 +267,11 @@
                     }
                 }
                 this._dfsAry = dfsAry;
+                this._astarMgr = new AStarMgr(this._dfsAry);
             }
-            console.log("dfsAry : ", this._dfsAry);
-            console.log("carData: ", this.data);
-            return this.dfsFunc(this._dfsAry, startPoint, targetPoint);
-        }
-        dfsFunc(list, sPoint, tPoint) {
-            const sData = list[sPoint.row][sPoint.col];
-            const tData = list[tPoint.row][tPoint.col];
-            if (!sData || !tData) {
-                return false;
-            }
-            const visitMap = {};
-            const dfs = (row, col) => {
-                if (row < 0 || row > list.length - 1) {
-                    return false;
-                }
-                if (col < 0 || col > list[0].length - 1) {
-                    return false;
-                }
-                const visitId = row + "_" + col;
-                if (visitMap[visitId]) {
-                    return false;
-                }
-                visitMap[visitId] = true;
-                const data = list[row][col];
-                if (data && !(row === tPoint.row && col === tPoint.col)) {
-                    return false;
-                }
-                if (row === tPoint.row && col === tPoint.col) {
-                    return true;
-                }
-                return dfs(row - 1, col) || dfs(row + 1, col) || dfs(row, col - 1) || dfs(row, col + 1);
-            };
-            return dfs(sPoint.row - 1, sPoint.col) || dfs(sPoint.row + 1, sPoint.col) || dfs(sPoint.row, sPoint.col - 1) || dfs(sPoint.row, sPoint.col + 1);
+            const paths = this._astarMgr.findPath([startPoint.row, startPoint.col], [targetPoint.row, targetPoint.col]);
+            console.log(paths);
+            return !!paths.length;
         }
     }
     class MahjongCardData {
@@ -242,10 +341,19 @@
             });
             return timeLine;
         }
+        static setScale(box, scale = 1) {
+            if (!box) {
+                return;
+            }
+            if (box.scaleX !== scale) {
+                box.scaleX = box.scaleY = scale;
+            }
+        }
     }
 
     var Handler = Laya.Handler;
     var Event$1 = Laya.Event;
+    var SoundManager = Laya.SoundManager;
     class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         constructor() {
             super();
@@ -257,6 +365,8 @@
             this._list = this.getChildByName("listItem");
             this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
             Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
+            SoundManager.autoStopMusic = false;
+            SoundManager.playMusic("audio/mixkit-tick-tock-clock-timer-music.wav", 0);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -286,25 +396,27 @@
             item.on(Event$1.MOUSE_OUT, this, this.onClickMouseUp, [index]);
         }
         onClickItem(index) {
+            SoundManager.playSound("audio/mixkit-flop.wav");
             if (this._preIdx > -1 && index !== this._preIdx) {
                 const curItemData = this._list.getItem(index);
                 const preItemData = this._list.getItem(this._preIdx);
                 const curItem = this._list.getCell(index).getChildByName("boxCard");
                 const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
                 if (curItemData.checkSame(preItemData) && this._proxy.model.checkDfs(curItemData, preItemData)) {
+                    ComUtils.setScale(curItem, 0.45);
                     this.clearCardItem(curItem, index);
                     this.clearCardItem(preItem, this._preIdx);
                 }
                 else {
-                    ComUtils.setTween(curItem);
-                    ComUtils.setTween(preItem);
+                    ComUtils.setScale(curItem, 0.4);
+                    ComUtils.setScale(preItem, 0.4);
                 }
                 this._preIdx = -1;
             }
             else {
                 this._preIdx = index;
                 const item = this._list.getCell(index).getChildByName("boxCard");
-                ComUtils.setTween(item);
+                ComUtils.setScale(item, 0.45);
             }
         }
         clearCardItem(box, index) {

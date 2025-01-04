@@ -68,16 +68,18 @@ export class AStar {
   /**
    * 获取某个节点的所有邻居节点
    * @param node - 当前节点
+   * @param end - 目标点
    * @returns 邻居节点的位置数组和方向
    */
-  private getNeighbors(node: PathNode): [GridPoint, GridPoint][] {
+  private getNeighbors(node: PathNode, end: GridPoint): [GridPoint, GridPoint][] {
     const [x, y] = node.position;
     const directions: GridPoint[] = [
       [0, 1], [1, 0], [0, -1], [-1, 0], // 上下左右四个方向
     ];
-    return directions
-      .map(([dx, dy]) => ([[x + dx, y + dy], [dx, dy]] as [GridPoint, GridPoint]))
-      .filter(([pos]) => this._grid.isValid(pos[0], pos[1]));
+    const list = directions.map(([dx, dy]) => ([[x + dx, y + dy], [dx, dy]] as [GridPoint, GridPoint]));
+    return list.filter(([pos]) => end[0] === pos[0] && end[1] === pos[1]
+      ? this._grid.isInBounds(pos[0], pos[1])
+      : this._grid.isValid(pos[0], pos[1]));
   }
 
   /**
@@ -114,7 +116,7 @@ export class AStar {
       closedSet.add(currentNode.position.toString());
 
       // 遍历当前节点的邻居
-      const neighbors = this.getNeighbors(currentNode);
+      const neighbors = this.getNeighbors(currentNode, end);
       for (const [neighborPos, direction] of neighbors) {
         if (closedSet.has(neighborPos.toString())) {
           continue; // 如果邻居已处理，跳过

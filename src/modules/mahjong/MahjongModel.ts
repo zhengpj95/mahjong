@@ -1,4 +1,5 @@
 import { CardType, FengType } from "@def/mahjong";
+import { AStarMgr, GridPoint } from "@base/astar";
 
 /**
  * @date 2024/12/22
@@ -30,7 +31,7 @@ export class MahjongModel {
   }
 
   // 麻将牌类型集
-  public getMahjongCardList(): CardData[] {
+  private getMahjongCardList(): CardData[] {
     const list: CardData[] = [];
     for (let type of CARD_TYPE_LIST) {
       for (let num of CARD_NUM_LIST) {
@@ -45,7 +46,7 @@ export class MahjongModel {
 
   private _rowColStrList: string[];
 
-  public getRowColStrList(): string[] {
+  private getRowColStrList(): string[] {
     if (!this._rowColStrList) {
       const rst: string[] = [];
       for (let i = 0; i < this.row; i++) {
@@ -58,7 +59,7 @@ export class MahjongModel {
     return this._rowColStrList;
   }
 
-  public getRandomRowCol(): number[] {
+  private getRandomRowCol(): number[] {
     const list = this.getRowColStrList();
     const idx = Math.random() * list.length >> 0;
     const listItem = list.splice(idx, 1)[0];
@@ -95,21 +96,13 @@ export class MahjongModel {
     return true;
   }
 
-  // 获取点击的牌【上右下左】非空牌的序号 todo 非空牌
-  public getDirectionList(index: number): number[] {
-    const leftIdx = Math.max(0, index - 1);
-    const rightIdx = Math.max(index + 1, this.col - 1);
-    const topIdx = Math.max(0, index - this.col);
-    const bottomIdx = Math.max(index + this.col, this.row - 1);
-    return [topIdx, rightIdx, bottomIdx, leftIdx];
-  }
-
   private _dfsAry: number[][];
+  private _astarMgr: AStarMgr;
 
   // dfs检查是否可以消除
-  public checkDfs(startData: MahjongCardData, targetData: MahjongCardData): boolean {
+  public findPath(startData: MahjongCardData, targetData: MahjongCardData): GridPoint[] {
     if (!startData || !targetData || !startData.checkSame(targetData)) {
-      return false;
+      return [];
     }
     const startPoint: CardPoint = { row: startData.row + 1, col: startData.col + 1 };
     const targetPoint: CardPoint = { row: targetData.row + 1, col: targetData.col + 1 };
@@ -129,41 +122,15 @@ export class MahjongModel {
         }
       }
       this._dfsAry = dfsAry;
+      this._astarMgr = new AStarMgr(this._dfsAry);
     }
-    console.log("dfsAry : ", this._dfsAry);
-    console.log("carData: ", this.data);
-    return this.dfsFunc(this._dfsAry, startPoint, targetPoint);
+    const paths = this._astarMgr.findPath([startPoint.row, startPoint.col], [targetPoint.row, targetPoint.col]);
+    return paths ?? [];
   }
 
-  private dfsFunc(list: number[][], sPoint: CardPoint, tPoint: CardPoint): boolean {
-    const sData = list[sPoint.row][sPoint.col];
-    const tData = list[tPoint.row][tPoint.col];
-    if (!sData || !tData) {
-      return false;
-    }
-    const visitMap = {};
-    const dfs = (row: number, col: number): boolean => {
-      if (row < 0 || row > list.length - 1) {
-        return false;
-      }
-      if (col < 0 || col > list[0].length - 1) {
-        return false;
-      }
-      const visitId = row + "_" + col;
-      if (visitMap[visitId]) {
-        return false;
-      }
-      visitMap[visitId] = true;
-      const data = list[row][col];
-      if (data && !(row === tPoint.row && col === tPoint.col)) {
-        return false;
-      }
-      if (row === tPoint.row && col === tPoint.col) {
-        return true;//找到
-      }
-      return dfs(row - 1, col) || dfs(row + 1, col) || dfs(row, col - 1) || dfs(row, col + 1);
-    };
-    return dfs(sPoint.row - 1, sPoint.col) || dfs(sPoint.row + 1, sPoint.col) || dfs(sPoint.row, sPoint.col - 1) || dfs(sPoint.row, sPoint.col + 1);
+  public canConnect(startData: MahjongCardData, targetData: MahjongCardData): boolean {
+    const paths = this.findPath(startData, targetData);
+    return !!paths.length;
   }
 }
 
