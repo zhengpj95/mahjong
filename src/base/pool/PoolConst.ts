@@ -3,7 +3,7 @@
  * @date 2025/1/4
  */
 export interface PoolObject {
-  alloc(): void;
+  onAlloc(): void;
 
-  free(): void;
+  onFree(): void;
 }

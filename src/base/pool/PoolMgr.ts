@@ -57,7 +57,7 @@ class PoolMgr {
    * 放入一个对象
    * @param obj
    */
-  public release(obj: any): boolean {
+  public free(obj: any): boolean {
     if (!obj) {
       return false;
     }
@@ -67,8 +67,8 @@ class PoolMgr {
       return false;
     }
     // 若是此对象实现了 IPoolObject 接口，则需要调用对应的 onRelease 方法
-    if (obj["onRelease"] && typeof (obj["onRelease"]) == "function") {
-      obj["onRelease"]();
+    if (obj["onFree"] && typeof (obj["onFree"]) == "function") {
+      obj["onFree"]();
     }
     this._poolMap[refKey].push(obj);
     return true;
