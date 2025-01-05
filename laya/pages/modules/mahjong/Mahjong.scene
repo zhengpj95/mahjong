@@ -1,12 +1,12 @@
 {
     "x":0,
     "type":"Scene",
-    "selectedBox":8,
-    "selecteID":9,
+    "selectedBox":2,
+    "selecteID":14,
     "searchKey":"Scene",
     "props":{"width":640,"sceneColor":"#aa110e","runtime":"modules/mahjong/MahjongMdr.ts","height":1136},
     "nodeParent":-1,
-    "maxID":13,
+    "maxID":16,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -35,14 +35,13 @@
             "props":{"width":555,"spaceY":3,"spaceX":3,"repeatY":8,"repeatX":10,"name":"listItem","height":590,"centerY":0,"centerX":0},
             "nodeParent":2,
             "label":"listItem",
-            "isOpen":true,
+            "isOpen":false,
             "isDirectory":true,
             "isAniNode":true,
             "hasChild":true,
             "compId":7,
             "child":[
                 {
-                    "x":30,
                     "type":"Box",
                     "searchKey":"Box,render",
                     "props":{"y":4,"x":4,"width":52,"name":"render","height":70},
@@ -55,7 +54,6 @@
                     "compId":8,
                     "child":[
                         {
-                            "x":45,
                             "type":"Box",
                             "selectedBox":3,
                             "selecteID":4,
@@ -94,6 +92,35 @@
                                 }]
                         }]
                 }]
+        },
+        {
+            "x":15,
+            "type":"Button",
+            "searchKey":"Button,btnTips",
+            "props":{"y":893,"skin":"common/button.png","name":"btnTips","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"提示","centerX":-100},
+            "nodeParent":2,
+            "label":"btnTips",
+            "isOpen":true,
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":13,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Button",
+            "searchKey":"Button,btnRefresh",
+            "props":{"y":893,"stateNum":"3","skin":"common/button.png","name":"btnRefresh","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"洗牌","centerX":100},
+            "nodeParent":2,
+            "label":"btnRefresh",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":14,
+            "child":[
+                ]
         }],
     "animations":[
         {

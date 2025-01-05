@@ -8,12 +8,15 @@ import Box = Laya.Box;
 import Image = Laya.Image;
 import Event = Laya.Event;
 import SoundManager = Laya.SoundManager;
+import Button = Laya.Button;
 
 type BoxCard = Box & {
   boxCard: Box & {
     img: Image;
   }
 }
+const INIT_SCALE = 0.4;
+const BIG_SCALE = 0.45;
 
 /**
  * @date 2024/12/22
@@ -22,6 +25,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private _proxy: MahjongProxy;
   private _list: List;
   private _preIdx = -1;
+  private _btnTips: Button;
+  private _btnRefresh: Button;
 
   constructor() {
     super();
@@ -32,6 +37,11 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     super.createChildren();
     this._list = <List>this.getChildByName("listItem");
     this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
+
+    this._btnTips = <Button>this.getChildByName("btnTips");
+    this._btnRefresh = <Button>this.getChildByName("btnRefresh");
+    this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
+    this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
 
     Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
     SoundManager.autoStopMusic = false;
@@ -49,9 +59,9 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   private onLoadedSuccess(): void {
     console.log("11111 onLoadedSuccess");
+    this._proxy.model.updateData(8, 10);
     const list = this._proxy.model.getMahjongData();
     this._list.array = list.reduce((a, b) => a.concat(b));
-    console.log(list);
   }
 
   private onRenderListItem(item: BoxCard, index: number): void {
@@ -78,19 +88,18 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       const curItem = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       const preItem = <BoxCard>this._list.getCell(this._preIdx).getChildByName("boxCard");
       if (curItemData.checkSame(preItemData) && this._proxy.model.canConnect(curItemData, preItemData)) {
-        ComUtils.setScale(curItem, 0.45);
+        ComUtils.setScale(curItem, BIG_SCALE);
         this.clearCardItem(curItem, index);
         this.clearCardItem(preItem, this._preIdx);
       } else {
-        ComUtils.setScale(curItem, 0.4);
-        ComUtils.setScale(preItem, 0.4);
+        ComUtils.setScale(curItem, INIT_SCALE);
+        ComUtils.setScale(preItem, INIT_SCALE);
       }
       this._preIdx = -1;
     } else {
       this._preIdx = index;
       const item = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
-      // ComUtils.setTween(item);
-      ComUtils.setScale(item, 0.45);
+      ComUtils.setScale(item, BIG_SCALE);
     }
   }
 
@@ -108,6 +117,26 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onClickMouseUp(index: number): void {
+    //
+  }
+
+  // 提示
+  private onBtnTips(): void {
+    const cardList = this._proxy.model.getTipsCardDataList();
+    if (cardList.length) {
+      const cells = this._list.cells || [];
+      for (let card of cardList) {
+        const idx = card.row * this._proxy.model.col + card.col;
+        const cardItem = <BoxCard>cells[idx].getChildByName("boxCard");
+        if (cardItem) {
+          ComUtils.setTween(cardItem);
+        }
+      }
+    }
+  }
+
+  // 洗牌
+  private onBtnRefresh(): void {
     //
   }
 }

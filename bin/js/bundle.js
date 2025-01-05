@@ -174,18 +174,29 @@
         [1]: "tong",
         [3]: "wan",
         [2]: "tiao",
-        [4]: "feng",
+        [4]: "feng"
     };
     class MahjongModel {
         constructor() {
-            this.row = 8;
-            this.col = 10;
+            this.row = 0;
+            this.col = 0;
             this.data = [];
+            this._rowColStrList = [];
+            this._pathData = [];
+            this._connectCardMap = {};
         }
-        updateRowCol(row = 8, col = 10) {
+        updateData(row = 8, col = 10) {
             this.row = row;
             this.col = col;
             this.data = [];
+        }
+        clearData() {
+            this.row = 0;
+            this.col = 0;
+            this.data.length = 0;
+            this._pathData.length = 0;
+            this._astarMgr = undefined;
+            this._rowColStrList.length = 0;
         }
         getMahjongCardList() {
             const list = [];
@@ -200,7 +211,7 @@
             return list;
         }
         getRowColStrList() {
-            if (!this._rowColStrList) {
+            if (!this._rowColStrList.length) {
                 const rst = [];
                 for (let i = 0; i < this.row; i++) {
                     for (let j = 0; j < this.col; j++) {
@@ -239,18 +250,18 @@
                 return false;
             }
             this.data[row][col] = undefined;
-            if (this._dfsAry) {
-                this._dfsAry[row + 1][col + 1] = 0;
+            if (this._pathData.length) {
+                this._pathData[row + 1][col + 1] = 0;
             }
             return true;
         }
-        checkDfs(startData, targetData) {
+        findPath(startData, targetData) {
             if (!startData || !targetData || !startData.checkSame(targetData)) {
-                return false;
+                return [];
             }
             const startPoint = { row: startData.row + 1, col: startData.col + 1 };
             const targetPoint = { row: targetData.row + 1, col: targetData.col + 1 };
-            if (!this._dfsAry) {
+            if (!this._astarMgr) {
                 const dfsAry = [];
                 for (let i = 0; i < this.row + 2; i++) {
                     for (let j = 0; j < this.col + 2; j++) {
@@ -266,12 +277,61 @@
                         }
                     }
                 }
-                this._dfsAry = dfsAry;
-                this._astarMgr = new AStarMgr(this._dfsAry);
+                this._pathData = dfsAry;
+                this._astarMgr = new AStarMgr(this._pathData);
             }
             const paths = this._astarMgr.findPath([startPoint.row, startPoint.col], [targetPoint.row, targetPoint.col]);
-            console.log(paths);
+            return paths || [];
+        }
+        canConnect(startData, targetData) {
+            const paths = this.findPath(startData, targetData);
             return !!paths.length;
+        }
+        getConnectCardDataList(cardData) {
+            if (!cardData) {
+                return [];
+            }
+            const rst = [];
+            for (let data of this.data) {
+                for (let item of data) {
+                    if (item && item.checkSame(cardData)) {
+                        rst.push(item);
+                    }
+                }
+            }
+            this._connectCardMap[cardData.cardData.toString()] = rst;
+            return rst;
+        }
+        getTipsCardDataList() {
+            if (!this.data.length) {
+                return [];
+            }
+            let minPath = Number.MAX_SAFE_INTEGER;
+            let rst = [];
+            for (let rows of this.data) {
+                for (let item of rows) {
+                    if (!item)
+                        continue;
+                    const connectList = this.getConnectCardDataList(item);
+                    if (!connectList.length)
+                        continue;
+                    for (let card of connectList) {
+                        if (!card || card.checkPos(item))
+                            continue;
+                        const paths = this.findPath(item, card);
+                        if (!paths.length)
+                            continue;
+                        if (paths.length === 2) {
+                            return [item, card];
+                        }
+                        if (paths.length < minPath) {
+                            rst = [item, card];
+                            minPath = paths.length;
+                        }
+                    }
+                }
+            }
+            return rst;
         }
     }
     class MahjongCardData {
@@ -291,6 +351,12 @@
                 return false;
             }
             return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
+        }
+        checkPos(data) {
+            if (!data) {
+                return false;
+            }
+            return data.row === this.row && data.col === this.col;
         }
     }
 
@@ -354,6 +420,8 @@
     var Handler = Laya.Handler;
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
+    const INIT_SCALE = 0.4;
+    const BIG_SCALE = 0.45;
     class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         constructor() {
             super();
@@ -364,6 +432,10 @@
             super.createChildren();
             this._list = this.getChildByName("listItem");
             this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
+            this._btnTips = this.getChildByName("btnTips");
+            this._btnRefresh = this.getChildByName("btnRefresh");
+            this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
+            this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
             Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
             SoundManager.autoStopMusic = false;
             SoundManager.playMusic("audio/mixkit-tick-tock-clock-timer-music.wav", 0);
@@ -377,9 +449,9 @@
         }
         onLoadedSuccess() {
             console.log("11111 onLoadedSuccess");
+            this._proxy.model.updateData(8, 10);
             const list = this._proxy.model.getMahjongData();
             this._list.array = list.reduce((a, b) => a.concat(b));
-            console.log(list);
         }
         onRenderListItem(item, index) {
             const img = item.getChildByName("boxCard").getChildByName("img");
@@ -402,21 +474,21 @@
                 const preItemData = this._list.getItem(this._preIdx);
                 const curItem = this._list.getCell(index).getChildByName("boxCard");
                 const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
-                if (curItemData.checkSame(preItemData) && this._proxy.model.checkDfs(curItemData, preItemData)) {
-                    ComUtils.setScale(curItem, 0.45);
+                if (curItemData.checkSame(preItemData) && this._proxy.model.canConnect(curItemData, preItemData)) {
+                    ComUtils.setScale(curItem, BIG_SCALE);
                     this.clearCardItem(curItem, index);
                     this.clearCardItem(preItem, this._preIdx);
                 }
                 else {
-                    ComUtils.setScale(curItem, 0.4);
-                    ComUtils.setScale(preItem, 0.4);
+                    ComUtils.setScale(curItem, INIT_SCALE);
+                    ComUtils.setScale(preItem, INIT_SCALE);
                 }
                 this._preIdx = -1;
             }
             else {
                 this._preIdx = index;
                 const item = this._list.getCell(index).getChildByName("boxCard");
-                ComUtils.setScale(item, 0.45);
+                ComUtils.setScale(item, BIG_SCALE);
             }
         }
         clearCardItem(box, index) {
@@ -430,6 +502,21 @@
         onClickMouseDown(index) {
         }
         onClickMouseUp(index) {
+        }
+        onBtnTips() {
+            const cardList = this._proxy.model.getTipsCardDataList();
+            if (cardList.length) {
+                const cells = this._list.cells || [];
+                for (let card of cardList) {
+                    const idx = card.row * this._proxy.model.col + card.col;
+                    const cardItem = cells[idx].getChildByName("boxCard");
+                    if (cardItem) {
+                        ComUtils.setTween(cardItem);
+                    }
+                }
+            }
+        }
+        onBtnRefresh() {
         }
     }
 
