@@ -24,9 +24,10 @@ export class MahjongModel {
   public col = 0;
   public data: MahjongCardData[][] = [];
 
-  private _rowColStrList: string[] = [];
+  private _rowColStrList: string[];
   private _pathData: number[][] = [];
   private _astarMgr: AStarMgr;
+  private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
 
   public updateData(row: number = 8, col: number = 10): void {
     this.row = row;
@@ -41,7 +42,8 @@ export class MahjongModel {
     this.data.length = 0;
     this._pathData.length = 0;
     this._astarMgr = <any>undefined;
-    this._rowColStrList.length = 0;
+    this._rowColStrList = <any>undefined;
+    this._sameCardMap = {};
   }
 
   // 麻将牌类型集
@@ -60,7 +62,7 @@ export class MahjongModel {
 
 
   private getRowColStrList(): string[] {
-    if (!this._rowColStrList.length) {
+    if (!this._rowColStrList) {
       const rst: string[] = [];
       for (let i = 0; i < this.row; i++) {
         for (let j = 0; j < this.col; j++) {
@@ -69,7 +71,7 @@ export class MahjongModel {
       }
       this._rowColStrList = rst;
     }
-    return this._rowColStrList;
+    return this._rowColStrList || [];
   }
 
   private getRandomRowCol(): number[] {
@@ -143,12 +145,15 @@ export class MahjongModel {
     return !!paths.length;
   }
 
-  private _connectCardMap = {};
 
-  // 根据某张牌得到剩余相同牌的信息
+  // 根据某张牌得到相同牌的信息
   public getConnectCardDataList(cardData: MahjongCardData): MahjongCardData[] {
     if (!cardData) {
       return [];
+    }
+    const cardKey = cardData.cardData.toString();
+    if (this._sameCardMap[cardKey]) {
+      return this._sameCardMap[cardKey] || [];
     }
     const rst: MahjongCardData[] = [];
     for (let data of this.data) {
@@ -158,7 +163,7 @@ export class MahjongModel {
         }
       }
     }
-    this._connectCardMap[cardData.cardData.toString()] = rst;
+    this._sameCardMap[cardKey] = rst;
     return rst;
   }
 
@@ -176,6 +181,7 @@ export class MahjongModel {
         if (!connectList.length) continue;
         for (let card of connectList) {
           if (!card || card.checkPos(item)) continue;
+          if (!this.data[card.row][card.col]) continue;
           const paths = this.findPath(item, card);
           if (!paths.length) continue;
           if (paths.length === 2) {

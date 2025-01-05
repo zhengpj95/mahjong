@@ -181,9 +181,8 @@
             this.row = 0;
             this.col = 0;
             this.data = [];
-            this._rowColStrList = [];
             this._pathData = [];
-            this._connectCardMap = {};
+            this._sameCardMap = {};
         }
         updateData(row = 8, col = 10) {
             this.row = row;
@@ -196,7 +195,8 @@
             this.data.length = 0;
             this._pathData.length = 0;
             this._astarMgr = undefined;
-            this._rowColStrList.length = 0;
+            this._rowColStrList = undefined;
+            this._sameCardMap = {};
         }
         getMahjongCardList() {
             const list = [];
@@ -211,7 +211,7 @@
             return list;
         }
         getRowColStrList() {
-            if (!this._rowColStrList.length) {
+            if (!this._rowColStrList) {
                 const rst = [];
                 for (let i = 0; i < this.row; i++) {
                     for (let j = 0; j < this.col; j++) {
@@ -220,7 +220,7 @@
                 }
                 this._rowColStrList = rst;
             }
-            return this._rowColStrList;
+            return this._rowColStrList || [];
         }
         getRandomRowCol() {
             const list = this.getRowColStrList();
@@ -291,6 +291,10 @@
             if (!cardData) {
                 return [];
             }
+            const cardKey = cardData.cardData.toString();
+            if (this._sameCardMap[cardKey]) {
+                return this._sameCardMap[cardKey] || [];
+            }
             const rst = [];
             for (let data of this.data) {
                 for (let item of data) {
@@ -299,7 +303,7 @@
                     }
                 }
             }
-            this._connectCardMap[cardData.cardData.toString()] = rst;
+            this._sameCardMap[cardKey] = rst;
             return rst;
         }
         getTipsCardDataList() {
@@ -317,6 +321,8 @@
                         continue;
                     for (let card of connectList) {
                         if (!card || card.checkPos(item))
+                            continue;
+                        if (!this.data[card.row][card.col])
                             continue;
                         const paths = this.findPath(item, card);
                         if (!paths.length)

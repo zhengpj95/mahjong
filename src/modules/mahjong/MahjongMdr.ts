@@ -122,6 +122,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   // 提示
   private onBtnTips(): void {
+    // 检查次数，有就继续，没有则拉起广告，给予次数 todo
     const cardList = this._proxy.model.getTipsCardDataList();
     if (cardList.length) {
       const cells = this._list.cells || [];
@@ -137,6 +138,6 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   // 洗牌
   private onBtnRefresh(): void {
-    //
+    // 检查次数，有就继续，没有则拉起广告，给予次数 todo
   }
 }
