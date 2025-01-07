@@ -4,13 +4,19 @@
 
 function getQualifiedClassName(value: any) {
   const type = typeof value;
-  if (!value || (type != "object" && !value.prototype)) {
+  if (!value || (type !== "object" && !value.prototype)) {
     return type;
   }
+
   const prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
-  if (prototype.hasOwnProperty("__class__")) {
+  if (prototype.hasOwnProperty("__class__") && prototype["__class__"]) {
     return prototype["__class__"];
+  } else if (type === "function" && value.name) {
+    return value.name;
+  } else if (prototype.constructor && prototype.constructor.name) {
+    return prototype.constructor.name;
   }
+
   const constructorString = prototype.constructor.toString().trim();
   const index = constructorString.indexOf("(");
   const className = constructorString.substring(9, index);
@@ -21,6 +27,8 @@ function getQualifiedClassName(value: any) {
   });
   return className;
 }
+
+const PoolObjectName = "PoolObjectName";
 
 class PoolMgr {
   private _poolMap: any = {};
@@ -49,7 +57,7 @@ class PoolMgr {
     if (clazz["onAlloc"] && typeof (clazz["onAlloc"]) == "function") {
       clazz["onAlloc"]();
     }
-    clazz.ObjectPoolKey = className;
+    clazz[`${PoolObjectName}`] = className;
     return clazz;
   }
 
@@ -61,7 +69,7 @@ class PoolMgr {
     if (!obj) {
       return false;
     }
-    let refKey: any = obj.ObjectPoolKey;
+    let refKey: string = obj[`${PoolObjectName}`];
     // 保证只有对象池中取出来的对象才可以放进来（已经清除的无法放入）
     if (!refKey || !this._poolMap[refKey] || this._poolMap[refKey].indexOf(obj) > -1) {
       return false;
@@ -94,3 +102,6 @@ class PoolMgr {
 
 const poolMgr = new PoolMgr();
 export default poolMgr;
+if (window) {
+  window["poolMgr"] = poolMgr;
+}
