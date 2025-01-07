@@ -1,5 +1,7 @@
 import { CardType, FengType } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar";
+import { PoolObject } from "@base/pool/PoolConst";
+import poolMgr from "@base/pool/PoolMgr";
 
 /**
  * @date 2024/12/22
@@ -89,7 +91,7 @@ export class MahjongModel {
         if (!this.data[randomItemAry[0]]) {
           this.data[randomItemAry[0]] = [];
         }
-        const cardData = new MahjongCardData();
+        const cardData = poolMgr.alloc(MahjongCardData);
         cardData.updateInfo(randomItemAry[0], randomItemAry[1], item);
         this.data[randomItemAry[0]][randomItemAry[1]] = cardData;
       }
@@ -104,6 +106,7 @@ export class MahjongModel {
     if (!this.data || !this.data[row]) {
       return false;
     }
+    poolMgr.free(this.data[row][col]);
     this.data[row][col] = undefined;
     if (this._pathData.length) {
       this._pathData[row + 1][col + 1] = 0;
@@ -199,7 +202,7 @@ export class MahjongModel {
 }
 
 /**单张麻将的数据*/
-export class MahjongCardData {
+export class MahjongCardData implements PoolObject {
   public row: number;
   public col: number;
   public cardData: CardData;
@@ -229,5 +232,15 @@ export class MahjongCardData {
       return false;
     }
     return data.row === this.row && data.col === this.col;
+  }
+
+  onAlloc(): void {
+    this.row = 0;
+    this.col = 0;
+    this.cardData = <any>undefined;
+  }
+
+  onFree(): void {
+    this.onAlloc();
   }
 }
