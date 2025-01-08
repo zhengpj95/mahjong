@@ -166,6 +166,90 @@
         }
     }
 
+    function getQualifiedClassName(value) {
+        const type = typeof value;
+        if (!value || (type !== "object" && !value.prototype)) {
+            return type;
+        }
+        const prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
+        if (prototype.hasOwnProperty("__class__") && prototype["__class__"]) {
+            return prototype["__class__"];
+        }
+        else if (type === "function" && value.name) {
+            return value.name;
+        }
+        else if (prototype.constructor && prototype.constructor.name) {
+            return prototype.constructor.name;
+        }
+        const constructorString = prototype.constructor.toString().trim();
+        const index = constructorString.indexOf("(");
+        const className = constructorString.substring(9, index);
+        Object.defineProperty(prototype, "__class__", {
+            value: className,
+            enumerable: false,
+            writable: true
+        });
+        return className;
+    }
+    const PoolObjectName = "__PoolObjectName__";
+    class PoolManager {
+        constructor() {
+            this._poolMap = {};
+        }
+        alloc(cls, ...args) {
+            let className = getQualifiedClassName(cls);
+            if (!this._poolMap[className]) {
+                this._poolMap[className] = [];
+            }
+            let list = this._poolMap[className];
+            if (list.length) {
+                let vo = list.pop();
+                if (vo["onAlloc"] && typeof (vo["onAlloc"]) === "function") {
+                    vo["onAlloc"]();
+                }
+                return vo;
+            }
+            let clazz = new cls(...args);
+            if (clazz["onAlloc"] && typeof (clazz["onAlloc"]) === "function") {
+                clazz["onAlloc"]();
+            }
+            clazz[`${PoolObjectName}`] = className;
+            return clazz;
+        }
+        free(obj) {
+            if (!obj) {
+                return false;
+            }
+            let refKey = obj[`${PoolObjectName}`];
+            if (!refKey || !this._poolMap[refKey] || this._poolMap[refKey].indexOf(obj) > -1) {
+                return false;
+            }
+            if (obj["onFree"] && typeof (obj["onFree"]) === "function") {
+                obj["onFree"]();
+            }
+            this._poolMap[refKey].push(obj);
+            return true;
+        }
+        clear() {
+            this._poolMap = {};
+        }
+        getContent() {
+            return this._poolMap;
+        }
+        setCount(count = 5) {
+            for (let key in this._poolMap) {
+                let list = this._poolMap[key];
+                if (list.length > count) {
+                    list.length = count;
+                }
+            }
+        }
+    }
+    const poolMgr = new PoolManager();
+    if (window) {
+        window["poolMgr"] = poolMgr;
+    }
+
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const CARD_TYPE_LIST = [1, 2];
@@ -236,7 +320,7 @@
                     if (!this.data[randomItemAry[0]]) {
                         this.data[randomItemAry[0]] = [];
                     }
-                    const cardData = new MahjongCardData();
+                    const cardData = poolMgr.alloc(MahjongCardData);
                     cardData.updateInfo(randomItemAry[0], randomItemAry[1], item);
                     this.data[randomItemAry[0]][randomItemAry[1]] = cardData;
                 }
@@ -249,6 +333,7 @@
             if (!this.data || !this.data[row]) {
                 return false;
             }
+            poolMgr.free(this.data[row][col]);
             this.data[row][col] = undefined;
             if (this._pathData.length) {
                 this._pathData[row + 1][col + 1] = 0;
@@ -259,8 +344,6 @@
             if (!startData || !targetData || !startData.checkSame(targetData)) {
                 return [];
             }
-            const startPoint = { row: startData.row + 1, col: startData.col + 1 };
-            const targetPoint = { row: targetData.row + 1, col: targetData.col + 1 };
             if (!this._astarMgr) {
                 const dfsAry = [];
                 for (let i = 0; i < this.row + 2; i++) {
@@ -280,7 +363,7 @@
                 this._pathData = dfsAry;
                 this._astarMgr = new AStarMgr(this._pathData);
             }
-            const paths = this._astarMgr.findPath([startPoint.row, startPoint.col], [targetPoint.row, targetPoint.col]);
+            const paths = this._astarMgr.findPath([startData.row + 1, startData.col + 1], [targetData.row + 1, targetData.col + 1]);
             return paths || [];
         }
         canConnect(startData, targetData) {
@@ -339,12 +422,45 @@
             }
             return rst;
         }
+        getLeaveCardDataList() {
+            return this.data.reduce((arr, item) => {
+                return arr.concat(item.filter(card => card && card.isValid()));
+            }, []);
+        }
+        getRefreshCardDataList() {
+            const list = this.getLeaveCardDataList();
+            console.log(list);
+            this._astarMgr = undefined;
+            this._rowColStrList = undefined;
+            this.data = [];
+            for (let i = 0; i < this.row; i++) {
+                this.data[i] = new Array(this.col).fill(undefined);
+            }
+            this._pathData = [];
+            for (let card of list) {
+                if (!card) {
+                    continue;
+                }
+                const random = this.getRandomRowCol();
+                if (!this.data[random[0]]) {
+                    this.data[random[0]] = new Array(this.col).fill(undefined);
+                }
+                card.updateInfo(random[0], random[1], card.cardData);
+                this.data[random[0]][random[1]] = card;
+            }
+            console.log(this.data);
+            return this.data;
+        }
     }
     class MahjongCardData {
         updateInfo(row, col, data) {
             this.row = row;
             this.col = col;
             this.cardData = data;
+            this["cardName"] = CardTypeName[data[0]] + data[1];
+        }
+        isValid() {
+            return this.cardData && this.cardData.length > 0;
         }
         getIcon() {
             if (!this.cardData) {
@@ -363,6 +479,14 @@
                 return false;
             }
             return data.row === this.row && data.col === this.col;
+        }
+        onAlloc() {
+            this.row = 0;
+            this.col = 0;
+            this.cardData = undefined;
+        }
+        onFree() {
+            this.onAlloc();
         }
     }
 
@@ -468,6 +592,7 @@
             }
             item.tag = data;
             img.skin = data.getIcon();
+            ComUtils.setScale(item.getChildByName("boxCard"), INIT_SCALE);
             item.on(Event$1.CLICK, this, this.onClickItem, [index]);
             item.on(Event$1.MOUSE_DOWN, this, this.onClickMouseDown, [index]);
             item.on(Event$1.MOUSE_UP, this, this.onClickMouseUp, [index]);
@@ -523,6 +648,9 @@
             }
         }
         onBtnRefresh() {
+            const list = this._proxy.model.getRefreshCardDataList();
+            this._list.array = list.reduce((a, b) => a.concat(b));
+            this._list.refresh();
         }
     }
 
