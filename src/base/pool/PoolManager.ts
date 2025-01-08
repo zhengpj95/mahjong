@@ -1,4 +1,6 @@
 /**
+ * 对象池处理
+ * @author zpj
  * @date 2025/1/4
  */
 
@@ -28,9 +30,9 @@ function getQualifiedClassName(value: any) {
   return className;
 }
 
-const PoolObjectName = "PoolObjectName";
+const PoolObjectName = "__PoolObjectName__";
 
-class PoolMgr {
+class PoolManager {
   private _poolMap: any = {};
 
   /**
@@ -46,7 +48,7 @@ class PoolMgr {
     let list: any[] = this._poolMap[className];
     if (list.length) {
       let vo = list.pop();
-      if (vo["onAlloc"] && typeof (vo["onAlloc"]) == "function") {
+      if (vo["onAlloc"] && typeof (vo["onAlloc"]) === "function") {
         vo["onAlloc"]();
       }
       return vo;
@@ -54,7 +56,7 @@ class PoolMgr {
 
     let clazz: any = new cls(...args);
     // 若是此对象实现了 IPoolObject 接口，则需要调用对应的 onAlloc 方法
-    if (clazz["onAlloc"] && typeof (clazz["onAlloc"]) == "function") {
+    if (clazz["onAlloc"] && typeof (clazz["onAlloc"]) === "function") {
       clazz["onAlloc"]();
     }
     clazz[`${PoolObjectName}`] = className;
@@ -75,7 +77,7 @@ class PoolMgr {
       return false;
     }
     // 若是此对象实现了 IPoolObject 接口，则需要调用对应的 onRelease 方法
-    if (obj["onFree"] && typeof (obj["onFree"]) == "function") {
+    if (obj["onFree"] && typeof (obj["onFree"]) === "function") {
       obj["onFree"]();
     }
     this._poolMap[refKey].push(obj);
@@ -100,8 +102,7 @@ class PoolMgr {
   }
 }
 
-const poolMgr = new PoolMgr();
-export default poolMgr;
+export const poolMgr = new PoolManager();
 if (window) {
   window["poolMgr"] = poolMgr;
 }
