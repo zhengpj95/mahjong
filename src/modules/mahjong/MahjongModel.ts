@@ -1,7 +1,7 @@
 import { CardType, FengType } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar";
 import { PoolObject } from "@base/pool/PoolConst";
-import poolMgr from "@base/pool/PoolMgr";
+import { poolMgr } from "@base/pool/PoolManager";
 
 /**
  * @date 2024/12/22
@@ -18,8 +18,7 @@ const CardTypeName = {
   [CardType.FENG]: "feng"
 };
 // 卡牌格式 [牌类型, 牌数字]
-type CardData = [CardType, number]
-type CardPoint = { row: number, col: number }
+type CardData = [CardType, number | FengType]
 
 export class MahjongModel {
   public row = 0;
@@ -119,8 +118,6 @@ export class MahjongModel {
     if (!startData || !targetData || !startData.checkSame(targetData)) {
       return [];
     }
-    const startPoint: CardPoint = {row: startData.row + 1, col: startData.col + 1};
-    const targetPoint: CardPoint = {row: targetData.row + 1, col: targetData.col + 1};
     if (!this._astarMgr) {
       const dfsAry: number[][] = [];
       for (let i = 0; i < this.row + 2; i++) {
@@ -139,7 +136,7 @@ export class MahjongModel {
       this._pathData = dfsAry;
       this._astarMgr = new AStarMgr(this._pathData);
     }
-    const paths = this._astarMgr.findPath([startPoint.row, startPoint.col], [targetPoint.row, targetPoint.col]);
+    const paths = this._astarMgr.findPath([startData.row + 1, startData.col + 1], [targetData.row + 1, targetData.col + 1]);
     return paths || [];
   }
 
@@ -199,6 +196,41 @@ export class MahjongModel {
     }
     return rst;
   }
+
+  // 剩余牌列表
+  public getLeaveCardDataList(): MahjongCardData[] {
+    return this.data.reduce((arr, item) => {
+        return arr.concat(item.filter(card => card && card.isValid()));
+      },
+      []
+    );
+  }
+
+  // 洗牌
+  public getRefreshCardDataList(): MahjongCardData[][] {
+    const list = this.getLeaveCardDataList();
+    console.log(list);
+    this._astarMgr = <any>undefined;
+    this._rowColStrList = <any>undefined;
+    this.data = [];
+    for (let i = 0; i < this.row; i++) {
+      this.data[i] = new Array(this.col).fill(undefined);
+    }
+    this._pathData = [];
+    for (let card of list) {
+      if (!card) {
+        continue;
+      }
+      const random = this.getRandomRowCol();
+      if (!this.data[random[0]]) {
+        this.data[random[0]] = new Array(this.col).fill(undefined);
+      }
+      card.updateInfo(random[0], random[1], card.cardData);
+      this.data[random[0]][random[1]] = card;
+    }
+    console.log(this.data);
+    return this.data;
+  }
 }
 
 /**单张麻将的数据*/
@@ -211,6 +243,11 @@ export class MahjongCardData implements PoolObject {
     this.row = row;
     this.col = col;
     this.cardData = data;
+    this["cardName"] = CardTypeName[data[0]] + data[1];
+  }
+
+  public isValid(): boolean {
+    return this.cardData && this.cardData.length > 0;
   }
 
   public getIcon(): string {

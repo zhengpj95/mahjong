@@ -73,6 +73,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     }
     item.tag = data;
     img.skin = data.getIcon();
+    ComUtils.setScale(<BoxCard>item.getChildByName("boxCard"), INIT_SCALE);
 
     item.on(Event.CLICK, this, this.onClickItem, [index]);
     item.on(Event.MOUSE_DOWN, this, this.onClickMouseDown, [index]);
@@ -139,5 +140,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   // 洗牌
   private onBtnRefresh(): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
+    const list = this._proxy.model.getRefreshCardDataList();
+    this._list.array = list.reduce((a, b) => a.concat(b));
+    this._list.refresh();
   }
 }
