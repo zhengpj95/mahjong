@@ -3,6 +3,7 @@
  * @author zpj
  * @date 2025/1/4
  */
+import { DebugUtils } from "@base/utils/DebugUtils";
 
 function getQualifiedClassName(value: any) {
   const type = typeof value;
@@ -103,6 +104,4 @@ class PoolManager {
 }
 
 export const poolMgr = new PoolManager();
-if (window) {
-  window["poolMgr"] = poolMgr;
-}
+DebugUtils.debug("poolMgr", poolMgr);
