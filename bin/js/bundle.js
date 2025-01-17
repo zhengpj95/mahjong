@@ -166,6 +166,17 @@
         }
     }
 
+    class DebugUtils {
+        static debug(key, cls) {
+            if (!key || !cls) {
+                return;
+            }
+            if (window) {
+                window[key] = cls;
+            }
+        }
+    }
+
     function getQualifiedClassName(value) {
         const type = typeof value;
         if (!value || (type !== "object" && !value.prototype)) {
@@ -246,9 +257,7 @@
         }
     }
     const poolMgr = new PoolManager();
-    if (window) {
-        window["poolMgr"] = poolMgr;
-    }
+    DebugUtils.debug("poolMgr", poolMgr);
 
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -697,6 +706,7 @@
                 Laya.Stat.show();
             Laya.alertGlobalError(true);
             Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
+            initLoop();
         }
         onVersionLoaded() {
             Laya.AtlasInfoManager.enable("fileconfig.json", Laya.Handler.create(this, this.onConfigLoaded));
@@ -704,6 +714,28 @@
         onConfigLoaded() {
             GameConfig.startScene && Laya.Scene.open(GameConfig.startScene);
         }
+    }
+    let _rowLoop;
+    let _timeMgrInit = false;
+    function _loop() {
+        try {
+            if (_rowLoop) {
+                _rowLoop.call(Laya.stage);
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
+        if (!_timeMgrInit) {
+            base.TimeMgr.init();
+            _timeMgrInit = true;
+        }
+        egret.ticker.update(true);
+    }
+    function initLoop() {
+        let stage = Laya.stage;
+        _rowLoop = stage["_loop"];
+        stage["_loop"] = _loop;
     }
     new Main();
 
