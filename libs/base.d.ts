@@ -154,6 +154,8 @@ declare namespace base {
 
     hideView(moduleName: string, viewType: string): void;
 
+    onNt(notify: string, method: Function, context: any): void;
+
     sendNt(notify: string, data?: any): void;
 
     onConnectLost(): void;
