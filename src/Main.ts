@@ -38,7 +38,7 @@ class Main {
 }
 
 let _rowLoop: () => boolean;
-let _timeMgrInit = false;
+let _initBase = false;
 
 function _loop(): void {
   try {
@@ -48,9 +48,14 @@ function _loop(): void {
   } catch (e) {
     console.log(e);
   }
-  if (!_timeMgrInit) {
+  if (!_initBase) {
+    // 兼容egret的stage为空的情况，并处理帧率
+    const egretStage = new egret.Stage();
+    egretStage.frameRate = 60;
+    egret.lifecycle.stage = egretStage;
+
     base.TimeMgr.init();
-    _timeMgrInit = true;
+    _initBase = true;
   }
   egret.ticker.update(true);
 }

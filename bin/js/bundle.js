@@ -716,7 +716,7 @@
         }
     }
     let _rowLoop;
-    let _timeMgrInit = false;
+    let _initBase = false;
     function _loop() {
         try {
             if (_rowLoop) {
@@ -726,9 +726,12 @@
         catch (e) {
             console.log(e);
         }
-        if (!_timeMgrInit) {
+        if (!_initBase) {
+            const egretStage = new egret.Stage();
+            egretStage.frameRate = 60;
+            egret.lifecycle.stage = egretStage;
             base.TimeMgr.init();
-            _timeMgrInit = true;
+            _initBase = true;
         }
         egret.ticker.update(true);
     }
