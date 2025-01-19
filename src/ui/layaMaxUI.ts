@@ -12,6 +12,14 @@ export module ui.modules.mahjong {
         }
     }
     REG("ui.modules.mahjong.MahjongUI",MahjongUI);
+    export class MahjongResultUI extends View {
+        constructor(){ super()}
+        createChildren():void {
+            super.createChildren();
+            this.loadScene("modules/mahjong/MahjongResult");
+        }
+    }
+    REG("ui.modules.mahjong.MahjongResultUI",MahjongResultUI);
     export class MainInfoUI extends Scene {
         constructor(){ super()}
         createChildren():void {

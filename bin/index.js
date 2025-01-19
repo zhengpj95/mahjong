@@ -8,9 +8,9 @@
 window.screenOrientation = "sensor_landscape";
 
 //-----libs-begin-----
-loadLib("libs/laya.core.js");
-loadLib("libs/laya.ui.js");
-loadLib("libs/laya.physics.js");
+loadLib("libs/laya.core.js")
+loadLib("libs/laya.ui.js")
+loadLib("libs/laya.physics.js")
 //-----libs-end-------
 loadLib("libs/egret.js");
 // loadLib("libs/egret.web.js");

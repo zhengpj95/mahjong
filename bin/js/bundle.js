@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+    var View = Laya.View;
     var Scene = Laya.Scene;
     var REG = Laya.ClassUtils.regClass;
     var ui;
@@ -18,6 +19,15 @@
                 }
                 mahjong.MahjongUI = MahjongUI;
                 REG("ui.modules.mahjong.MahjongUI", MahjongUI);
+                class MahjongResultUI extends View {
+                    constructor() { super(); }
+                    createChildren() {
+                        super.createChildren();
+                        this.loadScene("modules/mahjong/MahjongResult");
+                    }
+                }
+                mahjong.MahjongResultUI = MahjongResultUI;
+                REG("ui.modules.mahjong.MahjongResultUI", MahjongResultUI);
                 class MainInfoUI extends Scene {
                     constructor() { super(); }
                     createChildren() {
@@ -663,12 +673,29 @@
         }
     }
 
+    class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
+        constructor() {
+            super(...arguments);
+            this._isModal_ = true;
+        }
+        createChildren() {
+            super.createChildren();
+        }
+        onOpened(param) {
+            super.onOpened(param);
+        }
+        onClosed(type) {
+            super.onClosed(type);
+        }
+    }
+
     class GameConfig {
         constructor() {
         }
         static init() {
             var reg = Laya.ClassUtils.regClass;
             reg("modules/mahjong/MahjongMdr.ts", MahjongMdr);
+            reg("modules/mahjong/MahjongResultMdr.ts", MahjongResultMdr);
         }
     }
     GameConfig.width = 640;
@@ -684,6 +711,38 @@
     GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
+
+    var Sprite = Laya.Sprite;
+    var Scene$1 = Laya.Scene;
+    class LayerManager {
+        get ins() {
+            if (!this._ins) {
+                this._ins = new LayerManager();
+                this.init();
+            }
+            return this._ins;
+        }
+        init() {
+            console.log(Scene$1.root);
+            this.modal;
+        }
+        get modal() {
+            if (!this._modal) {
+                this._modal = new Sprite();
+                Scene$1["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
+                const modal = Scene$1["_modal_"];
+                modal.name = "modal";
+                Laya.stage.on("resize", null, () => {
+                    modal.size(Laya.stage.width, Laya.stage.height);
+                    modal.event(Laya.Event.RESIZE);
+                });
+                modal.size(Laya.stage.width, Laya.stage.height);
+                modal.event(Laya.Event.RESIZE);
+            }
+            return this._modal;
+        }
+    }
+    const layerMgr = new LayerManager();
 
     class Main {
         constructor() {
@@ -706,6 +765,7 @@
                 Laya.Stat.show();
             Laya.alertGlobalError(true);
             Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
+            layerMgr.init();
             initLoop();
         }
         onVersionLoaded() {

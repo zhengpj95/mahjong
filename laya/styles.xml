@@ -8,4 +8,6 @@
    <item name="mahjong/Feng_Zhong.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
    <item name="mahjong" type="" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
    <item name="" type="" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
+   <item name="common/bg1.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=6,4,7,3" picType="0" scale="0"/>
+   <item name="common/bg0.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
 </res>
