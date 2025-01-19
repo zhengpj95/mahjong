@@ -4,6 +4,19 @@
  */
 import Sprite = Laya.Sprite;
 import Scene = Laya.Scene;
+import View = Laya.View;
+
+export enum LayerIndex {
+  ROOT = 1,
+  MODAL = 2,
+  TIPS = 3
+}
+
+export function setLayerIndex(scene: Scene | View, idx: LayerIndex = LayerIndex.ROOT): void {
+  if (scene) {
+    scene["_layerIndex_"] = idx;
+  }
+}
 
 export class LayerManager {
   private _ins: LayerManager;
