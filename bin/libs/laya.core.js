@@ -24287,7 +24287,12 @@ window.Laya= (function (exports) {
         open(closeOther = true, param = null) {
             if (closeOther)
                 Scene.closeAll();
-            Scene.root.addChild(this);
+            // 模块层处理
+            if (this["_isModal_"] && Scene && Scene['_modal_']) {
+                Scene['_modal_'].addChild(this);
+            } else {
+                Scene.root.addChild(this);
+            }
             this.onOpened(param);
         }
         onOpened(param) {

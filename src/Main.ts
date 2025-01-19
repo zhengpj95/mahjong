@@ -1,4 +1,5 @@
 import GameConfig from "./GameConfig";
+import { layerMgr } from "./LayerManager";
 
 class Main {
   constructor() {
@@ -23,6 +24,7 @@ class Main {
     //激活资源版本控制，version.json由IDE发布功能自动生成，如果没有也不影响后续流程
     Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
 
+    layerMgr.init();
     initLoop();
   }
 
