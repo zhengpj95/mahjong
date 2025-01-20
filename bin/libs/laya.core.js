@@ -24288,7 +24288,7 @@ window.Laya= (function (exports) {
             if (closeOther)
                 Scene.closeAll();
             // 模块层处理
-            if (this["_isModal_"] && Scene && Scene['_modal_']) {
+            if (this["_layerIndex_"] && this["_layerIndex_"] === 2 && Scene['_modal_']) {
                 Scene['_modal_'].addChild(this);
             } else {
                 Scene.root.addChild(this);

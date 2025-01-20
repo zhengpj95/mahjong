@@ -1,5 +1,5 @@
 import GameConfig from "./GameConfig";
-import { layerMgr } from "./LayerManager";
+import { layerMgr } from "@base/LayerManager";
 
 class Main {
   constructor() {
