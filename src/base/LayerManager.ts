@@ -42,6 +42,7 @@ export class LayerManager {
       Scene["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
       const modal: Sprite = Scene["_modal_"];
       modal.name = "modal";
+      modal.mouseThrough = true;
 
       Laya.stage.on("resize", null, () => {
         modal.size(Laya.stage.width, Laya.stage.height);
@@ -61,6 +62,7 @@ export class LayerManager {
       Scene["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
       const tips: Sprite = Scene["_tips_"];
       tips.name = "tips";
+      tips.mouseThrough = true;
 
       Laya.stage.on("resize", null, () => {
         tips.size(Laya.stage.width, Laya.stage.height);
