@@ -29,8 +29,9 @@ export class LayerManager {
   }
 
   public init(): void {
-    console.log(Scene.root);
+    Scene.root;
     this.modal;
+    this.tips;
   }
 
   // modal层
@@ -39,7 +40,7 @@ export class LayerManager {
     if (!this._modal) {
       this._modal = new Sprite();
       Scene["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
-      const modal = Scene["_modal_"];
+      const modal: Sprite = Scene["_modal_"];
       modal.name = "modal";
 
       Laya.stage.on("resize", null, () => {
@@ -48,6 +49,25 @@ export class LayerManager {
       });
       modal.size(Laya.stage.width, Laya.stage.height);
       modal.event(Laya.Event.RESIZE);
+    }
+    return this._modal;
+  }
+
+  // tips层
+  private _tips: Sprite;
+  public get tips(): Sprite {
+    if (!this._tips) {
+      this._tips = new Sprite();
+      Scene["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
+      const tips: Sprite = Scene["_tips_"];
+      tips.name = "tips";
+
+      Laya.stage.on("resize", null, () => {
+        tips.size(Laya.stage.width, Laya.stage.height);
+        tips.event(Laya.Event.RESIZE);
+      });
+      tips.size(Laya.stage.width, Laya.stage.height);
+      tips.event(Laya.Event.RESIZE);
     }
     return this._modal;
   }
