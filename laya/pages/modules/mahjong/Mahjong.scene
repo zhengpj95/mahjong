@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":14,
+    "selecteID":16,
     "searchKey":"Scene",
     "props":{"width":640,"sceneColor":"#aa110e","runtime":"modules/mahjong/MahjongMdr.ts","height":1136},
     "nodeParent":-1,
-    "maxID":16,
+    "maxID":19,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -121,6 +121,48 @@
             "compId":14,
             "child":[
                 ]
+        },
+        {
+            "x":15,
+            "type":"HBox",
+            "searchKey":"HBox,boxScore",
+            "props":{"y":200,"x":319,"name":"boxScore","centerX":0,"anchorX":0.5},
+            "nodeParent":2,
+            "label":"boxScore",
+            "isOpen":true,
+            "isDirectory":true,
+            "isAniNode":true,
+            "hasChild":true,
+            "compId":16,
+            "child":[
+                {
+                    "x":30,
+                    "type":"Label",
+                    "searchKey":"Label",
+                    "props":{"text":"得分：","fontSize":22,"color":"#ffffff"},
+                    "nodeParent":16,
+                    "label":"Label",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":17,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Label",
+                    "searchKey":"Label,lab",
+                    "props":{"y":0,"x":57,"text":"0","name":"lab","fontSize":22,"color":"#ffffff"},
+                    "nodeParent":16,
+                    "label":"lab",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":18,
+                    "child":[
+                        ]
+                }]
         }],
     "animations":[
         {

@@ -10,6 +10,7 @@ import Image = Laya.Image;
 import Event = Laya.Event;
 import SoundManager = Laya.SoundManager;
 import Button = Laya.Button;
+import Label = Laya.Label;
 
 type BoxCard = Box & {
   boxCard: Box & {
@@ -28,6 +29,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private _preIdx = -1;
   private _btnTips: Button;
   private _btnRefresh: Button;
+  private _lastScoreTime = 0;
 
   constructor() {
     super();
@@ -68,6 +70,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onRefreshNext(): void {
+    this.resetScore();
     this._proxy.model.showNext();
     const list = this._proxy.model.getMahjongData();
     this._list.array = list.reduce((a, b) => a.concat(b));
@@ -101,6 +104,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         ComUtils.setScale(curItem, BIG_SCALE);
         this.clearCardItem(curItem, index);
         this.clearCardItem(preItem, this._preIdx);
+        this.addScore();
       } else {
         ComUtils.setScale(curItem, INIT_SCALE);
         ComUtils.setScale(preItem, INIT_SCALE);
@@ -111,6 +115,27 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       const item = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       ComUtils.setScale(item, BIG_SCALE);
     }
+  }
+
+  private addScore(): void {
+    const now = Date.now();
+    const diffTime = now - this._lastScoreTime;
+    let score = 1; // 消除间隔不同，加分不同
+    if (diffTime < 2 * 1000) {
+      score = 5;
+    } else if (diffTime < 5 * 1000) {
+      score = 3;
+    }
+    this._proxy.model.levelScore += score;
+    this._lastScoreTime = now;
+    const lab = <Label>this.getChildByName("boxScore").getChildByName("lab");
+    lab.text = this._proxy.model.levelScore + "";
+  }
+
+  private resetScore(): void {
+    this._lastScoreTime = 0;
+    const lab = <Label>this.getChildByName("boxScore").getChildByName("lab");
+    lab.text = "0";
   }
 
   private clearCardItem(box: BoxCard, index: number): void {

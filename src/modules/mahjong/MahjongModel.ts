@@ -26,6 +26,8 @@ export class MahjongModel {
   public col = 0;
   public data: MahjongCardData[][] = [];
 
+  public levelScore = 0;
+
   private _rowColStrList: string[];
   private _pathData: number[][] = [];
   private _astarMgr: AStarMgr;
@@ -39,6 +41,7 @@ export class MahjongModel {
 
   // 清除当前关卡数据
   public clearData(): void {
+    this.levelScore = 0;
     this.row = 0;
     this.col = 0;
     this.data.length = 0;
