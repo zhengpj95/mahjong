@@ -285,6 +285,7 @@
             this.row = 0;
             this.col = 0;
             this.data = [];
+            this.level = 0;
             this.levelScore = 0;
             this._pathData = [];
             this._sameCardMap = {};
@@ -478,6 +479,7 @@
             return this.data;
         }
         showNext() {
+            this.level += 1;
             this.clearData();
             this.updateData();
         }
@@ -614,13 +616,12 @@
         }
         onLoadedSuccess() {
             console.log("11111 onLoadedSuccess");
-            this._proxy.model.updateData(8, 10);
-            const list = this._proxy.model.getMahjongData();
-            this._list.array = list.reduce((a, b) => a.concat(b));
+            this.onRefreshNext();
         }
         onRefreshNext() {
-            this.resetScore();
             this._proxy.model.showNext();
+            this.resetScore();
+            this.updateLevel();
             const list = this._proxy.model.getMahjongData();
             this._list.array = list.reduce((a, b) => a.concat(b));
         }
@@ -663,6 +664,10 @@
                 const item = this._list.getCell(index).getChildByName("boxCard");
                 ComUtils.setScale(item, BIG_SCALE);
             }
+        }
+        updateLevel() {
+            const lab = this.getChildByName("labLevel");
+            lab.text = "关卡：" + this._proxy.model.level;
         }
         addScore() {
             const now = Date.now();

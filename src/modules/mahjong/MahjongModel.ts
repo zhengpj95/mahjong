@@ -26,6 +26,7 @@ export class MahjongModel {
   public col = 0;
   public data: MahjongCardData[][] = [];
 
+  public level = 0;
   public levelScore = 0;
 
   private _rowColStrList: string[];
@@ -242,6 +243,7 @@ export class MahjongModel {
 
   /**下一关*/
   public showNext(): void {
+    this.level += 1;
     this.clearData();
     this.updateData();
   }

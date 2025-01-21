@@ -64,14 +64,14 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   private onLoadedSuccess(): void {
     console.log("11111 onLoadedSuccess");
-    this._proxy.model.updateData(8, 10);
-    const list = this._proxy.model.getMahjongData();
-    this._list.array = list.reduce((a, b) => a.concat(b));
+    this.onRefreshNext();
   }
 
   private onRefreshNext(): void {
-    this.resetScore();
     this._proxy.model.showNext();
+
+    this.resetScore();
+    this.updateLevel();
     const list = this._proxy.model.getMahjongData();
     this._list.array = list.reduce((a, b) => a.concat(b));
   }
@@ -115,6 +115,11 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       const item = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       ComUtils.setScale(item, BIG_SCALE);
     }
+  }
+
+  private updateLevel(): void {
+    const lab = <Label>this.getChildByName("labLevel");
+    lab.text = "关卡：" + this._proxy.model.level;
   }
 
   private addScore(): void {
