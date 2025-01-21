@@ -12,6 +12,14 @@ export module ui.modules.mahjong {
         }
     }
     REG("ui.modules.mahjong.MahjongUI",MahjongUI);
+    export class MahjongHomeUI extends View {
+        constructor(){ super()}
+        createChildren():void {
+            super.createChildren();
+            this.loadScene("modules/mahjong/MahjongHome");
+        }
+    }
+    REG("ui.modules.mahjong.MahjongHomeUI",MahjongHomeUI);
     export class MahjongResultUI extends View {
 		public btnHome:Laya.Button;
 		public btnNext:Laya.Button;
@@ -22,12 +30,4 @@ export module ui.modules.mahjong {
         }
     }
     REG("ui.modules.mahjong.MahjongResultUI",MahjongResultUI);
-    export class MainInfoUI extends Scene {
-        constructor(){ super()}
-        createChildren():void {
-            super.createChildren();
-            this.loadScene("modules/mahjong/MainInfo");
-        }
-    }
-    REG("ui.modules.mahjong.MainInfoUI",MainInfoUI);
 }

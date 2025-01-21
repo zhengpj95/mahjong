@@ -19,6 +19,15 @@
                 }
                 mahjong.MahjongUI = MahjongUI;
                 REG("ui.modules.mahjong.MahjongUI", MahjongUI);
+                class MahjongHomeUI extends View {
+                    constructor() { super(); }
+                    createChildren() {
+                        super.createChildren();
+                        this.loadScene("modules/mahjong/MahjongHome");
+                    }
+                }
+                mahjong.MahjongHomeUI = MahjongHomeUI;
+                REG("ui.modules.mahjong.MahjongHomeUI", MahjongHomeUI);
                 class MahjongResultUI extends View {
                     constructor() { super(); }
                     createChildren() {
@@ -28,15 +37,6 @@
                 }
                 mahjong.MahjongResultUI = MahjongResultUI;
                 REG("ui.modules.mahjong.MahjongResultUI", MahjongResultUI);
-                class MainInfoUI extends Scene {
-                    constructor() { super(); }
-                    createChildren() {
-                        super.createChildren();
-                        this.loadScene("modules/mahjong/MainInfo");
-                    }
-                }
-                mahjong.MainInfoUI = MainInfoUI;
-                REG("ui.modules.mahjong.MainInfoUI", MainInfoUI);
             })(mahjong = modules.mahjong || (modules.mahjong = {}));
         })(modules = ui.modules || (ui.modules = {}));
     })(ui || (ui = {}));
@@ -721,8 +721,27 @@
         }
     }
 
-    var Sprite = Laya.Sprite;
     var Scene$2 = Laya.Scene;
+    var Handler$1 = Laya.Handler;
+    class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
+        createChildren() {
+            super.createChildren();
+            this._btnStart = this.getChildByName("btnStart");
+            this._btnStart.clickHandler = Handler$1.create(this, this.onClickBtnStart, undefined, false);
+        }
+        onOpened(param) {
+            super.onOpened(param);
+        }
+        onClosed(type) {
+            super.onClosed(type);
+        }
+        onClickBtnStart() {
+            Scene$2.open("modules/mahjong/Mahjong.scene");
+        }
+    }
+
+    var Sprite = Laya.Sprite;
+    var Scene$3 = Laya.Scene;
     var LayerIndex;
     (function (LayerIndex) {
         LayerIndex[LayerIndex["ROOT"] = 1] = "ROOT";
@@ -743,15 +762,15 @@
             return this._ins;
         }
         init() {
-            Scene$2.root;
+            Scene$3.root;
             this.modal;
             this.tips;
         }
         get modal() {
             if (!this._modal) {
                 this._modal = new Sprite();
-                Scene$2["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
-                const modal = Scene$2["_modal_"];
+                Scene$3["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
+                const modal = Scene$3["_modal_"];
                 modal.name = "modal";
                 modal.mouseThrough = true;
                 Laya.stage.on("resize", null, () => {
@@ -766,8 +785,8 @@
         get tips() {
             if (!this._tips) {
                 this._tips = new Sprite();
-                Scene$2["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
-                const tips = Scene$2["_tips_"];
+                Scene$3["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
+                const tips = Scene$3["_tips_"];
                 tips.name = "tips";
                 tips.mouseThrough = true;
                 Laya.stage.on("resize", null, () => {
@@ -782,13 +801,13 @@
     }
     const layerMgr = new LayerManager();
 
-    var Handler$1 = Laya.Handler;
+    var Handler$2 = Laya.Handler;
     class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
         createChildren() {
             super.createChildren();
             setLayerIndex(this, LayerIndex.MODAL);
-            this.btnHome.clickHandler = Handler$1.create(this, this.onClickHome, undefined, false);
-            this.btnNext.clickHandler = Handler$1.create(this, this.onClickNext, undefined, false);
+            this.btnHome.clickHandler = Handler$2.create(this, this.onClickHome, undefined, false);
+            this.btnNext.clickHandler = Handler$2.create(this, this.onClickNext, undefined, false);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -810,6 +829,7 @@
         static init() {
             var reg = Laya.ClassUtils.regClass;
             reg("modules/mahjong/MahjongMdr.ts", MahjongMdr);
+            reg("modules/mahjong/MahjongHomeMdr.ts", MahjongHomeMdr);
             reg("modules/mahjong/MahjongResultMdr.ts", MahjongResultMdr);
         }
     }
@@ -819,7 +839,7 @@
     GameConfig.screenMode = "none";
     GameConfig.alignV = "middle";
     GameConfig.alignH = "center";
-    GameConfig.startScene = "modules/mahjong/Mahjong.scene";
+    GameConfig.startScene = "modules/mahjong/MahjongHome.scene";
     GameConfig.sceneRoot = "";
     GameConfig.debug = false;
     GameConfig.stat = false;
