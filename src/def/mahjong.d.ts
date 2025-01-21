@@ -18,3 +18,8 @@ export const enum FengType {
   FA = 6,
   BAIBAN = 7
 }
+
+
+export const enum MahjongEvent {
+  UPDATE_NEXT = "mahjong_update_next",
+}

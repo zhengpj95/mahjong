@@ -269,6 +269,7 @@
     const poolMgr = new PoolManager();
     DebugUtils.debug("poolMgr", poolMgr);
 
+    var Scene$1 = Laya.Scene;
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const CARD_TYPE_LIST = [1, 2];
@@ -356,6 +357,10 @@
             this.data[row][col] = undefined;
             if (this._pathData.length) {
                 this._pathData[row + 1][col + 1] = 0;
+            }
+            const cnt = this.getLeaveCardDataList().length;
+            if (cnt <= 0) {
+                this.showResult();
             }
             return true;
         }
@@ -469,6 +474,13 @@
             }
             console.log(this.data);
             return this.data;
+        }
+        showNext() {
+            this.clearData();
+            this.updateData();
+        }
+        showResult() {
+            Scene$1.open("modules/mahjong/MahjongResult.scene", false);
         }
     }
     class MahjongCardData {
@@ -588,6 +600,7 @@
             Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
             SoundManager.autoStopMusic = false;
             SoundManager.playMusic("audio/mixkit-tick-tock-clock-timer-music.wav", 0);
+            base.facade.onNt("mahjong_update_next", this.onRefreshNext, this);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -599,6 +612,11 @@
         onLoadedSuccess() {
             console.log("11111 onLoadedSuccess");
             this._proxy.model.updateData(8, 10);
+            const list = this._proxy.model.getMahjongData();
+            this._list.array = list.reduce((a, b) => a.concat(b));
+        }
+        onRefreshNext() {
+            this._proxy.model.showNext();
             const list = this._proxy.model.getMahjongData();
             this._list.array = list.reduce((a, b) => a.concat(b));
         }
@@ -673,19 +691,86 @@
         }
     }
 
-    class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
-        constructor() {
-            super(...arguments);
-            this._isModal_ = true;
+    var Sprite = Laya.Sprite;
+    var Scene$2 = Laya.Scene;
+    var LayerIndex;
+    (function (LayerIndex) {
+        LayerIndex[LayerIndex["ROOT"] = 1] = "ROOT";
+        LayerIndex[LayerIndex["MODAL"] = 2] = "MODAL";
+        LayerIndex[LayerIndex["TIPS"] = 3] = "TIPS";
+    })(LayerIndex || (LayerIndex = {}));
+    function setLayerIndex(scene, idx = LayerIndex.ROOT) {
+        if (scene) {
+            scene["_layerIndex_"] = idx;
         }
+    }
+    class LayerManager {
+        get ins() {
+            if (!this._ins) {
+                this._ins = new LayerManager();
+                this.init();
+            }
+            return this._ins;
+        }
+        init() {
+            Scene$2.root;
+            this.modal;
+            this.tips;
+        }
+        get modal() {
+            if (!this._modal) {
+                this._modal = new Sprite();
+                Scene$2["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
+                const modal = Scene$2["_modal_"];
+                modal.name = "modal";
+                modal.mouseThrough = true;
+                Laya.stage.on("resize", null, () => {
+                    modal.size(Laya.stage.width, Laya.stage.height);
+                    modal.event(Laya.Event.RESIZE);
+                });
+                modal.size(Laya.stage.width, Laya.stage.height);
+                modal.event(Laya.Event.RESIZE);
+            }
+            return this._modal;
+        }
+        get tips() {
+            if (!this._tips) {
+                this._tips = new Sprite();
+                Scene$2["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
+                const tips = Scene$2["_tips_"];
+                tips.name = "tips";
+                tips.mouseThrough = true;
+                Laya.stage.on("resize", null, () => {
+                    tips.size(Laya.stage.width, Laya.stage.height);
+                    tips.event(Laya.Event.RESIZE);
+                });
+                tips.size(Laya.stage.width, Laya.stage.height);
+                tips.event(Laya.Event.RESIZE);
+            }
+            return this._modal;
+        }
+    }
+    const layerMgr = new LayerManager();
+
+    var Handler$1 = Laya.Handler;
+    class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
         createChildren() {
             super.createChildren();
+            setLayerIndex(this, LayerIndex.MODAL);
+            this.btnHome.clickHandler = Handler$1.create(this, this.onClickHome, undefined, false);
+            this.btnNext.clickHandler = Handler$1.create(this, this.onClickNext, undefined, false);
         }
         onOpened(param) {
             super.onOpened(param);
         }
         onClosed(type) {
             super.onClosed(type);
+        }
+        onClickHome() {
+        }
+        onClickNext() {
+            base.facade.sendNt("mahjong_update_next");
+            this.close();
         }
     }
 
@@ -711,38 +796,6 @@
     GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
-
-    var Sprite = Laya.Sprite;
-    var Scene$1 = Laya.Scene;
-    class LayerManager {
-        get ins() {
-            if (!this._ins) {
-                this._ins = new LayerManager();
-                this.init();
-            }
-            return this._ins;
-        }
-        init() {
-            console.log(Scene$1.root);
-            this.modal;
-        }
-        get modal() {
-            if (!this._modal) {
-                this._modal = new Sprite();
-                Scene$1["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
-                const modal = Scene$1["_modal_"];
-                modal.name = "modal";
-                Laya.stage.on("resize", null, () => {
-                    modal.size(Laya.stage.width, Laya.stage.height);
-                    modal.event(Laya.Event.RESIZE);
-                });
-                modal.size(Laya.stage.width, Laya.stage.height);
-                modal.event(Laya.Event.RESIZE);
-            }
-            return this._modal;
-        }
-    }
-    const layerMgr = new LayerManager();
 
     class Main {
         constructor() {

@@ -2,6 +2,7 @@ import { CardType, FengType } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar";
 import { PoolObject } from "@base/pool/PoolConst";
 import { poolMgr } from "@base/pool/PoolManager";
+import Scene = Laya.Scene;
 
 /**
  * @date 2024/12/22
@@ -36,7 +37,7 @@ export class MahjongModel {
     this.data = [];
   }
 
-  // 清除当前关卡数据 todo
+  // 清除当前关卡数据
   public clearData(): void {
     this.row = 0;
     this.col = 0;
@@ -109,6 +110,10 @@ export class MahjongModel {
     this.data[row][col] = undefined;
     if (this._pathData.length) {
       this._pathData[row + 1][col + 1] = 0;
+    }
+    const cnt = this.getLeaveCardDataList().length;
+    if (cnt <= 0) {
+      this.showResult();
     }
     return true;
   }
@@ -230,6 +235,17 @@ export class MahjongModel {
     }
     console.log(this.data);
     return this.data;
+  }
+
+  /**下一关*/
+  public showNext(): void {
+    this.clearData();
+    this.updateData();
+  }
+
+  /**展示结算弹窗*/
+  public showResult(): void {
+    Scene.open("modules/mahjong/MahjongResult.scene", false);
   }
 }
 

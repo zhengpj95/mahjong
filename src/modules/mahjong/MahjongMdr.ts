@@ -2,6 +2,7 @@ import { ui } from "@ui/layaMaxUI";
 import { MahjongProxy } from "./MahjongProxy";
 import { MahjongCardData } from "./MahjongModel";
 import ComUtils from "@base/utils/ComUtils";
+import { MahjongEvent } from "@def/mahjong";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -46,6 +47,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
     SoundManager.autoStopMusic = false;
     SoundManager.playMusic("audio/mixkit-tick-tock-clock-timer-music.wav", 0);
+
+    base.facade.onNt(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
   }
 
   onOpened(param: any) {
@@ -60,6 +63,12 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private onLoadedSuccess(): void {
     console.log("11111 onLoadedSuccess");
     this._proxy.model.updateData(8, 10);
+    const list = this._proxy.model.getMahjongData();
+    this._list.array = list.reduce((a, b) => a.concat(b));
+  }
+
+  private onRefreshNext(): void {
+    this._proxy.model.showNext();
     const list = this._proxy.model.getMahjongData();
     this._list.array = list.reduce((a, b) => a.concat(b));
   }
