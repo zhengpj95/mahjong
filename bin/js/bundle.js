@@ -820,11 +820,14 @@
         createChildren() {
             super.createChildren();
             setLayerIndex(this, LayerIndex.MODAL);
+            this._proxy = MahjongProxy.ins();
+            this._lab = this.getChildByName("boxHtml").getChildByName("lab");
             this.btnHome.clickHandler = Handler$2.create(this, this.onClickHome, undefined, false);
             this.btnNext.clickHandler = Handler$2.create(this, this.onClickNext, undefined, false);
         }
         onOpened(param) {
             super.onOpened(param);
+            this._lab.text = `得分: ` + this._proxy.model.levelScore;
         }
         onClosed(type) {
             super.onClosed(type);
