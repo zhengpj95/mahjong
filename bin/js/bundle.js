@@ -394,6 +394,9 @@
             return paths || [];
         }
         canConnect(startData, targetData) {
+            if (!startData || !targetData) {
+                return false;
+            }
             const paths = this.findPath(startData, targetData);
             return !!paths.length;
         }
@@ -503,6 +506,9 @@
         }
         checkSame(data) {
             if (!data || !data.cardData) {
+                return false;
+            }
+            if (!this.isValid()) {
                 return false;
             }
             return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
@@ -659,7 +665,8 @@
                 const preItemData = this._list.getItem(this._preIdx);
                 const curItem = this._list.getCell(index).getChildByName("boxCard");
                 const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
-                if (curItemData.checkSame(preItemData) && this._proxy.model.canConnect(curItemData, preItemData)) {
+                if (curItemData && curItemData.checkSame(preItemData)
+                    && this._proxy.model.canConnect(curItemData, preItemData)) {
                     ComUtils.setScale(curItem, BIG_SCALE);
                     this.clearCardItem(curItem, index);
                     this.clearCardItem(preItem, this._preIdx);

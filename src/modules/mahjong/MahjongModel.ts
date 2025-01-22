@@ -283,6 +283,9 @@ export class MahjongCardData implements PoolObject {
     if (!data || !data.cardData) {
       return false;
     }
+    if (!this.isValid()) {
+      return false;
+    }
     return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
   }
 
