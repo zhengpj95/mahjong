@@ -150,6 +150,9 @@ export class MahjongModel {
   }
 
   public canConnect(startData: MahjongCardData, targetData: MahjongCardData): boolean {
+    if (!startData || !targetData) {
+      return false;
+    }
     const paths = this.findPath(startData, targetData);
     return !!paths.length;
   }
