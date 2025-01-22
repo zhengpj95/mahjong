@@ -456,7 +456,6 @@
         }
         getRefreshCardDataList() {
             const list = this.getLeaveCardDataList();
-            console.log(list);
             this._astarMgr = undefined;
             this._rowColStrList = undefined;
             this.data = [];
@@ -475,7 +474,6 @@
                 card.updateInfo(random[0], random[1], card.cardData);
                 this.data[random[0]][random[1]] = card;
             }
-            console.log(this.data);
             return this.data;
         }
         showNext() {

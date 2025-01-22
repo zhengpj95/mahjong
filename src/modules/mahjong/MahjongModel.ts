@@ -218,7 +218,6 @@ export class MahjongModel {
   // 洗牌
   public getRefreshCardDataList(): MahjongCardData[][] {
     const list = this.getLeaveCardDataList();
-    console.log(list);
     this._astarMgr = <any>undefined;
     this._rowColStrList = <any>undefined;
     this.data = [];
@@ -237,7 +236,6 @@ export class MahjongModel {
       card.updateInfo(random[0], random[1], card.cardData);
       this.data[random[0]][random[1]] = card;
     }
-    console.log(this.data);
     return this.data;
   }
 
