@@ -3,6 +3,7 @@ import { MahjongProxy } from "./MahjongProxy";
 import { MahjongCardData } from "./MahjongModel";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent } from "@def/mahjong";
+import { eventMgr } from "@base/event/EventManager";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -47,10 +48,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
 
     Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
-    SoundManager.autoStopMusic = false;
-    SoundManager.playMusic("audio/mixkit-tick-tock-clock-timer-music.wav", 0);
 
-    base.facade.onNt(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
+    eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
   }
 
   onOpened(param: any) {
@@ -68,6 +67,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onRefreshNext(): void {
+    console.log(`11111 onRefreshNext`);
     this._proxy.model.showNext();
 
     this.resetScore();

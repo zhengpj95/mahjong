@@ -582,6 +582,21 @@
         }
     }
 
+    var EventDispatcher = Laya.EventDispatcher;
+    class EventManager extends EventDispatcher {
+        on(type, caller, listener, args) {
+            return super.on(type, caller, listener, args);
+        }
+        off(type, caller, listener, onceOnly) {
+            return super.off(type, caller, listener, onceOnly);
+        }
+        event(type, data) {
+            return super.event(type, data);
+        }
+    }
+    const eventMgr = new EventManager();
+    DebugUtils.debug("eventMgr", eventMgr);
+
     var Handler = Laya.Handler;
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
@@ -603,9 +618,7 @@
             this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
             this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
             Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
-            SoundManager.autoStopMusic = false;
-            SoundManager.playMusic("audio/mixkit-tick-tock-clock-timer-music.wav", 0);
-            base.facade.onNt("mahjong_update_next", this.onRefreshNext, this);
+            eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -619,6 +632,7 @@
             this.onRefreshNext();
         }
         onRefreshNext() {
+            console.log(`11111 onRefreshNext`);
             this._proxy.model.showNext();
             this.resetScore();
             this.updateLevel();
@@ -818,7 +832,7 @@
         onClickHome() {
         }
         onClickNext() {
-            base.facade.sendNt("mahjong_update_next");
+            eventMgr.event("mahjong_update_next");
             this.close();
         }
     }
@@ -879,7 +893,6 @@
         }
     }
     let _rowLoop;
-    let _initBase = false;
     function _loop() {
         try {
             if (_rowLoop) {
@@ -889,14 +902,6 @@
         catch (e) {
             console.log(e);
         }
-        if (!_initBase) {
-            const egretStage = new egret.Stage();
-            egretStage.frameRate = 60;
-            egret.lifecycle.stage = egretStage;
-            base.TimeMgr.init();
-            _initBase = true;
-        }
-        egret.ticker.update(true);
     }
     function initLoop() {
         let stage = Laya.stage;

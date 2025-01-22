@@ -1,7 +1,6 @@
 D .
 D audio
 R 93E518F7 mixkit-flop.wav
-R 2098C7E1 mixkit-tick-tock-clock-timer-music.wav
 D common
 P 07B8FD00 bg0.png
 P 7D862B48 bg1.png
