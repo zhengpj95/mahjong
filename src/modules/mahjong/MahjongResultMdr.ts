@@ -6,6 +6,7 @@ import { MahjongProxy } from "./MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import Handler = Laya.Handler;
 import Label = Laya.Label;
+import Scene = Laya.Scene;
 
 /**
  * 结算弹窗
@@ -36,7 +37,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
   }
 
   private onClickHome(): void {
-    //
+    Scene.open("modules/mahjong/MahjongHome.scene");
+    this.close();
   }
 
   private onClickNext(): void {

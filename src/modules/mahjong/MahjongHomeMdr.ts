@@ -13,7 +13,7 @@ export default class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
   public createChildren(): void {
     super.createChildren();
     this._btnStart = <Button>this.getChildByName("btnStart");
-    this._btnStart.clickHandler = Handler.create(this, this.onClickBtnStart, undefined, false);
+    this._btnStart.clickHandler = Handler.create(this, this.onClickBtnStart, undefined, true);
   }
 
   public onOpened(param: any): void {

@@ -765,7 +765,7 @@
         createChildren() {
             super.createChildren();
             this._btnStart = this.getChildByName("btnStart");
-            this._btnStart.clickHandler = Handler$1.create(this, this.onClickBtnStart, undefined, false);
+            this._btnStart.clickHandler = Handler$1.create(this, this.onClickBtnStart, undefined, true);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -840,6 +840,7 @@
     const layerMgr = new LayerManager();
 
     var Handler$2 = Laya.Handler;
+    var Scene$4 = Laya.Scene;
     class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
         createChildren() {
             super.createChildren();
@@ -857,6 +858,8 @@
             super.onClosed(type);
         }
         onClickHome() {
+            Scene$4.open("modules/mahjong/MahjongHome.scene");
+            this.close();
         }
         onClickNext() {
             eventMgr.event("mahjong_update_next");
