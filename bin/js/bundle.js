@@ -584,6 +584,25 @@
                 box.scaleX = box.scaleY = scale;
             }
         }
+        static getNodeByNameList(box, nameList) {
+            if (!box) {
+                return undefined;
+            }
+            if (Array.isArray(nameList)) {
+                let com = box;
+                while (nameList.length) {
+                    const name = nameList.shift();
+                    com = com.getChildByName(name);
+                    if (!com) {
+                        console.error(`ComUtils.getNodeByNameList error: `, name);
+                    }
+                }
+                return com;
+            }
+            else {
+                return box.getChildByName(nameList);
+            }
+        }
     }
 
     var EventDispatcher = Laya.EventDispatcher;
@@ -644,7 +663,7 @@
             this._list.array = list.reduce((a, b) => a.concat(b));
         }
         onRenderListItem(item, index) {
-            const img = item.getChildByName("boxCard").getChildByName("img");
+            const img = ComUtils.getNodeByNameList(item, ["boxCard", "img"]);
             const data = item.dataSource;
             if (!data) {
                 img.skin = "";
@@ -700,12 +719,12 @@
             }
             this._proxy.model.levelScore += score;
             this._lastScoreTime = now;
-            const lab = this.getChildByName("boxScore").getChildByName("lab");
+            const lab = ComUtils.getNodeByNameList(this, ["boxScore", "lab"]);
             lab.text = this._proxy.model.levelScore + "";
         }
         resetScore() {
             this._lastScoreTime = 0;
-            const lab = this.getChildByName("boxScore").getChildByName("lab");
+            const lab = ComUtils.getNodeByNameList(this, ["boxScore", "lab"]);
             lab.text = "0";
         }
         clearCardItem(box, index) {
@@ -826,7 +845,7 @@
             super.createChildren();
             setLayerIndex(this, LayerIndex.MODAL);
             this._proxy = MahjongProxy.ins();
-            this._lab = this.getChildByName("boxHtml").getChildByName("lab");
+            this._lab = ComUtils.getNodeByNameList(this, ["boxHtml", "lab"]);
             this.btnHome.clickHandler = Handler$2.create(this, this.onClickHome, undefined, true);
             this.btnNext.clickHandler = Handler$2.create(this, this.onClickNext, undefined, true);
         }

@@ -77,7 +77,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onRenderListItem(item: BoxCard, index: number): void {
-    const img = <Image>item.getChildByName("boxCard").getChildByName("img");
+    const img = ComUtils.getNodeByNameList<Image>(item, ["boxCard", "img"]);
     const data: MahjongCardData = item.dataSource;
     if (!data) {
       img.skin = "";
@@ -134,13 +134,13 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     }
     this._proxy.model.levelScore += score;
     this._lastScoreTime = now;
-    const lab = <Label>this.getChildByName("boxScore").getChildByName("lab");
+    const lab = ComUtils.getNodeByNameList<Label>(this, ["boxScore", "lab"]);
     lab.text = this._proxy.model.levelScore + "";
   }
 
   private resetScore(): void {
     this._lastScoreTime = 0;
-    const lab = <Label>this.getChildByName("boxScore").getChildByName("lab");
+    const lab = ComUtils.getNodeByNameList<Label>(this, ["boxScore", "lab"]);
     lab.text = "0";
   }
 

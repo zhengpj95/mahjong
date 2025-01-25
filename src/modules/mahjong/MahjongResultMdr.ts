@@ -3,6 +3,7 @@ import { LayerIndex, setLayerIndex } from "@base/LayerManager";
 import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
 import { MahjongProxy } from "./MahjongProxy";
+import ComUtils from "@base/utils/ComUtils";
 import Handler = Laya.Handler;
 import Label = Laya.Label;
 
@@ -19,7 +20,7 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
     setLayerIndex(this, LayerIndex.MODAL);
 
     this._proxy = MahjongProxy.ins();
-    this._lab = <Label>this.getChildByName("boxHtml").getChildByName("lab");
+    this._lab = ComUtils.getNodeByNameList<Label>(this, ["boxHtml", "lab"]);
     this.btnHome.clickHandler = Handler.create(this, this.onClickHome, undefined, true);
     this.btnNext.clickHandler = Handler.create(this, this.onClickNext, undefined, true);
   }
