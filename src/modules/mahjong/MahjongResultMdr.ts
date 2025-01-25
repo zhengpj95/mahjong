@@ -20,8 +20,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
 
     this._proxy = MahjongProxy.ins();
     this._lab = <Label>this.getChildByName("boxHtml").getChildByName("lab");
-    this.btnHome.clickHandler = Handler.create(this, this.onClickHome, undefined, false);
-    this.btnNext.clickHandler = Handler.create(this, this.onClickNext, undefined, false);
+    this.btnHome.clickHandler = Handler.create(this, this.onClickHome, undefined, true);
+    this.btnNext.clickHandler = Handler.create(this, this.onClickNext, undefined, true);
   }
 
   onOpened(param: any) {

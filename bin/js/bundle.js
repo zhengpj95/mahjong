@@ -827,8 +827,8 @@
             setLayerIndex(this, LayerIndex.MODAL);
             this._proxy = MahjongProxy.ins();
             this._lab = this.getChildByName("boxHtml").getChildByName("lab");
-            this.btnHome.clickHandler = Handler$2.create(this, this.onClickHome, undefined, false);
-            this.btnNext.clickHandler = Handler$2.create(this, this.onClickNext, undefined, false);
+            this.btnHome.clickHandler = Handler$2.create(this, this.onClickHome, undefined, true);
+            this.btnNext.clickHandler = Handler$2.create(this, this.onClickNext, undefined, true);
         }
         onOpened(param) {
             super.onOpened(param);
