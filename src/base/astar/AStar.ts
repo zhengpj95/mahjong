@@ -1,6 +1,9 @@
 import { Grid } from "./Grid";
 import { GridPoint } from "./AStarConst";
 
+/** 默认拐点数 */
+const DEFAULT_TURN_COUNT = 2;
+
 /**
  * 表示路径搜索中的节点信息
  */
@@ -17,9 +20,8 @@ class PathNode {
     this.h = h;
     this.parent = parent;
     this.direction = direction;
-    if (this.getTurnCount()) {
-      this.g += 1;
-    }
+    // const parentCnt = this.getTurnCountTotal() || 0;
+    // this.g += parentCnt;
   }
 
   /**
@@ -38,6 +40,37 @@ class PathNode {
     }
     return this.direction.toString() !== this.parent.direction.toString() ? 1 : 0;
   }
+
+  /**路径信息*/
+  private getPathString(): string {
+    const list: string[] = [this.position.join("_")];
+    let p = this.parent;
+    while (p) {
+      list.push(p.position.join("_"));
+      p = p.parent;
+    }
+    return list.reverse().join(",");
+  }
+
+  /**
+   * 全部拐点数
+   */
+  public getTurnCountTotal(): number {
+    if (!this.parent || !this.parent.direction || !this.direction) {
+      return 0; // 起点没有拐点
+    }
+    let cnt = 0;
+    let p = this.parent;
+    let d = this.direction;
+    while (p && d) {
+      if (p.direction && d.toString() !== p.direction.toString()) {
+        cnt++;
+      }
+      d = p.direction;
+      p = p.parent;
+    }
+    return cnt;
+  }
 }
 
 /**
@@ -45,13 +78,16 @@ class PathNode {
  */
 export class AStar {
   private _grid: Grid; // 网格实例
+  private _turnCount: number = 0;// 拐点数
 
   /**
    * 构造函数
    * @param grid - Grid 实例
+   * @param turnCnt - 拐点数，默认2
    */
-  constructor(grid: Grid) {
+  constructor(grid: Grid, turnCnt = DEFAULT_TURN_COUNT) {
     this._grid = grid;
+    this._turnCount = turnCnt;
   }
 
   /**
@@ -98,7 +134,7 @@ export class AStar {
 
     while (openList.length > 0) {
       // 按照 f 值 + 拐点数排序，选择最优的节点
-      openList.sort((a, b) => (a.f + a.getTurnCount()) - (b.f + b.getTurnCount()));
+      openList.sort((a, b) => (a.f + a.getTurnCountTotal()) - (b.f + b.getTurnCountTotal()));
       const currentNode = openList.shift()!; // 当前节点
 
       // 如果到达终点，则回溯路径
@@ -135,6 +171,10 @@ export class AStar {
             openList.splice(openList.indexOf(existingNode), 1);
           }
           // 将邻居节点加入打开列表
+          const neighborNode = new PathNode(neighborPos, g, h, currentNode, direction);
+          if (neighborNode.getTurnCountTotal() > this._turnCount) {
+            continue;
+          }
           openList.push(new PathNode(neighborPos, g, h, currentNode, direction));
         }
       }

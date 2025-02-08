@@ -41,6 +41,7 @@
         })(modules = ui.modules || (ui.modules = {}));
     })(ui || (ui = {}));
 
+    const DEFAULT_TURN_COUNT = 2;
     class PathNode {
         constructor(position, g, h, parent = null, direction = null) {
             this.position = position;
@@ -48,9 +49,6 @@
             this.h = h;
             this.parent = parent;
             this.direction = direction;
-            if (this.getTurnCount()) {
-                this.g += 1;
-            }
         }
         get f() {
             return this.g + this.h;
@@ -61,10 +59,37 @@
             }
             return this.direction.toString() !== this.parent.direction.toString() ? 1 : 0;
         }
+        getPathString() {
+            const list = [this.position.join("_")];
+            let p = this.parent;
+            while (p) {
+                list.push(p.position.join("_"));
+                p = p.parent;
+            }
+            return list.reverse().join(",");
+        }
+        getTurnCountTotal() {
+            if (!this.parent || !this.parent.direction || !this.direction) {
+                return 0;
+            }
+            let cnt = 0;
+            let p = this.parent;
+            let d = this.direction;
+            while (p && d) {
+                if (p.direction && d.toString() !== p.direction.toString()) {
+                    cnt++;
+                }
+                d = p.direction;
+                p = p.parent;
+            }
+            return cnt;
+        }
     }
     class AStar {
-        constructor(grid) {
+        constructor(grid, turnCnt = DEFAULT_TURN_COUNT) {
+            this._turnCount = 0;
             this._grid = grid;
+            this._turnCount = turnCnt;
         }
         heuristic(a, b) {
             return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
@@ -85,7 +110,7 @@
             const startNode = new PathNode(start, 0, this.heuristic(start, end));
             openList.push(startNode);
             while (openList.length > 0) {
-                openList.sort((a, b) => (a.f + a.getTurnCount()) - (b.f + b.getTurnCount()));
+                openList.sort((a, b) => (a.f + a.getTurnCountTotal()) - (b.f + b.getTurnCountTotal()));
                 const currentNode = openList.shift();
                 if (currentNode.position[0] === end[0] && currentNode.position[1] === end[1]) {
                     const path = [];
@@ -108,6 +133,10 @@
                     if (!existingNode || g < existingNode.g) {
                         if (existingNode) {
                             openList.splice(openList.indexOf(existingNode), 1);
+                        }
+                        const neighborNode = new PathNode(neighborPos, g, h, currentNode, direction);
+                        if (neighborNode.getTurnCountTotal() > this._turnCount) {
+                            continue;
                         }
                         openList.push(new PathNode(neighborPos, g, h, currentNode, direction));
                     }
@@ -685,7 +714,7 @@
                 const curItem = this._list.getCell(index).getChildByName("boxCard");
                 const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
                 if (curItemData && curItemData.checkSame(preItemData)
-                    && this._proxy.model.canConnect(curItemData, preItemData)) {
+                    && this._proxy.model.canConnect(preItemData, curItemData)) {
                     ComUtils.setScale(curItem, BIG_SCALE);
                     this.clearCardItem(curItem, index);
                     this.clearCardItem(preItem, this._preIdx);
