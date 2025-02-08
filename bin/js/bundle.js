@@ -669,7 +669,7 @@
             this._btnRefresh = this.getChildByName("btnRefresh");
             this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
             this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
-            Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
+            Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
             eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
         }
         onOpened(param) {

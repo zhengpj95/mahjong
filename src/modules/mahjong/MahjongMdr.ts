@@ -47,7 +47,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
     this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
 
-    Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess));
+    Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
 
     eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
   }
