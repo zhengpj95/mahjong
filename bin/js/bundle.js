@@ -698,9 +698,15 @@
                 this._preIdx = -1;
             }
             else {
+                const item = this._list.getCell(index);
+                const cardData = item.dataSource;
+                if (!cardData || !cardData.isValid()) {
+                    this._preIdx = -1;
+                    return;
+                }
                 this._preIdx = index;
-                const item = this._list.getCell(index).getChildByName("boxCard");
-                ComUtils.setScale(item, BIG_SCALE);
+                const boxCard = item.getChildByName("boxCard");
+                ComUtils.setScale(boxCard, BIG_SCALE);
             }
         }
         updateLevel() {

@@ -76,7 +76,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._list.array = list.reduce((a, b) => a.concat(b));
   }
 
-  private onRenderListItem(item: BoxCard, index: number): void {
+  private onRenderListItem(item: Box & { boxCard: BoxCard }, index: number): void {
     const img = ComUtils.getNodeByNameList<Image>(item, ["boxCard", "img"]);
     const data: MahjongCardData = item.dataSource;
     if (!data) {
@@ -112,9 +112,15 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       }
       this._preIdx = -1;
     } else {
+      const item = this._list.getCell(index);
+      const cardData = <MahjongCardData>item.dataSource;
+      if (!cardData || !cardData.isValid()) {
+        this._preIdx = -1;
+        return;
+      }
       this._preIdx = index;
-      const item = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
-      ComUtils.setScale(item, BIG_SCALE);
+      const boxCard = <BoxCard>item.getChildByName("boxCard");
+      ComUtils.setScale(boxCard, BIG_SCALE);
     }
   }
 
