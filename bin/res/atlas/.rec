@@ -5,6 +5,8 @@ D common
 P 07B8FD00 bg0.png
 P 7D862B48 bg1.png
 P 5B258D17 button.png
+D login
+R 60C481D1 mahjong_login_bg.jpg
 D mahjong
 P 3895FCA2 feng1.png
 P 0556B1B0 feng2.png
