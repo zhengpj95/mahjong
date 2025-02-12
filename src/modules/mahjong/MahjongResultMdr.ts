@@ -37,11 +37,13 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
   }
 
   private onClickHome(): void {
+    console.warn("MahjongResultMdr.onClickHome...");
     Scene.open("modules/mahjong/MahjongHome.scene");
     this.close();
   }
 
   private onClickNext(): void {
+    console.warn("MahjongResultMdr.onClickNext...");
     eventMgr.event(MahjongEvent.UPDATE_NEXT);
     this.close();
   }

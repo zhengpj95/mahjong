@@ -18,6 +18,7 @@ export default class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
 
   public onOpened(param: any): void {
     super.onOpened(param);
+    console.warn(`11111 MahjongHomeMdr.onOpened...`, param);
   }
 
   public onClosed(type?: string): void {

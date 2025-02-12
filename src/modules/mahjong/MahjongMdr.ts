@@ -13,11 +13,16 @@ import SoundManager = Laya.SoundManager;
 import Button = Laya.Button;
 import Label = Laya.Label;
 
-type BoxCard = Box & {
+type BoxRender = Box & {
   boxCard: Box & {
-    img: Image;
+    img: Image
   }
 }
+
+type BoxCard = Box & {
+  img: Image;
+}
+
 const INIT_SCALE = 0.4;
 const BIG_SCALE = 0.45;
 
@@ -62,12 +67,12 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onLoadedSuccess(): void {
-    console.log("11111 onLoadedSuccess");
+    console.warn("11111 onLoadedSuccess");
     this.onRefreshNext();
   }
 
   private onRefreshNext(): void {
-    console.log(`11111 onRefreshNext`);
+    console.warn(`11111 onRefreshNext`);
     this._proxy.model.showNext();
 
     this.resetScore();
@@ -76,7 +81,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._list.array = list.reduce((a, b) => a.concat(b));
   }
 
-  private onRenderListItem(item: Box & { boxCard: BoxCard }, index: number): void {
+  private onRenderListItem(item: BoxRender, index: number): void {
     const img = ComUtils.getNodeByNameList<Image>(item, ["boxCard", "img"]);
     const data: MahjongCardData = item.dataSource;
     if (!data) {
