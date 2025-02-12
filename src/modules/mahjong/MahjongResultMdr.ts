@@ -2,7 +2,7 @@ import { ui } from "@ui/layaMaxUI";
 import { LayerIndex, setLayerIndex } from "@base/LayerManager";
 import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
-import { MahjongProxy } from "./MahjongProxy";
+import { MahjongProxy } from "./model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import Handler = Laya.Handler;
 import Label = Laya.Label;

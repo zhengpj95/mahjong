@@ -1,6 +1,6 @@
 import { ui } from "@ui/layaMaxUI";
-import { MahjongProxy } from "./MahjongProxy";
-import { MahjongCardData } from "./MahjongModel";
+import { MahjongProxy } from "./model/MahjongProxy";
+import { MahjongCardData } from "./model/MahjongModel";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";

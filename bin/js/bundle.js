@@ -562,7 +562,7 @@
         static ins() {
             if (!this._instance) {
                 this._instance = new MahjongProxy();
-                window[this._instance.constructor.name] = this._instance;
+                DebugUtils.debug("this._instance.constructor.name", this._instance);
             }
             return this._instance;
         }
@@ -977,9 +977,6 @@
         stage["_loop"] = _loop;
     }
     new Main();
-    const message = "king";
-    const msgConst = "king";
-    const newC = msgConst;
 
 }());
 //# sourceMappingURL=bundle.js.map

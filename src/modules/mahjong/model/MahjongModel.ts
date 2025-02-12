@@ -1,5 +1,5 @@
 import { CardType, FengType } from "@def/mahjong";
-import { AStarMgr, GridPoint } from "@base/astar";
+import { AStarMgr, GridPoint } from "@base/astar/index";
 import { PoolObject } from "@base/pool/PoolConst";
 import { poolMgr } from "@base/pool/PoolManager";
 import Scene = Laya.Scene;
