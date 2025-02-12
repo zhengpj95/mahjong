@@ -680,11 +680,11 @@
             this._preIdx = -1;
         }
         onLoadedSuccess() {
-            console.log("11111 onLoadedSuccess");
+            console.warn("11111 onLoadedSuccess");
             this.onRefreshNext();
         }
         onRefreshNext() {
-            console.log(`11111 onRefreshNext`);
+            console.warn(`11111 onRefreshNext`);
             this._proxy.model.showNext();
             this.resetScore();
             this.updateLevel();
@@ -804,6 +804,7 @@
         }
         onOpened(param) {
             super.onOpened(param);
+            console.warn(`11111 MahjongHomeMdr.onOpened...`, param);
         }
         onClosed(type) {
             super.onClosed(type);
@@ -893,10 +894,12 @@
             super.onClosed(type);
         }
         onClickHome() {
+            console.warn("MahjongResultMdr.onClickHome...");
             Scene$4.open("modules/mahjong/MahjongHome.scene");
             this.close();
         }
         onClickNext() {
+            console.warn("MahjongResultMdr.onClickNext...");
             eventMgr.event("mahjong_update_next");
             this.close();
         }
@@ -974,6 +977,9 @@
         stage["_loop"] = _loop;
     }
     new Main();
+    const message = "king";
+    const msgConst = "king";
+    const newC = msgConst;
 
 }());
 //# sourceMappingURL=bundle.js.map
