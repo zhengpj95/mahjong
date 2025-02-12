@@ -562,7 +562,7 @@
         static ins() {
             if (!this._instance) {
                 this._instance = new MahjongProxy();
-                DebugUtils.debug("this._instance.constructor.name", this._instance);
+                DebugUtils.debug(this._instance.constructor.name, this._instance);
             }
             return this._instance;
         }
