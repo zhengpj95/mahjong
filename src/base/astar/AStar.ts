@@ -1,8 +1,12 @@
 import { Grid } from "./Grid";
 import { GridPoint } from "./AStarConst";
+import { DebugUtils } from "@base/utils/DebugUtils";
 
 /** 默认拐点数 */
 const DEFAULT_TURN_COUNT = 2;
+/** 方向 */
+const DIRECTION: number[][] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+const DIRECTION_NAME = ["right", "down", "left", "up"];
 
 /**
  * 表示路径搜索中的节点信息
@@ -20,8 +24,6 @@ class PathNode {
     this.h = h;
     this.parent = parent;
     this.direction = direction;
-    // const parentCnt = this.getTurnCountTotal() || 0;
-    // this.g += parentCnt;
   }
 
   /**
@@ -31,18 +33,8 @@ class PathNode {
     return this.g + this.h;
   }
 
-  /**
-   * 计算当前节点的拐点数
-   */
-  public getTurnCount(): number {
-    if (!this.parent || !this.parent.direction || !this.direction) {
-      return 0; // 起点没有拐点
-    }
-    return this.direction.toString() !== this.parent.direction.toString() ? 1 : 0;
-  }
-
   /**路径信息*/
-  private getPathString(): string {
+  private getPathStr(): string {
     const list: string[] = [this.position.join("_")];
     let p = this.parent;
     while (p) {
@@ -50,6 +42,24 @@ class PathNode {
       p = p.parent;
     }
     return list.reverse().join(",");
+  }
+
+  /**路径信息*/
+  public get pathStr(): string {
+    return this.getPathStr();
+  }
+
+  /**方向*/
+  public get directionName(): string {
+    if (!this.direction) {
+      return "";
+    }
+    for (let i = 0; i < DIRECTION.length; i++) {
+      if (DIRECTION[i].toString() === this.direction.toString()) {
+        return DIRECTION_NAME[i];
+      }
+    }
+    return "";
   }
 
   /**
@@ -109,10 +119,7 @@ export class AStar {
    */
   private getNeighbors(node: PathNode, end: GridPoint): [GridPoint, GridPoint][] {
     const [x, y] = node.position;
-    const directions: GridPoint[] = [
-      [0, 1], [1, 0], [0, -1], [-1, 0], // 上下左右四个方向
-    ];
-    const list = directions.map(([dx, dy]) => ([[x + dx, y + dy], [dx, dy]] as [GridPoint, GridPoint]));
+    const list = DIRECTION.map(([dx, dy]) => ([[x + dx, y + dy], [dx, dy]] as [GridPoint, GridPoint]));
     return list.filter(([pos]) => end[0] === pos[0] && end[1] === pos[1]
       ? this._grid.isInBounds(pos[0], pos[1])
       : this._grid.isValid(pos[0], pos[1]));
@@ -136,6 +143,7 @@ export class AStar {
       // 按照 f 值 + 拐点数排序，选择最优的节点
       openList.sort((a, b) => (a.f + a.getTurnCountTotal()) - (b.f + b.getTurnCountTotal()));
       const currentNode = openList.shift()!; // 当前节点
+      DebugUtils.debugLog(currentNode.pathStr);
 
       // 如果到达终点，则回溯路径
       if (currentNode.position[0] === end[0] && currentNode.position[1] === end[1]) {
@@ -149,20 +157,23 @@ export class AStar {
       }
 
       // 将当前节点标记为已处理
-      closedSet.add(currentNode.position.toString());
+      closedSet.add(currentNode.pathStr);
 
       // 遍历当前节点的邻居
-      const neighbors = this.getNeighbors(currentNode, end);
-      for (const [neighborPos, direction] of neighbors) {
-        if (closedSet.has(neighborPos.toString())) {
+      const neighborList = this.getNeighbors(currentNode, end);
+      for (const [neighbor, direction] of neighborList) {
+        const neighborPath = currentNode.pathStr + "," + neighbor.toString();
+        if (closedSet.has(neighborPath)) {
           continue; // 如果邻居已处理，跳过
         }
 
         const g = currentNode.g + 1; // 从起点到邻居的实际代价
-        const h = this.heuristic(neighborPos, end); // 邻居到目标的启发式代价
-        const existingNode = openList.find(
-          node => node.position[0] === neighborPos[0] && node.position[1] === neighborPos[1]
-        );
+        const h = this.heuristic(neighbor, end); // 邻居到目标的启发式代价
+        const neighborNode = new PathNode(neighbor, g, h, currentNode, direction);
+        if (neighborNode.getTurnCountTotal() > this._turnCount) {
+          continue;
+        }
+        const existingNode = openList.find(node => node.pathStr === neighborPath);
 
         // 如果邻居节点不在打开列表或新的路径代价更低
         if (!existingNode || g < existingNode.g) {
@@ -171,11 +182,7 @@ export class AStar {
             openList.splice(openList.indexOf(existingNode), 1);
           }
           // 将邻居节点加入打开列表
-          const neighborNode = new PathNode(neighborPos, g, h, currentNode, direction);
-          if (neighborNode.getTurnCountTotal() > this._turnCount) {
-            continue;
-          }
-          openList.push(new PathNode(neighborPos, g, h, currentNode, direction));
+          openList.push(neighborNode);
         }
       }
     }

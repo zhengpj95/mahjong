@@ -187,8 +187,9 @@ export class MahjongModel {
     let minPath = Number.MAX_SAFE_INTEGER;
     let rst: MahjongCardData[] = [];
     for (let rows of this.data) {
+      if (!rows || !rows.length) continue;
       for (let item of rows) {
-        if (!item) continue;// 已消除
+        if (!item || !item.isValid()) continue;// 已消除
         const connectList = this.getConnectCardDataList(item);
         if (!connectList.length) continue;
         for (let card of connectList) {
