@@ -64,6 +64,10 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   onClosed(type?: string) {
     super.onClosed(type);
     this._preIdx = -1;
+    this._btnTips.clickHandler.clear();
+    this._btnTips.clickHandler = undefined;
+    this._btnRefresh.clickHandler.clear();
+    this._btnRefresh.clickHandler = undefined;
   }
 
   private onLoadedSuccess(): void {

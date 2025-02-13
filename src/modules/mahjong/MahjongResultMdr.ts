@@ -4,9 +4,9 @@ import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
 import { MahjongProxy } from "./model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
-import Handler = Laya.Handler;
 import Label = Laya.Label;
 import Scene = Laya.Scene;
+import Event = Laya.Event;
 
 /**
  * 结算弹窗
@@ -22,8 +22,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
 
     this._proxy = MahjongProxy.ins();
     this._lab = ComUtils.getNodeByNameList<Label>(this, ["boxHtml", "lab"]);
-    this.btnHome.clickHandler = Handler.create(this, this.onClickHome, undefined, true);
-    this.btnNext.clickHandler = Handler.create(this, this.onClickNext, undefined, true);
+    this.btnHome.once(Event.CLICK, this, this.onClickHome);
+    this.btnNext.once(Event.CLICK, this, this.onClickNext);
   }
 
   onOpened(param: any) {
@@ -34,8 +34,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
 
   onClosed(type?: string) {
     super.onClosed(type);
-    this.btnHome.clickHandler = undefined;//需要清空
-    this.btnNext.clickHandler = undefined;
+    this.btnHome.off(Event.CLICK, this, this.onClickHome);
+    this.btnNext.off(Event.CLICK, this, this.onClickNext);
   }
 
   private onClickHome(): void {
