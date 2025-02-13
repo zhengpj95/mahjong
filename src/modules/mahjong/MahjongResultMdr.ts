@@ -34,6 +34,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
 
   onClosed(type?: string) {
     super.onClosed(type);
+    this.btnHome.clickHandler = undefined;//需要清空
+    this.btnNext.clickHandler = undefined;
   }
 
   private onClickHome(): void {
