@@ -479,29 +479,37 @@
             }
             let minPath = Number.MAX_SAFE_INTEGER;
             let rst = [];
+            const checkSet = new Set();
             for (let rows of this.data) {
                 if (!rows || !rows.length)
                     continue;
                 for (let item of rows) {
-                    if (!item || !item.isValid())
+                    if (!item || !item.cardData || !item.isValid())
                         continue;
+                    if (checkSet.has(item.cardData.toString()))
+                        continue;
+                    checkSet.add(item.cardData.toString());
                     const connectList = this.getConnectCardDataList(item);
                     if (!connectList.length)
                         continue;
-                    for (let card of connectList) {
-                        if (!card || card.checkPos(item))
+                    for (let i = 0; i < connectList.length; i++) {
+                        const cardI = connectList[i];
+                        if (!cardI || !cardI.isValid())
                             continue;
-                        if (!this.data[card.row][card.col])
-                            continue;
-                        const paths = this.findPath(item, card);
-                        if (!paths.length)
-                            continue;
-                        if (paths.length === 2) {
-                            return [item, card];
-                        }
-                        if (paths.length < minPath) {
-                            rst = [item, card];
-                            minPath = paths.length;
+                        for (let j = i + 1; j < connectList.length; j++) {
+                            const cardJ = connectList[j];
+                            if (!cardJ || !cardJ.isValid())
+                                continue;
+                            const paths = this.findPath(cardI, cardJ);
+                            if (!paths.length)
+                                continue;
+                            if (paths.length === 2) {
+                                return [cardI, cardJ];
+                            }
+                            if (paths.length < minPath) {
+                                rst = [cardI, cardJ];
+                                minPath = paths.length;
+                            }
                         }
                     }
                 }
