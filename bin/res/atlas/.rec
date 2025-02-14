@@ -1,6 +1,7 @@
 D .
 D audio
 R 93E518F7 mixkit-flop.wav
+D bg
 D common
 P 07B8FD00 bg0.png
 P 7D862B48 bg1.png

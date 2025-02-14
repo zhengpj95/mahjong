@@ -141,11 +141,15 @@
         findPath(start, end) {
             const openList = [];
             const closedSet = new Set();
+            const excludeSet = new Set();
             const startNode = new PathNode(start, 0, this.heuristic(start, end));
             openList.push(startNode);
             while (openList.length > 0) {
                 openList.sort((a, b) => (a.f + a.getTurnCountTotal()) - (b.f + b.getTurnCountTotal()));
                 const currentNode = openList.shift();
+                if (excludeSet.has(currentNode.pathStr)) {
+                    continue;
+                }
                 DebugUtils.debugLog(currentNode.pathStr);
                 if (currentNode.position[0] === end[0] && currentNode.position[1] === end[1]) {
                     const path = [];
@@ -160,13 +164,14 @@
                 const neighborList = this.getNeighbors(currentNode, end);
                 for (const [neighbor, direction] of neighborList) {
                     const neighborPath = currentNode.pathStr + "," + neighbor.toString();
-                    if (closedSet.has(neighborPath)) {
+                    if (closedSet.has(neighborPath) || excludeSet.has(neighborPath)) {
                         continue;
                     }
                     const g = currentNode.g + 1;
                     const h = this.heuristic(neighbor, end);
                     const neighborNode = new PathNode(neighbor, g, h, currentNode, direction);
                     if (neighborNode.getTurnCountTotal() > this._turnCount) {
+                        excludeSet.add(neighborPath);
                         continue;
                     }
                     const existingNode = openList.find(node => node.pathStr === neighborPath);
