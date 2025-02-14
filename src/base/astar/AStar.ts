@@ -134,6 +134,7 @@ export class AStar {
   public findPath(start: GridPoint, end: GridPoint): GridPoint[] {
     const openList: PathNode[] = [];        // 打开列表，存储待处理的节点
     const closedSet: Set<string> = new Set(); // 关闭列表，存储已处理的节点
+    const excludeSet: Set<string> = new Set(); // 排除的路径
 
     // 创建起点节点并加入打开列表
     const startNode = new PathNode(start, 0, this.heuristic(start, end));
@@ -143,6 +144,9 @@ export class AStar {
       // 按照 f 值 + 拐点数排序，选择最优的节点
       openList.sort((a, b) => (a.f + a.getTurnCountTotal()) - (b.f + b.getTurnCountTotal()));
       const currentNode = openList.shift()!; // 当前节点
+      if (excludeSet.has(currentNode.pathStr)) {
+        continue;
+      }
       DebugUtils.debugLog(currentNode.pathStr);
 
       // 如果到达终点，则回溯路径
@@ -163,7 +167,7 @@ export class AStar {
       const neighborList = this.getNeighbors(currentNode, end);
       for (const [neighbor, direction] of neighborList) {
         const neighborPath = currentNode.pathStr + "," + neighbor.toString();
-        if (closedSet.has(neighborPath)) {
+        if (closedSet.has(neighborPath) || excludeSet.has(neighborPath)) {
           continue; // 如果邻居已处理，跳过
         }
 
@@ -171,6 +175,7 @@ export class AStar {
         const h = this.heuristic(neighbor, end); // 邻居到目标的启发式代价
         const neighborNode = new PathNode(neighbor, g, h, currentNode, direction);
         if (neighborNode.getTurnCountTotal() > this._turnCount) {
+          excludeSet.add(neighborPath);//排除的路径
           continue;
         }
         const existingNode = openList.find(node => node.pathStr === neighborPath);
