@@ -907,7 +907,7 @@
                 tips.size(Laya.stage.width, Laya.stage.height);
                 tips.event(Laya.Event.RESIZE);
             }
-            return this._modal;
+            return this._tips;
         }
     }
     let layerMgr;
