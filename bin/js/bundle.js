@@ -872,13 +872,6 @@
         }
     }
     class LayerManager {
-        get ins() {
-            if (!this._ins) {
-                this._ins = new LayerManager();
-                this.init();
-            }
-            return this._ins;
-        }
         init() {
             Scene$3.root;
             this.modal;
@@ -917,7 +910,11 @@
             return this._modal;
         }
     }
-    const layerMgr = new LayerManager();
+    let layerMgr;
+    function initLayerMgr() {
+        layerMgr = new LayerManager();
+        layerMgr.init();
+    }
 
     var Scene$4 = Laya.Scene;
     var Event$2 = Laya.Event;
@@ -996,7 +993,7 @@
                 Laya.Stat.show();
             Laya.alertGlobalError(true);
             Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
-            layerMgr.init();
+            initLayerMgr();
             initLoop();
         }
         onVersionLoaded() {

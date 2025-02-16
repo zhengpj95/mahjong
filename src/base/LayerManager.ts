@@ -18,16 +18,7 @@ export function setLayerIndex(scene: Scene | View, idx: LayerIndex = LayerIndex.
   }
 }
 
-export class LayerManager {
-  private _ins: LayerManager;
-  public get ins(): LayerManager {
-    if (!this._ins) {
-      this._ins = new LayerManager();
-      this.init();
-    }
-    return this._ins;
-  }
-
+class LayerManager {
   public init(): void {
     Scene.root;
     this.modal;
@@ -75,4 +66,9 @@ export class LayerManager {
   }
 }
 
-export const layerMgr = new LayerManager();
+export let layerMgr: LayerManager;
+
+export function initLayerMgr(): void {
+  layerMgr = new LayerManager();
+  layerMgr.init()
+}
