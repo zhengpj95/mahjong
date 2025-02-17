@@ -14,7 +14,7 @@ class TipsItem extends Box implements PoolObject {
   private _lab: Label;
 
   public onAlloc(): void {
-    this.size(500, 30);
+    this.size(600, 35);
     this.centerX = 0;
     this.centerY = -100;
     if (!this._img) {
@@ -26,9 +26,10 @@ class TipsItem extends Box implements PoolObject {
     }
     if (!this._lab) {
       this._lab = new Label();
-      this._lab.fontSize = 26;
+      this._lab.fontSize = 22;
       this._lab.color = "#ffffff";
-      this._lab.centerX = this._lab.centerY = 0;
+      this._lab.centerX = 0;
+      this._lab.centerY = 1;
       this.addChild(this._lab);
     }
     this.alpha = 1;
