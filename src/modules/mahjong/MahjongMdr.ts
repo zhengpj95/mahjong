@@ -105,7 +105,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       // 同一个牌，则清除
       const boxCard = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       this._preIdx = -1;
-      ComUtils.setScale(boxCard);
+      ComUtils.setScale(boxCard, INIT_SCALE);
       return;
     }
 
