@@ -4,6 +4,7 @@ import { MahjongCardData } from "./model/MahjongModel";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
+import { showTips } from "../misc/TipsMdr";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -97,12 +98,17 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     ComUtils.setScale(<BoxCard>item.getChildByName("boxCard"), INIT_SCALE);
 
     item.on(Event.CLICK, this, this.onClickItem, [index]);
-    item.on(Event.MOUSE_DOWN, this, this.onClickMouseDown, [index]);
-    item.on(Event.MOUSE_UP, this, this.onClickMouseUp, [index]);
-    item.on(Event.MOUSE_OUT, this, this.onClickMouseUp, [index]);
   }
 
   private onClickItem(index: number): void {
+    if (this._preIdx > -1 && index === this._preIdx) {
+      // 同一个牌，则清除
+      const boxCard = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
+      this._preIdx = -1;
+      ComUtils.setScale(boxCard);
+      return;
+    }
+
     SoundManager.playSound("audio/mixkit-flop.wav");
     if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
@@ -168,14 +174,6 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     }));
   }
 
-  private onClickMouseDown(index: number): void {
-    //
-  }
-
-  private onClickMouseUp(index: number): void {
-    //
-  }
-
   // 提示
   private onBtnTips(): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
@@ -189,6 +187,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
           ComUtils.setTween(cardItem);
         }
       }
+    } else {
+      showTips("无可消除的卡牌，请洗牌");
     }
   }
 
@@ -198,5 +198,6 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     const list = this._proxy.model.getRefreshCardDataList();
     this._list.array = list.reduce((a, b) => a.concat(b));
     this._list.refresh();
+    showTips("洗牌成功！");
   }
 }

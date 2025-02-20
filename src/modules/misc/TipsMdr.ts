@@ -49,7 +49,7 @@ class TipsItem extends Box implements PoolObject {
 
   public execTween(): void {
     Tween.clearAll(this);
-    Tween.to(this, { alpha: 0.6 }, 1000, null, Handler.create(this, this.execTweenEnd, null, true), 1000);
+    Tween.to(this, { alpha: 0.6 }, 800, null, Handler.create(this, this.execTweenEnd, null, true), 800);
   }
 
   private execTweenEnd(): void {
@@ -64,7 +64,7 @@ class TipsItem extends Box implements PoolObject {
  * @author zpj
  * @date 2025/2/16
  */
-export class TipsMdr extends Box {
+class TipsMdr extends Box {
   private _sprite: Sprite;
   private _tipsList: TipsItem[] = [];
   private _timer: Timer;
@@ -121,4 +121,13 @@ export class TipsMdr extends Box {
     this._sprite.addChild(tipsItem);
     tipsItem.execTween();
   }
+}
+
+let mdr: TipsMdr | undefined;
+
+export function showTips(str: string): void {
+  if (!mdr) {
+    mdr = new TipsMdr();
+  }
+  mdr.addTips(str);
 }

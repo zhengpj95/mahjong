@@ -689,7 +689,175 @@
     const eventMgr = new EventManager();
     DebugUtils.debug("eventMgr", eventMgr);
 
+    var Sprite = Laya.Sprite;
+    var Scene$2 = Laya.Scene;
+    var LayerIndex;
+    (function (LayerIndex) {
+        LayerIndex[LayerIndex["ROOT"] = 1] = "ROOT";
+        LayerIndex[LayerIndex["MODAL"] = 2] = "MODAL";
+        LayerIndex[LayerIndex["TIPS"] = 3] = "TIPS";
+    })(LayerIndex || (LayerIndex = {}));
+    function setLayerIndex(scene, idx = LayerIndex.ROOT) {
+        if (scene) {
+            scene["_layerIndex_"] = idx;
+        }
+    }
+    class LayerManager {
+        init() {
+            Scene$2.root;
+            this.modal;
+            this.tips;
+        }
+        get modal() {
+            if (!this._modal) {
+                this._modal = new Sprite();
+                Scene$2["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
+                const modal = Scene$2["_modal_"];
+                modal.name = "modal";
+                modal.mouseThrough = true;
+                Laya.stage.on("resize", null, () => {
+                    modal.size(Laya.stage.width, Laya.stage.height);
+                    modal.event(Laya.Event.RESIZE);
+                });
+                modal.size(Laya.stage.width, Laya.stage.height);
+                modal.event(Laya.Event.RESIZE);
+            }
+            return this._modal;
+        }
+        get tips() {
+            if (!this._tips) {
+                this._tips = new Sprite();
+                Scene$2["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
+                const tips = Scene$2["_tips_"];
+                tips.name = "tips";
+                tips.mouseThrough = true;
+                Laya.stage.on("resize", null, () => {
+                    tips.size(Laya.stage.width, Laya.stage.height);
+                    tips.event(Laya.Event.RESIZE);
+                });
+                tips.size(Laya.stage.width, Laya.stage.height);
+                tips.event(Laya.Event.RESIZE);
+            }
+            return this._tips;
+        }
+    }
+    let layerMgr;
+    function initLayerMgr() {
+        layerMgr = new LayerManager();
+        layerMgr.init();
+    }
+
+    var Box = Laya.Box;
+    var Label = Laya.Label;
+    var Image = Laya.Image;
+    var Timer = Laya.Timer;
+    var Tween = Laya.Tween;
     var Handler = Laya.Handler;
+    var Sprite$1 = Laya.Sprite;
+    class TipsItem extends Box {
+        onAlloc() {
+            this.size(600, 35);
+            this.centerX = 0;
+            this.centerY = -100;
+            if (!this._img) {
+                this._img = new Image();
+                this._img.skin = `common/bg0.png`;
+                this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
+                this._img.sizeGrid = `3,8,6,5`;
+                this.addChild(this._img);
+            }
+            if (!this._lab) {
+                this._lab = new Label();
+                this._lab.fontSize = 22;
+                this._lab.color = "#ffffff";
+                this._lab.centerX = 0;
+                this._lab.centerY = 1;
+                this.addChild(this._lab);
+            }
+            this.alpha = 1;
+            this._lab.text = "";
+        }
+        onFree() {
+            this.alpha = 1;
+            if (this._lab) {
+                this._lab.text = "";
+            }
+        }
+        set text(str) {
+            this._lab.text = str;
+        }
+        execTween() {
+            Tween.clearAll(this);
+            Tween.to(this, { alpha: 0.6 }, 800, null, Handler.create(this, this.execTweenEnd, null, true), 800);
+        }
+        execTweenEnd() {
+            this.removeSelf();
+            Tween.clearAll(this);
+            poolMgr.free(this);
+        }
+    }
+    class TipsMdr extends Box {
+        constructor() {
+            super();
+            this._tipsList = [];
+            this._showMaxNum = 5;
+            if (!this._sprite) {
+                this._sprite = new Sprite$1();
+                this._sprite.size(Laya.stage.width, Laya.stage.height);
+                this.addChild(this._sprite);
+            }
+            this.size(Laya.stage.width, Laya.stage.height);
+            layerMgr.tips.addChild(this);
+        }
+        addTips(str) {
+            if (Array.isArray(str)) {
+                for (let strItem of str) {
+                    const tipsItem = poolMgr.alloc(TipsItem);
+                    tipsItem.text = strItem;
+                    this._tipsList.push(tipsItem);
+                }
+            }
+            else {
+                const tipsItem = poolMgr.alloc(TipsItem);
+                tipsItem.text = str;
+                this._tipsList.push(tipsItem);
+            }
+            if (!this._timer) {
+                this._timer = new Timer();
+                this._timer.loop(100, this, this.onUpdate);
+                this.onUpdate();
+            }
+        }
+        onUpdate() {
+            if (!this._tipsList.length) {
+                this._timer.clearAll(this);
+                this._timer = undefined;
+                return;
+            }
+            const existSize = this._sprite.numChildren;
+            if (existSize >= this._showMaxNum) {
+                return;
+            }
+            for (let i = 0; i < existSize; i++) {
+                const item = this._sprite.getChildAt(i);
+                if (item) {
+                    item.y = item.y - (item.height + 5);
+                }
+            }
+            const tipsItem = this._tipsList.shift();
+            this._sprite.addChild(tipsItem);
+            tipsItem.execTween();
+        }
+    }
+    let mdr;
+    function showTips(str) {
+        if (!mdr) {
+            mdr = new TipsMdr();
+        }
+        mdr.addTips(str);
+    }
+
+    var Handler$1 = Laya.Handler;
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
     const INIT_SCALE = 0.4;
@@ -704,11 +872,11 @@
         createChildren() {
             super.createChildren();
             this._list = this.getChildByName("listItem");
-            this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
+            this._list.renderHandler = Handler$1.create(this, this.onRenderListItem, undefined, false);
             this._btnTips = this.getChildByName("btnTips");
             this._btnRefresh = this.getChildByName("btnRefresh");
-            this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
-            this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
+            this._btnTips.clickHandler = Handler$1.create(this, this.onBtnTips, undefined, false);
+            this._btnRefresh.clickHandler = Handler$1.create(this, this.onBtnRefresh, undefined, false);
             Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
             eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
         }
@@ -746,11 +914,14 @@
             img.skin = data.getIcon();
             ComUtils.setScale(item.getChildByName("boxCard"), INIT_SCALE);
             item.on(Event$1.CLICK, this, this.onClickItem, [index]);
-            item.on(Event$1.MOUSE_DOWN, this, this.onClickMouseDown, [index]);
-            item.on(Event$1.MOUSE_UP, this, this.onClickMouseUp, [index]);
-            item.on(Event$1.MOUSE_OUT, this, this.onClickMouseUp, [index]);
         }
         onClickItem(index) {
+            if (this._preIdx > -1 && index === this._preIdx) {
+                const boxCard = this._list.getCell(index).getChildByName("boxCard");
+                this._preIdx = -1;
+                ComUtils.setScale(boxCard);
+                return;
+            }
             SoundManager.playSound("audio/mixkit-flop.wav");
             if (this._preIdx > -1 && index !== this._preIdx) {
                 const curItemData = this._list.getItem(index);
@@ -808,15 +979,11 @@
         }
         clearCardItem(box, index) {
             const idx = index;
-            ComUtils.setTween(box, true, Handler.create(this, () => {
+            ComUtils.setTween(box, true, Handler$1.create(this, () => {
                 const curImg = box.getChildByName("img");
                 curImg.skin = "";
                 this._proxy.model.deleteCard(idx);
             }));
-        }
-        onClickMouseDown(index) {
-        }
-        onClickMouseUp(index) {
         }
         onBtnTips() {
             const cardList = this._proxy.model.getTipsCardDataList();
@@ -830,21 +997,25 @@
                     }
                 }
             }
+            else {
+                showTips("无可消除的卡牌，请洗牌");
+            }
         }
         onBtnRefresh() {
             const list = this._proxy.model.getRefreshCardDataList();
             this._list.array = list.reduce((a, b) => a.concat(b));
             this._list.refresh();
+            showTips("洗牌成功！");
         }
     }
 
-    var Scene$2 = Laya.Scene;
-    var Handler$1 = Laya.Handler;
+    var Scene$3 = Laya.Scene;
+    var Handler$2 = Laya.Handler;
     class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
         createChildren() {
             super.createChildren();
             this._btnStart = this.getChildByName("btnStart");
-            this._btnStart.clickHandler = Handler$1.create(this, this.onClickBtnStart, undefined, true);
+            this._btnStart.clickHandler = Handler$2.create(this, this.onClickBtnStart, undefined, true);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -854,66 +1025,8 @@
             super.onClosed(type);
         }
         onClickBtnStart() {
-            Scene$2.open("modules/mahjong/Mahjong.scene");
+            Scene$3.open("modules/mahjong/Mahjong.scene");
         }
-    }
-
-    var Sprite = Laya.Sprite;
-    var Scene$3 = Laya.Scene;
-    var LayerIndex;
-    (function (LayerIndex) {
-        LayerIndex[LayerIndex["ROOT"] = 1] = "ROOT";
-        LayerIndex[LayerIndex["MODAL"] = 2] = "MODAL";
-        LayerIndex[LayerIndex["TIPS"] = 3] = "TIPS";
-    })(LayerIndex || (LayerIndex = {}));
-    function setLayerIndex(scene, idx = LayerIndex.ROOT) {
-        if (scene) {
-            scene["_layerIndex_"] = idx;
-        }
-    }
-    class LayerManager {
-        init() {
-            Scene$3.root;
-            this.modal;
-            this.tips;
-        }
-        get modal() {
-            if (!this._modal) {
-                this._modal = new Sprite();
-                Scene$3["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
-                const modal = Scene$3["_modal_"];
-                modal.name = "modal";
-                modal.mouseThrough = true;
-                Laya.stage.on("resize", null, () => {
-                    modal.size(Laya.stage.width, Laya.stage.height);
-                    modal.event(Laya.Event.RESIZE);
-                });
-                modal.size(Laya.stage.width, Laya.stage.height);
-                modal.event(Laya.Event.RESIZE);
-            }
-            return this._modal;
-        }
-        get tips() {
-            if (!this._tips) {
-                this._tips = new Sprite();
-                Scene$3["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
-                const tips = Scene$3["_tips_"];
-                tips.name = "tips";
-                tips.mouseThrough = true;
-                Laya.stage.on("resize", null, () => {
-                    tips.size(Laya.stage.width, Laya.stage.height);
-                    tips.event(Laya.Event.RESIZE);
-                });
-                tips.size(Laya.stage.width, Laya.stage.height);
-                tips.event(Laya.Event.RESIZE);
-            }
-            return this._tips;
-        }
-    }
-    let layerMgr;
-    function initLayerMgr() {
-        layerMgr = new LayerManager();
-        layerMgr.init();
     }
 
     var Scene$4 = Laya.Scene;
