@@ -1,6 +1,6 @@
 import { ui } from "@ui/layaMaxUI";
 import { LayerIndex, setLayerIndex } from "@base/LayerManager";
-import { MahjongEvent } from "@def/mahjong";
+import { IMahjongResultParam, MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
 import { MahjongProxy } from "./model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
@@ -15,6 +15,7 @@ import Event = Laya.Event;
 export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
   private _lab: Label;
   private _proxy: MahjongProxy;
+  private _param?: IMahjongResultParam;
 
   createChildren() {
     super.createChildren();
@@ -28,8 +29,15 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
 
   onOpened(param: any) {
     super.onOpened(param);
+    this._param = param;
 
-    this._lab.text = `得分: ` + this._proxy.model.levelScore;
+    if (!this._param || !this._param.type) {
+      this._lab.text = `得分: ` + this._proxy.model.levelScore;
+      this.btnNext.text.text = `下一关`;
+    } else {
+      this._lab.text = `挑战时间已到，挑战失败！`;
+      this.btnNext.text.text = `重新挑战`;
+    }
   }
 
   onClosed(type?: string) {
@@ -46,7 +54,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
 
   private onClickNext(): void {
     console.warn("MahjongResultMdr.onClickNext...");
-    eventMgr.event(MahjongEvent.UPDATE_NEXT);
+    const challengeAgain = this._param && this._param.type === 1;
+    eventMgr.event(MahjongEvent.UPDATE_NEXT, challengeAgain); // true 是重新挑战
     this.close();
   }
 }

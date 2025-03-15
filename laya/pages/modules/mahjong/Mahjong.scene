@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":20,
+    "selecteID":33,
     "searchKey":"Scene",
     "props":{"width":640,"sceneColor":"#aa110e","runtime":"modules/mahjong/MahjongMdr.ts","height":1136},
     "nodeParent":-1,
-    "maxID":21,
+    "maxID":38,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -175,6 +175,92 @@
                     "compId":18,
                     "child":[
                         ]
+                }]
+        },
+        {
+            "x":15,
+            "type":"Box",
+            "selectedBox":26,
+            "selecteID":28,
+            "searchKey":"Box",
+            "props":{"y":165,"presetID":1,"preset":"laya/pages/prefab/BarProgress.prefab","centerX":0},
+            "nodeParent":2,
+            "maxID":32,
+            "label":"bar",
+            "isOpen":true,
+            "isDirectory":true,
+            "isAniNode":true,
+            "hasChild":true,
+            "compId":33,
+            "child":[
+                {
+                    "x":30,
+                    "type":"Image",
+                    "searchKey":"Image",
+                    "props":{"presetID":2,"preset":"laya/pages/prefab/BarProgress.prefab"},
+                    "nodeParent":33,
+                    "label":"Image(BarProgress)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":34,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Image",
+                    "searchKey":"Image",
+                    "props":{"presetID":3,"preset":"laya/pages/prefab/BarProgress.prefab"},
+                    "nodeParent":33,
+                    "label":"imgBar",
+                    "isOpen":true,
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":35,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Label",
+                    "searchKey":"Label",
+                    "props":{"presetID":4,"preset":"laya/pages/prefab/BarProgress.prefab"},
+                    "nodeParent":33,
+                    "label":"lab",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":36,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Script",
+                    "switchAble":true,
+                    "source":"src/script/BarProgress.ts",
+                    "searchKey":"Script,BarProgress",
+                    "removeAble":true,
+                    "props":{"presetID":5,"preset":"laya/pages/prefab/BarProgress.prefab"},
+                    "nodeParent":33,
+                    "label":"BarProgress",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":37,
+                    "child":[
+                        ]
+                }],
+            "animations":[
+                {
+                    "nodes":[
+                        ],
+                    "name":"ani1",
+                    "id":1,
+                    "frameRate":24,
+                    "action":0
                 }]
         }],
     "animations":[

@@ -11,4 +11,6 @@
    <item name="common/bg1.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=6,4,7,3" picType="0" scale="0"/>
    <item name="common/bg0.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
    <item name="bg" type="" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
+   <item name="common/img_progress_bg.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=16,47,13,51" picType="0" scale="0"/>
+   <item name="common/img_progress.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=11,49,8,46" picType="0" scale="0"/>
 </res>

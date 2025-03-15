@@ -23,3 +23,8 @@ export const enum FengType {
 export const enum MahjongEvent {
   UPDATE_NEXT = "mahjong_update_next",
 }
+
+export interface IMahjongResultParam {
+  /**0成功，1失败*/
+  type: number;
+}

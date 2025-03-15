@@ -5,6 +5,7 @@ import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
 import { showTips } from "../misc/TipsMdr";
+import BarProgress from "../../script/BarProgress";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -13,6 +14,7 @@ import Event = Laya.Event;
 import SoundManager = Laya.SoundManager;
 import Button = Laya.Button;
 import Label = Laya.Label;
+import CallBack = base.CallBack;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -37,6 +39,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private _btnTips: Button;
   private _btnRefresh: Button;
   private _lastScoreTime = 0;
+  private _endTime = 0;
 
   constructor() {
     super();
@@ -76,14 +79,33 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this.onRefreshNext();
   }
 
-  private onRefreshNext(): void {
+  private onRefreshNext(data?: any): void {
     console.warn(`11111 onRefreshNext`);
-    this._proxy.model.showNext();
+    if (data) {
+      this._proxy.model.challengeAgain();
+    } else {
+      this._proxy.model.showNext();
+    }
 
     this.resetScore();
     this.updateLevel();
     const list = this._proxy.model.getMahjongData();
     this._list.array = list.reduce((a, b) => a.concat(b));
+    this.updateBar();
+  }
+
+  private updateBar(): void {
+    const now = Date.now() / 1000 >> 0;
+    this._endTime = now + this._proxy.model.getChallengeTime();
+    const bar = <Box>this.getChildByName("bar");
+    const barComp = <BarProgress>bar.getComponent(BarProgress);
+    barComp.value = 1;
+    base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+  }
+
+  // 失败结束
+  private onTimeOut(): void {
+    this._proxy.model.showResult({ type: 1 });
   }
 
   private onRenderListItem(item: BoxRender, index: number): void {

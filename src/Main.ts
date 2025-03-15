@@ -46,6 +46,7 @@ function _loop(): void {
     if (_rowLoop) {
       _rowLoop.call(Laya.stage);
     }
+    base.baseLoop();
   } catch (e) {
     console.log(e);
   }

@@ -1,4 +1,4 @@
-import { CardType, FengType } from "@def/mahjong";
+import { CardType, FengType, IMahjongResultParam } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar/index";
 import { PoolObject } from "@base/pool/PoolConst";
 import { poolMgr } from "@base/pool/PoolManager";
@@ -250,6 +250,23 @@ export class MahjongModel {
     return this.data;
   }
 
+  // 关卡挑战时间
+  public getChallengeTime(): number {
+    const lv = this.level;
+    if (lv <= 10) {
+      return 60 * 3;
+    } else if (lv <= 20) {
+      return 60 * 2;
+    }
+    return 90;
+  }
+
+  /**重新挑战*/
+  public challengeAgain(): void {
+    this.clearData();
+    this.updateData();
+  }
+
   /**下一关*/
   public showNext(): void {
     this.level += 1;
@@ -258,8 +275,8 @@ export class MahjongModel {
   }
 
   /**展示结算弹窗*/
-  public showResult(): void {
-    Scene.open("modules/mahjong/MahjongResult.scene", false);
+  public showResult(param?: IMahjongResultParam): void {
+    Scene.open("modules/mahjong/MahjongResult.scene", false, param);
   }
 }
 
