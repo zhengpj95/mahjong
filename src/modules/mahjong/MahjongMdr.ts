@@ -100,6 +100,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     const bar = <Box>this.getChildByName("bar");
     const barComp = <BarProgress>bar.getComponent(BarProgress);
     barComp.value = 1;
+    base.tweenMgr.remove(bar);
     base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
   }
 
