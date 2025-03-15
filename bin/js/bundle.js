@@ -548,6 +548,9 @@
             }
             return this.data;
         }
+        getChallengeTime() {
+            return 30;
+        }
         challengeAgain() {
             this.clearData();
             this.updateData();
@@ -947,13 +950,6 @@
             this._btnRefresh.clickHandler.clear();
             this._btnRefresh.clickHandler = undefined;
         }
-        getEndTIme() {
-            const level = this._proxy.model.level;
-            if (level <= 10) {
-                return 60;
-            }
-            return 90;
-        }
         onLoadedSuccess() {
             console.warn("11111 onLoadedSuccess");
             this.onRefreshNext();
@@ -974,10 +970,11 @@
         }
         updateBar() {
             const now = Date.now() / 1000 >> 0;
-            this._endTime = now + this.getEndTIme();
+            this._endTime = now + this._proxy.model.getChallengeTime();
             const bar = this.getChildByName("bar");
             const barComp = bar.getComponent(BarProgress);
             barComp.value = 1;
+            base.tweenMgr.remove(bar);
             base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
         }
         onTimeOut() {
