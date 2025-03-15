@@ -548,13 +548,17 @@
             }
             return this.data;
         }
+        challengeAgain() {
+            this.clearData();
+            this.updateData();
+        }
         showNext() {
             this.level += 1;
             this.clearData();
             this.updateData();
         }
-        showResult() {
-            Scene$1.open("modules/mahjong/MahjongResult.scene", false);
+        showResult(param) {
+            Scene$1.open("modules/mahjong/MahjongResult.scene", false, param);
         }
     }
     class MahjongCardData {
@@ -857,9 +861,60 @@
         mdr.addTips(str);
     }
 
+    var Script = Laya.Script;
+    var Image$1 = Laya.Image;
+    function createImgMask() {
+        const img = new Image$1();
+        img.skin = `common/img_progress.png`;
+        img.width = img.height = 0;
+        img.sizeGrid = "11,49,8,46";
+        return img;
+    }
+    class BarProgress extends Script {
+        onAwake() {
+            super.onAwake();
+            const owner = this.owner;
+            this._imgBar = owner.getChildByName("imgBar");
+            this._lab = owner.getChildByName("lab");
+            if (!this._imgMask) {
+                this._imgMask = createImgMask();
+                this._imgMask.height = this._imgBar.height;
+                this._imgBar.mask = this._imgMask;
+            }
+            Object.defineProperty(this.owner, "value", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    return this.value;
+                },
+                set: (v) => {
+                    this.value = v;
+                }
+            });
+        }
+        onEnable() {
+            super.onEnable();
+        }
+        onDestroy() {
+            super.onDestroy();
+        }
+        set value(val) {
+            if (this._imgMask && this._imgBar) {
+                this._imgMask.width = val * this._imgBar.width;
+            }
+        }
+        get value() {
+            if (this._imgMask && this._imgBar) {
+                return this._imgMask.width / this._imgBar.width;
+            }
+            return 0;
+        }
+    }
+
     var Handler$1 = Laya.Handler;
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
+    var CallBack = base.CallBack;
     const INIT_SCALE = 0.4;
     const BIG_SCALE = 0.45;
     class MahjongMdr extends ui.modules.mahjong.MahjongUI {
@@ -867,6 +922,7 @@
             super();
             this._preIdx = -1;
             this._lastScoreTime = 0;
+            this._endTime = 0;
             this._proxy = MahjongProxy.ins();
         }
         createChildren() {
@@ -891,17 +947,41 @@
             this._btnRefresh.clickHandler.clear();
             this._btnRefresh.clickHandler = undefined;
         }
+        getEndTIme() {
+            const level = this._proxy.model.level;
+            if (level <= 10) {
+                return 60;
+            }
+            return 90;
+        }
         onLoadedSuccess() {
             console.warn("11111 onLoadedSuccess");
             this.onRefreshNext();
         }
-        onRefreshNext() {
+        onRefreshNext(data) {
             console.warn(`11111 onRefreshNext`);
-            this._proxy.model.showNext();
+            if (data) {
+                this._proxy.model.challengeAgain();
+            }
+            else {
+                this._proxy.model.showNext();
+            }
             this.resetScore();
             this.updateLevel();
             const list = this._proxy.model.getMahjongData();
             this._list.array = list.reduce((a, b) => a.concat(b));
+            this.updateBar();
+        }
+        updateBar() {
+            const now = Date.now() / 1000 >> 0;
+            this._endTime = now + this.getEndTIme();
+            const bar = this.getChildByName("bar");
+            const barComp = bar.getComponent(BarProgress);
+            barComp.value = 1;
+            base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+        }
+        onTimeOut() {
+            this._proxy.model.showResult({ type: 1 });
         }
         onRenderListItem(item, index) {
             const img = ComUtils.getNodeByNameList(item, ["boxCard", "img"]);
@@ -919,7 +999,7 @@
             if (this._preIdx > -1 && index === this._preIdx) {
                 const boxCard = this._list.getCell(index).getChildByName("boxCard");
                 this._preIdx = -1;
-                ComUtils.setScale(boxCard);
+                ComUtils.setScale(boxCard, INIT_SCALE);
                 return;
             }
             SoundManager.playSound("audio/mixkit-flop.wav");
@@ -1042,7 +1122,15 @@
         }
         onOpened(param) {
             super.onOpened(param);
-            this._lab.text = `得分: ` + this._proxy.model.levelScore;
+            this._param = param;
+            if (!this._param || !this._param.type) {
+                this._lab.text = `得分: ` + this._proxy.model.levelScore;
+                this.btnNext.text.text = `下一关`;
+            }
+            else {
+                this._lab.text = `挑战时间已到，挑战失败！`;
+                this.btnNext.text.text = `重新挑战`;
+            }
         }
         onClosed(type) {
             super.onClosed(type);
@@ -1056,7 +1144,8 @@
         }
         onClickNext() {
             console.warn("MahjongResultMdr.onClickNext...");
-            eventMgr.event("mahjong_update_next");
+            const challengeAgain = this._param && this._param.type === 1;
+            eventMgr.event("mahjong_update_next", challengeAgain);
             this.close();
         }
     }
@@ -1067,6 +1156,7 @@
         static init() {
             var reg = Laya.ClassUtils.regClass;
             reg("modules/mahjong/MahjongMdr.ts", MahjongMdr);
+            reg("script/BarProgress.ts", BarProgress);
             reg("modules/mahjong/MahjongHomeMdr.ts", MahjongHomeMdr);
             reg("modules/mahjong/MahjongResultMdr.ts", MahjongResultMdr);
         }
@@ -1122,6 +1212,7 @@
             if (_rowLoop) {
                 _rowLoop.call(Laya.stage);
             }
+            base.baseLoop();
         }
         catch (e) {
             console.log(e);
