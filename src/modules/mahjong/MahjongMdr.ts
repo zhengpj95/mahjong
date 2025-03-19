@@ -56,7 +56,6 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
     this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
 
-    Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
 
     eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
     eventMgr.on(MahjongEvent.SHOW_RESULT, this, this.showResultToClear);
@@ -64,7 +63,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   onOpened(param: any) {
     super.onOpened(param);
-    this._proxy.model.clearData();
+    this._proxy.model.clearData(true);
+    Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
   }
 
   onClosed(type?: string) {

@@ -42,7 +42,10 @@ export class MahjongModel {
   }
 
   // 清除当前关卡数据
-  public clearData(): void {
+  public clearData(isReset = false): void {
+    if (isReset) {
+      this.level = 0;
+    }
     this.levelScore = 0;
     this.row = 0;
     this.col = 0;
@@ -66,7 +69,6 @@ export class MahjongModel {
     }
     return list;
   }
-
 
   private getRowColStrList(): string[] {
     if (!this._rowColStrList) {
@@ -157,7 +159,6 @@ export class MahjongModel {
     const paths = this.findPath(startData, targetData);
     return !!paths.length;
   }
-
 
   // 根据某张牌得到相同牌的信息
   public getConnectCardDataList(cardData: MahjongCardData): MahjongCardData[] {

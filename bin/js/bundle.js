@@ -328,6 +328,21 @@
     const poolMgr = new PoolManager();
     DebugUtils.debug("poolMgr", poolMgr);
 
+    var EventDispatcher = Laya.EventDispatcher;
+    class EventManager extends EventDispatcher {
+        on(type, caller, listener, args) {
+            return super.on(type, caller, listener, args);
+        }
+        off(type, caller, listener, onceOnly) {
+            return super.off(type, caller, listener, onceOnly);
+        }
+        event(type, data) {
+            return super.event(type, data);
+        }
+    }
+    const eventMgr = new EventManager();
+    DebugUtils.debug("eventMgr", eventMgr);
+
     var Scene$1 = Laya.Scene;
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -568,6 +583,7 @@
             this.updateData();
         }
         showResult(param) {
+            eventMgr.event("mahjong_show_result");
             Scene$1.open("modules/mahjong/MahjongResult.scene", false, param);
         }
     }
@@ -687,21 +703,6 @@
             }
         }
     }
-
-    var EventDispatcher = Laya.EventDispatcher;
-    class EventManager extends EventDispatcher {
-        on(type, caller, listener, args) {
-            return super.on(type, caller, listener, args);
-        }
-        off(type, caller, listener, onceOnly) {
-            return super.off(type, caller, listener, onceOnly);
-        }
-        event(type, data) {
-            return super.event(type, data);
-        }
-    }
-    const eventMgr = new EventManager();
-    DebugUtils.debug("eventMgr", eventMgr);
 
     var Sprite = Laya.Sprite;
     var Scene$2 = Laya.Scene;
@@ -943,11 +944,13 @@
             this._btnRefresh = this.getChildByName("btnRefresh");
             this._btnTips.clickHandler = Handler$1.create(this, this.onBtnTips, undefined, false);
             this._btnRefresh.clickHandler = Handler$1.create(this, this.onBtnRefresh, undefined, false);
-            Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
             eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
+            eventMgr.on("mahjong_show_result", this, this.showResultToClear);
         }
         onOpened(param) {
             super.onOpened(param);
+            this._proxy.model.clearData();
+            Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
         }
         onClosed(type) {
             super.onClosed(type);
@@ -983,6 +986,10 @@
             barComp.value = 1;
             base.tweenMgr.remove(bar);
             base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+        }
+        showResultToClear() {
+            const bar = this.getChildByName("bar");
+            base.tweenMgr.remove(bar);
         }
         onTimeOut() {
             this._proxy.model.showResult({ type: 1 });
