@@ -1189,6 +1189,42 @@
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
 
+    var Handler$3 = Laya.Handler;
+    class GameCfg {
+        static init() {
+            Laya.loader.load(this.jsonCfgListPath, Handler$3.create(this, this.onLoaded), null, Laya.Loader.JSON, 0);
+        }
+        static onLoaded(data) {
+            if (data && data.length) {
+                for (const jsonName of data) {
+                    Laya.loader.load(this.jsonPath + jsonName, Handler$3.create(this, this.onLoadedJson, [jsonName]), null, Laya.Loader.JSON, 0);
+                }
+            }
+        }
+        static onLoadedJson(jsonName, data) {
+            console.log(jsonName, data);
+            jsonName = jsonName.replace(".json", "");
+            this.cfgMap[jsonName] = data;
+            const list = [];
+            for (const key in data) {
+                list.push(data[key]);
+            }
+            this.cfgListMap[jsonName] = list;
+        }
+        static getCfgListByName(cfgName) {
+            return this.cfgListMap[cfgName] || [];
+        }
+        static getCfgByNameId(cfgName, id) {
+            const obj = this.cfgMap[cfgName];
+            return obj ? obj[id] : undefined;
+        }
+    }
+    GameCfg.jsonPath = "json/";
+    GameCfg.jsonCfgListPath = "json/cfglist.json";
+    GameCfg.cfgMap = {};
+    GameCfg.cfgListMap = {};
+    DebugUtils.debug("GameCfg", GameCfg);
+
     class Main {
         constructor() {
             if (window["Laya3D"])
@@ -1212,6 +1248,8 @@
             Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
             initLayerMgr();
             initLoop();
+            GameCfg.init();
+            console.log("CardConfig");
         }
         onVersionLoaded() {
             Laya.AtlasInfoManager.enable("fileconfig.json", Laya.Handler.create(this, this.onConfigLoaded));

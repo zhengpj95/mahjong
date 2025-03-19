@@ -1,4 +1,4 @@
-/** 本文件为导表工具导出，不可手动修改 */
+/** 关联配置表结构 */
 
 declare module config {
   /** 牌资源 */
@@ -19,5 +19,8 @@ declare module config {
     readonly cardType: any[];
     /** 字牌（风牌和箭牌） */
     readonly fengType: any[];
+    /** 布局[行,列] */
+    readonly layout: any[];
   }
+
 }

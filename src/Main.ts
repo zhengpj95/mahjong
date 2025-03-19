@@ -1,5 +1,6 @@
 import GameConfig from "./GameConfig";
 import { initLayerMgr } from "@base/LayerManager";
+import { GameCfg } from "@base/cfg/GameCfg";
 
 class Main {
   constructor() {
@@ -26,6 +27,7 @@ class Main {
 
     initLayerMgr();
     initLoop();
+    GameCfg.init();
   }
 
   onVersionLoaded(): void {
