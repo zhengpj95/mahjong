@@ -549,7 +549,14 @@
             return this.data;
         }
         getChallengeTime() {
-            return 30;
+            const lv = this.level;
+            if (lv <= 10) {
+                return 60 * 3;
+            }
+            else if (lv <= 20) {
+                return 60 * 2;
+            }
+            return 90;
         }
         challengeAgain() {
             this.clearData();
