@@ -369,7 +369,10 @@
             this.col = col;
             this.data = [];
         }
-        clearData() {
+        clearData(isReset = false) {
+            if (isReset) {
+                this.level = 0;
+            }
             this.levelScore = 0;
             this.row = 0;
             this.col = 0;
@@ -949,7 +952,7 @@
         }
         onOpened(param) {
             super.onOpened(param);
-            this._proxy.model.clearData();
+            this._proxy.model.clearData(true);
             Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
         }
         onClosed(type) {
