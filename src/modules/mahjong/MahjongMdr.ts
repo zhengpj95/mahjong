@@ -59,10 +59,12 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
 
     eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
+    eventMgr.on(MahjongEvent.SHOW_RESULT, this, this.showResultToClear);
   }
 
   onOpened(param: any) {
     super.onOpened(param);
+    this._proxy.model.clearData();
   }
 
   onClosed(type?: string) {
@@ -102,6 +104,12 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     barComp.value = 1;
     base.tweenMgr.remove(bar);
     base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+  }
+
+  // 展示结算弹窗时候，清除操作
+  private showResultToClear(): void {
+    const bar = <Box>this.getChildByName("bar");
+    base.tweenMgr.remove(bar);
   }
 
   // 失败结束

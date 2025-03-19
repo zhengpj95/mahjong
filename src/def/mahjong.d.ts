@@ -22,6 +22,7 @@ export const enum FengType {
 
 export const enum MahjongEvent {
   UPDATE_NEXT = "mahjong_update_next",
+  SHOW_RESULT = "mahjong_show_result"
 }
 
 export interface IMahjongResultParam {

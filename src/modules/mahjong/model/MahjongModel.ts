@@ -1,7 +1,8 @@
-import { CardType, FengType, IMahjongResultParam } from "@def/mahjong";
+import { CardType, FengType, IMahjongResultParam, MahjongEvent } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar/index";
 import { PoolObject } from "@base/pool/PoolConst";
 import { poolMgr } from "@base/pool/PoolManager";
+import { eventMgr } from "@base/event/EventManager";
 import Scene = Laya.Scene;
 
 /**
@@ -276,6 +277,7 @@ export class MahjongModel {
 
   /**展示结算弹窗*/
   public showResult(param?: IMahjongResultParam): void {
+    eventMgr.event(MahjongEvent.SHOW_RESULT);
     Scene.open("modules/mahjong/MahjongResult.scene", false, param);
   }
 }
