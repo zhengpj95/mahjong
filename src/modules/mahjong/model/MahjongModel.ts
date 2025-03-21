@@ -1,26 +1,14 @@
-import { CardType, FengType, IMahjongResultParam, MahjongEvent } from "@def/mahjong";
+import { CardType, IMahjongResultParam, MahjongEvent } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar/index";
-import { PoolObject } from "@base/pool/PoolConst";
 import { poolMgr } from "@base/pool/PoolManager";
 import { eventMgr } from "@base/event/EventManager";
+import { MahjongCardData } from "./MahjongCardData";
+import { CARD_COUNT, CARD_NUM_LIST, CARD_TYPE_LIST, CardData, FENG_TYPE_LIST } from "../MahjongConst";
 import Scene = Laya.Scene;
 
 /**
  * @date 2024/12/22
  */
-
-const CARD_COUNT = 4;
-const CARD_NUM_LIST: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-const CARD_TYPE_LIST: CardType[] = [CardType.TONG, CardType.TIAO];
-const FENG_TYPE_LIST: FengType[] = [FengType.ZHONG, FengType.FA];
-const CardTypeName = {
-  [CardType.TONG]: "tong",
-  [CardType.WAN]: "wan",
-  [CardType.TIAO]: "tiao",
-  [CardType.FENG]: "feng"
-};
-// 卡牌格式 [牌类型, 牌数字]
-type CardData = [CardType, number | FengType]
 
 export class MahjongModel {
   public row = 0;
@@ -280,57 +268,5 @@ export class MahjongModel {
   public showResult(param?: IMahjongResultParam): void {
     eventMgr.event(MahjongEvent.SHOW_RESULT);
     Scene.open("modules/mahjong/MahjongResult.scene", false, param);
-  }
-}
-
-/**单张麻将的数据*/
-export class MahjongCardData implements PoolObject {
-  public row: number;
-  public col: number;
-  public cardData: CardData;
-
-  public updateInfo(row: number, col: number, data: CardData): void {
-    this.row = row;
-    this.col = col;
-    this.cardData = data;
-    this["cardName"] = CardTypeName[data[0]] + data[1];
-  }
-
-  public isValid(): boolean {
-    return this.cardData && this.cardData.length > 0;
-  }
-
-  public getIcon(): string {
-    if (!this.cardData) {
-      return "";
-    }
-    return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
-  }
-
-  public checkSame(data: MahjongCardData): boolean {
-    if (!data || !data.cardData) {
-      return false;
-    }
-    if (!this.isValid()) {
-      return false;
-    }
-    return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
-  }
-
-  public checkPos(data: MahjongCardData): boolean {
-    if (!data) {
-      return false;
-    }
-    return data.row === this.row && data.col === this.col;
-  }
-
-  onAlloc(): void {
-    this.row = 0;
-    this.col = 0;
-    this.cardData = <any>undefined;
-  }
-
-  onFree(): void {
-    this.onAlloc();
   }
 }

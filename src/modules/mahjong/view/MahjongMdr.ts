@@ -1,11 +1,11 @@
 import { ui } from "@ui/layaMaxUI";
-import { MahjongProxy } from "./model/MahjongProxy";
-import { MahjongCardData } from "./model/MahjongModel";
+import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
-import { showTips } from "../misc/TipsMdr";
-import BarProgress from "../../script/BarProgress";
+import { showTips } from "../../misc/TipsMdr";
+import BarProgress from "../../../script/BarProgress";
+import { MahjongCardData } from "../model/MahjongCardData";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;

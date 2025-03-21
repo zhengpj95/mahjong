@@ -343,7 +343,6 @@
     const eventMgr = new EventManager();
     DebugUtils.debug("eventMgr", eventMgr);
 
-    var Scene$1 = Laya.Scene;
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const CARD_TYPE_LIST = [1, 2];
@@ -354,6 +353,49 @@
         [2]: "tiao",
         [4]: "feng"
     };
+
+    class MahjongCardData {
+        updateInfo(row, col, data) {
+            this.row = row;
+            this.col = col;
+            this.cardData = data;
+            this["cardName"] = CardTypeName[data[0]] + data[1];
+        }
+        isValid() {
+            return this.cardData && this.cardData.length > 0;
+        }
+        getIcon() {
+            if (!this.cardData) {
+                return "";
+            }
+            return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
+        }
+        checkSame(data) {
+            if (!data || !data.cardData) {
+                return false;
+            }
+            if (!this.isValid()) {
+                return false;
+            }
+            return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
+        }
+        checkPos(data) {
+            if (!data) {
+                return false;
+            }
+            return data.row === this.row && data.col === this.col;
+        }
+        onAlloc() {
+            this.row = 0;
+            this.col = 0;
+            this.cardData = undefined;
+        }
+        onFree() {
+            this.onAlloc();
+        }
+    }
+
+    var Scene$1 = Laya.Scene;
     class MahjongModel {
         constructor() {
             this.row = 0;
@@ -588,46 +630,6 @@
         showResult(param) {
             eventMgr.event("mahjong_show_result");
             Scene$1.open("modules/mahjong/MahjongResult.scene", false, param);
-        }
-    }
-    class MahjongCardData {
-        updateInfo(row, col, data) {
-            this.row = row;
-            this.col = col;
-            this.cardData = data;
-            this["cardName"] = CardTypeName[data[0]] + data[1];
-        }
-        isValid() {
-            return this.cardData && this.cardData.length > 0;
-        }
-        getIcon() {
-            if (!this.cardData) {
-                return "";
-            }
-            return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
-        }
-        checkSame(data) {
-            if (!data || !data.cardData) {
-                return false;
-            }
-            if (!this.isValid()) {
-                return false;
-            }
-            return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
-        }
-        checkPos(data) {
-            if (!data) {
-                return false;
-            }
-            return data.row === this.row && data.col === this.col;
-        }
-        onAlloc() {
-            this.row = 0;
-            this.col = 0;
-            this.cardData = undefined;
-        }
-        onFree() {
-            this.onAlloc();
         }
     }
 
@@ -1169,10 +1171,10 @@
         }
         static init() {
             var reg = Laya.ClassUtils.regClass;
-            reg("modules/mahjong/MahjongMdr.ts", MahjongMdr);
+            reg("modules/mahjong/view/MahjongMdr.ts", MahjongMdr);
             reg("script/BarProgress.ts", BarProgress);
-            reg("modules/mahjong/MahjongHomeMdr.ts", MahjongHomeMdr);
-            reg("modules/mahjong/MahjongResultMdr.ts", MahjongResultMdr);
+            reg("modules/mahjong/view/MahjongHomeMdr.ts", MahjongHomeMdr);
+            reg("modules/mahjong/view/MahjongResultMdr.ts", MahjongResultMdr);
         }
     }
     GameConfig.width = 640;
@@ -1249,7 +1251,6 @@
             initLayerMgr();
             initLoop();
             GameCfg.init();
-            console.log("CardConfig");
         }
         onVersionLoaded() {
             Laya.AtlasInfoManager.enable("fileconfig.json", Laya.Handler.create(this, this.onConfigLoaded));
