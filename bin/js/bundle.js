@@ -343,23 +343,56 @@
     const eventMgr = new EventManager();
     DebugUtils.debug("eventMgr", eventMgr);
 
+    var Handler = Laya.Handler;
+    class GameCfg {
+        static init() {
+            Laya.loader.load(this.jsonCfgListPath, Handler.create(this, this.onLoaded), null, Laya.Loader.JSON, 0);
+        }
+        static onLoaded(data) {
+            if (data && data.length) {
+                for (const jsonName of data) {
+                    Laya.loader.load(this.jsonPath + jsonName, Handler.create(this, this.onLoadedJson, [jsonName]), null, Laya.Loader.JSON, 0);
+                }
+            }
+        }
+        static onLoadedJson(jsonName, data) {
+            console.log(jsonName, data);
+            jsonName = jsonName.replace(".json", "");
+            this.cfgMap[jsonName] = data;
+            const list = [];
+            for (const key in data) {
+                list.push(data[key]);
+            }
+            this.cfgListMap[jsonName] = list;
+        }
+        static getCfgListByName(cfgName) {
+            return this.cfgListMap[cfgName] || [];
+        }
+        static getCfgByNameId(cfgName, id) {
+            const obj = this.cfgMap[cfgName];
+            return obj ? obj[id] : undefined;
+        }
+    }
+    GameCfg.jsonPath = "json/";
+    GameCfg.jsonCfgListPath = "json/cfglist.json";
+    GameCfg.cfgMap = {};
+    GameCfg.cfgListMap = {};
+    DebugUtils.debug("GameCfg", GameCfg);
+
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    const CARD_TYPE_LIST = [1, 2];
-    const FENG_TYPE_LIST = [5, 6];
-    const CardTypeName = {
-        [1]: "tong",
-        [3]: "wan",
-        [2]: "tiao",
-        [4]: "feng"
-    };
+    function getCardTypeRes(type, num) {
+        const cardCfg = GameCfg.getCfgByNameId("CardConfig", type);
+        return `mahjong/${cardCfg.res + num}.png`;
+    }
 
     class MahjongCardData {
         updateInfo(row, col, data) {
             this.row = row;
             this.col = col;
             this.cardData = data;
-            this["cardName"] = CardTypeName[data[0]] + data[1];
+            const cardCfg = GameCfg.getCfgByNameId("CardConfig", data[0]);
+            this["cardName"] = cardCfg.res + data[1];
         }
         isValid() {
             return this.cardData && this.cardData.length > 0;
@@ -368,7 +401,7 @@
             if (!this.cardData) {
                 return "";
             }
-            return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
+            return getCardTypeRes(this.cardData[0], this.cardData[1]);
         }
         checkSame(data) {
             if (!data || !data.cardData) {
@@ -406,9 +439,17 @@
             this._pathData = [];
             this._sameCardMap = {};
         }
-        updateData(row = 8, col = 10) {
-            this.row = row;
-            this.col = col;
+        getLevelCfg() {
+            const list = GameCfg.getCfgListByName("LevelConfig") || [];
+            if (this.level >= list.length) {
+                return list[list.length - 1];
+            }
+            return GameCfg.getCfgByNameId("LevelConfig", this.level || 1);
+        }
+        updateData() {
+            const cfg = this.getLevelCfg();
+            this.row = cfg && cfg.layout ? cfg.layout[0] : 8;
+            this.col = cfg && cfg.layout ? cfg.layout[1] : 10;
             this.data = [];
         }
         clearData(isReset = false) {
@@ -426,12 +467,14 @@
         }
         getMahjongCardList() {
             const list = [];
-            for (let type of CARD_TYPE_LIST) {
+            const cardTypeList = this.getLevelCfg().cardType || [];
+            const fengTypeList = this.getLevelCfg().fengType || [];
+            for (let type of cardTypeList) {
                 for (let num of CARD_NUM_LIST) {
                     list.push([type, num]);
                 }
             }
-            for (let feng of FENG_TYPE_LIST) {
+            for (let feng of fengTypeList) {
                 list.push([4, feng]);
             }
             return list;
@@ -609,12 +652,9 @@
             return this.data;
         }
         getChallengeTime() {
-            const lv = this.level;
-            if (lv <= 10) {
-                return 60 * 3;
-            }
-            else if (lv <= 20) {
-                return 60 * 2;
+            const cfg = this.getLevelCfg();
+            if (cfg.time) {
+                return cfg.time;
             }
             return 90;
         }
@@ -772,7 +812,7 @@
     var Image = Laya.Image;
     var Timer = Laya.Timer;
     var Tween = Laya.Tween;
-    var Handler = Laya.Handler;
+    var Handler$1 = Laya.Handler;
     var Sprite$1 = Laya.Sprite;
     class TipsItem extends Box {
         onAlloc() {
@@ -808,7 +848,7 @@
         }
         execTween() {
             Tween.clearAll(this);
-            Tween.to(this, { alpha: 0.6 }, 800, null, Handler.create(this, this.execTweenEnd, null, true), 800);
+            Tween.to(this, { alpha: 0.6 }, 800, null, Handler$1.create(this, this.execTweenEnd, null, true), 800);
         }
         execTweenEnd() {
             this.removeSelf();
@@ -927,7 +967,140 @@
         }
     }
 
-    var Handler$1 = Laya.Handler;
+    class StringUtils {
+        static padString(str, totalLen, paddingChar = "0") {
+            let n = +totalLen | 0;
+            if (paddingChar == null || n == 0) {
+                return str;
+            }
+            let i;
+            let buf = [];
+            for (i = 0, n = Math.abs(n) - str.length; i < n; i++) {
+                buf.push(paddingChar);
+            }
+            if (totalLen < 0) {
+                buf.unshift(str);
+            }
+            else {
+                buf.push(str);
+            }
+            return buf.join("");
+        }
+    }
+    StringUtils.ChineseNum = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+    StringUtils.ChineseWeekNum = ["日", "一", "二", "三", "四", "五", "六", "日"];
+    StringUtils.ChineseWeekNum2 = ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+
+    const Second = {
+        Day: 86400,
+        Hour: 3600,
+        Minute: 60
+    };
+    const WeekChinese = ["日", "一", "二", "三", "四", "五", "六", "日"];
+    const WeekName = [
+        "\u661F\u671F\u65E5",
+        "\u661F\u671F\u4E00",
+        "\u661F\u671F\u4E8C",
+        "\u661F\u671F\u4E09",
+        "\u661F\u671F\u56DB",
+        "\u661F\u671F\u4E94",
+        "\u661F\u671F\u516D",
+        "\u661F\u671F\u65E5"
+    ];
+    const ZhouName = [
+        "\u5468\u65E5",
+        "\u5468\u4E00",
+        "\u5468\u4E8C",
+        "\u5468\u4E09",
+        "\u5468\u56DB",
+        "\u5468\u4E94",
+        "\u5468\u516D",
+        "\u5468\u65E5"
+    ];
+    class TimeUtils {
+        static _tmpReplacer(k) {
+            let obj = TimeUtils._tmpObj;
+            let type = k.charAt(0);
+            let v = obj[type];
+            if (type === "E") {
+                let day = WeekChinese.indexOf(v);
+                return k.length <= 2 ? ZhouName[day] : WeekName[day];
+            }
+            if (v.length < k.length) {
+                return StringUtils.padString(v, k.length);
+            }
+            return v;
+        }
+        static formatTime(time, format = "yyyy-MM-dd HH:mm:ss.SSS") {
+            let date = this._tmpDate;
+            date.setTime(time);
+            let obj = this._tmpObj;
+            obj["y"] = "" + date.getFullYear();
+            obj["q"] = "" + Math.floor((date.getMonth() + 3) / 3);
+            obj["M"] = "" + (date.getMonth() + 1);
+            obj["E"] = WeekChinese[date.getDay()];
+            obj["d"] = "" + date.getDate();
+            obj["h"] = "" + (date.getHours() % 12 === 0 ? 12 : date.getHours() % 12);
+            obj["H"] = "" + date.getHours();
+            obj["m"] = "" + date.getMinutes();
+            obj["s"] = "" + date.getSeconds();
+            obj["S"] = "" + date.getMilliseconds();
+            return format.replace(/y+|q+|M+|E+|d+|h+|H+|m+|s+|S+/g, this._tmpReplacer);
+        }
+        static formatTimeSecond(second, format = "yyyy-MM-dd HH:mm:ss") {
+            return this.formatTime(second * 1000, format);
+        }
+        static formatSecond(second, format = "dd:HH:mm:ss", adaption = false) {
+            let obj = this._tmpObj;
+            let remain = second;
+            if (adaption) {
+                if (remain < Second.Hour) {
+                    format = "m分s秒";
+                }
+                else if (remain < Second.Day) {
+                    format = "H时m分";
+                }
+            }
+            obj["y"] = "";
+            obj["q"] = "";
+            obj["M"] = "";
+            obj["E"] = "";
+            if (format.indexOf("d") > -1) {
+                obj["d"] = "" + Math.floor(remain / Second.Day);
+                remain = remain % Second.Day;
+            }
+            else {
+                obj["d"] = "";
+            }
+            obj["h"] = "";
+            if (format.indexOf("H") > -1) {
+                obj["H"] = "" + Math.floor(remain / Second.Hour);
+                remain = remain % Second.Hour;
+            }
+            else {
+                obj["H"] = "";
+            }
+            if (format.indexOf("m") > -1) {
+                obj["m"] = "" + Math.floor(remain / Second.Minute);
+                remain = remain % Second.Minute;
+            }
+            else {
+                obj["m"] = "";
+            }
+            if (format.indexOf("s") > -1) {
+                obj["s"] = "" + Math.floor(remain % Second.Minute);
+            }
+            else {
+                obj["s"] = "";
+            }
+            obj["S"] = "";
+            return format.replace(/y+|M+|d+|H+|m+|s+|S+/g, this._tmpReplacer);
+        }
+    }
+    TimeUtils._tmpDate = new Date();
+    TimeUtils._tmpObj = {};
+
+    var Handler$2 = Laya.Handler;
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
     var CallBack = base.CallBack;
@@ -944,11 +1117,11 @@
         createChildren() {
             super.createChildren();
             this._list = this.getChildByName("listItem");
-            this._list.renderHandler = Handler$1.create(this, this.onRenderListItem, undefined, false);
+            this._list.renderHandler = Handler$2.create(this, this.onRenderListItem, undefined, false);
             this._btnTips = this.getChildByName("btnTips");
             this._btnRefresh = this.getChildByName("btnRefresh");
-            this._btnTips.clickHandler = Handler$1.create(this, this.onBtnTips, undefined, false);
-            this._btnRefresh.clickHandler = Handler$1.create(this, this.onBtnRefresh, undefined, false);
+            this._btnTips.clickHandler = Handler$2.create(this, this.onBtnTips, undefined, false);
+            this._btnRefresh.clickHandler = Handler$2.create(this, this.onBtnRefresh, undefined, false);
             eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
             eventMgr.on("mahjong_show_result", this, this.showResultToClear);
         }
@@ -990,6 +1163,7 @@
             const barComp = bar.getComponent(BarProgress);
             barComp.value = 1;
             base.tweenMgr.remove(bar);
+            console.log(111111, TimeUtils.formatTime(Date.now()));
             base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
         }
         showResultToClear() {
@@ -997,6 +1171,7 @@
             base.tweenMgr.remove(bar);
         }
         onTimeOut() {
+            console.log(111112, TimeUtils.formatTime(Date.now()));
             this._proxy.model.showResult({ type: 1 });
         }
         onRenderListItem(item, index) {
@@ -1075,7 +1250,7 @@
         }
         clearCardItem(box, index) {
             const idx = index;
-            ComUtils.setTween(box, true, Handler$1.create(this, () => {
+            ComUtils.setTween(box, true, Handler$2.create(this, () => {
                 const curImg = box.getChildByName("img");
                 curImg.skin = "";
                 this._proxy.model.deleteCard(idx);
@@ -1106,12 +1281,12 @@
     }
 
     var Scene$3 = Laya.Scene;
-    var Handler$2 = Laya.Handler;
+    var Handler$3 = Laya.Handler;
     class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
         createChildren() {
             super.createChildren();
             this._btnStart = this.getChildByName("btnStart");
-            this._btnStart.clickHandler = Handler$2.create(this, this.onClickBtnStart, undefined, true);
+            this._btnStart.clickHandler = Handler$3.create(this, this.onClickBtnStart, undefined, true);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -1190,42 +1365,6 @@
     GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
-
-    var Handler$3 = Laya.Handler;
-    class GameCfg {
-        static init() {
-            Laya.loader.load(this.jsonCfgListPath, Handler$3.create(this, this.onLoaded), null, Laya.Loader.JSON, 0);
-        }
-        static onLoaded(data) {
-            if (data && data.length) {
-                for (const jsonName of data) {
-                    Laya.loader.load(this.jsonPath + jsonName, Handler$3.create(this, this.onLoadedJson, [jsonName]), null, Laya.Loader.JSON, 0);
-                }
-            }
-        }
-        static onLoadedJson(jsonName, data) {
-            console.log(jsonName, data);
-            jsonName = jsonName.replace(".json", "");
-            this.cfgMap[jsonName] = data;
-            const list = [];
-            for (const key in data) {
-                list.push(data[key]);
-            }
-            this.cfgListMap[jsonName] = list;
-        }
-        static getCfgListByName(cfgName) {
-            return this.cfgListMap[cfgName] || [];
-        }
-        static getCfgByNameId(cfgName, id) {
-            const obj = this.cfgMap[cfgName];
-            return obj ? obj[id] : undefined;
-        }
-    }
-    GameCfg.jsonPath = "json/";
-    GameCfg.jsonCfgListPath = "json/cfglist.json";
-    GameCfg.cfgMap = {};
-    GameCfg.cfgListMap = {};
-    DebugUtils.debug("GameCfg", GameCfg);
 
     class Main {
         constructor() {

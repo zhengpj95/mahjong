@@ -16,11 +16,11 @@ declare module config {
     /** 闯关时间 */
     readonly time: number;
     /** 牌类型 */
-    readonly cardType: any[];
+    readonly cardType: number[];
     /** 字牌（风牌和箭牌） */
-    readonly fengType: any[];
+    readonly fengType: number[];
     /** 布局[行,列] */
-    readonly layout: any[];
+    readonly layout: number[];
   }
 
 }

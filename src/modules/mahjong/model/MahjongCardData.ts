@@ -4,7 +4,10 @@
  */
 
 import { PoolObject } from "@base/pool/PoolConst";
-import { CardData, CardTypeName } from "../MahjongConst";
+import { CardData, getCardTypeRes } from "../MahjongConst";
+import { GameCfg } from "@base/cfg/GameCfg";
+import ConfigName = config.ConfigName;
+import CardConfig = config.CardConfig;
 
 /**单张麻将的数据*/
 export class MahjongCardData implements PoolObject {
@@ -16,7 +19,8 @@ export class MahjongCardData implements PoolObject {
     this.row = row;
     this.col = col;
     this.cardData = data;
-    this["cardName"] = CardTypeName[data[0]] + data[1];
+    const cardCfg = GameCfg.getCfgByNameId<CardConfig>(ConfigName.CARD, data[0]);
+    this["cardName"] = cardCfg.res + data[1];
   }
 
   public isValid(): boolean {
@@ -27,7 +31,7 @@ export class MahjongCardData implements PoolObject {
     if (!this.cardData) {
       return "";
     }
-    return `mahjong/${CardTypeName[this.cardData[0] + ""] + this.cardData[1]}.png`;
+    return getCardTypeRes(this.cardData[0], this.cardData[1]);
   }
 
   public checkSame(data: MahjongCardData): boolean {

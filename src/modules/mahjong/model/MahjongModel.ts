@@ -1,10 +1,13 @@
 import { CardType, IMahjongResultParam, MahjongEvent } from "@def/mahjong";
-import { AStarMgr, GridPoint } from "@base/astar/index";
+import { AStarMgr, GridPoint } from "@base/astar";
 import { poolMgr } from "@base/pool/PoolManager";
 import { eventMgr } from "@base/event/EventManager";
 import { MahjongCardData } from "./MahjongCardData";
-import { CARD_COUNT, CARD_NUM_LIST, CARD_TYPE_LIST, CardData, FENG_TYPE_LIST } from "../MahjongConst";
+import { CARD_COUNT, CARD_NUM_LIST, CardData } from "../MahjongConst";
+import { GameCfg } from "@base/cfg/GameCfg";
 import Scene = Laya.Scene;
+import ConfigName = config.ConfigName;
+import LevelConfig = config.LevelConfig;
 
 /**
  * @date 2024/12/22
@@ -23,9 +26,18 @@ export class MahjongModel {
   private _astarMgr: AStarMgr;
   private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
 
-  public updateData(row: number = 8, col: number = 10): void {
-    this.row = row;
-    this.col = col;
+  private getLevelCfg(): LevelConfig {
+    const list = GameCfg.getCfgListByName<LevelConfig>(ConfigName.LEVEl) || [];
+    if (this.level >= list.length) {
+      return list[list.length - 1];
+    }
+    return GameCfg.getCfgByNameId<LevelConfig>(ConfigName.LEVEl, this.level || 1);
+  }
+
+  public updateData(): void {
+    const cfg = this.getLevelCfg();
+    this.row = cfg && cfg.layout ? cfg.layout[0] : 8;
+    this.col = cfg && cfg.layout ? cfg.layout[1] : 10;
     this.data = [];
   }
 
@@ -47,12 +59,14 @@ export class MahjongModel {
   // 麻将牌类型集
   private getMahjongCardList(): CardData[] {
     const list: CardData[] = [];
-    for (let type of CARD_TYPE_LIST) {
+    const cardTypeList = this.getLevelCfg().cardType || [];
+    const fengTypeList = this.getLevelCfg().fengType || [];
+    for (let type of cardTypeList) {
       for (let num of CARD_NUM_LIST) {
         list.push([type, num]);
       }
     }
-    for (let feng of FENG_TYPE_LIST) {
+    for (let feng of fengTypeList) {
       list.push([CardType.FENG, feng]);
     }
     return list;
@@ -242,11 +256,9 @@ export class MahjongModel {
 
   // 关卡挑战时间
   public getChallengeTime(): number {
-    const lv = this.level;
-    if (lv <= 10) {
-      return 60 * 3;
-    } else if (lv <= 20) {
-      return 60 * 2;
+    const cfg = this.getLevelCfg();
+    if (cfg.time) {
+      return cfg.time;
     }
     return 90;
   }
