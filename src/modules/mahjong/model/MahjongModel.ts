@@ -29,7 +29,11 @@ export class MahjongModel {
   private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
 
   constructor() {
-    this.level = AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL) || 0;
+    AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data: number) => {
+      console.log(`11111 before getItem: ${this.level}`);
+      this.level = data;
+      console.log(`11111 after getItem: ${this.level}`);
+    });
   }
 
   private getLevelCfg(): LevelConfig {
@@ -280,7 +284,9 @@ export class MahjongModel {
     this.level += 1;
     this.clearData();
     this.updateData();
-    AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level);
+    AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level, (success?: boolean) => {
+      console.log(`11111 setItem: `, this.level);
+    });
   }
 
   /**展示结算弹窗*/
