@@ -613,7 +613,11 @@
             this.levelScore = 0;
             this._pathData = [];
             this._sameCardMap = {};
-            this.level = AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL) || 0;
+            AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data) => {
+                console.log(`11111 before getItem: ${this.level}`);
+                this.level = data || 0;
+                console.log(`11111 after getItem: ${this.level}`);
+            });
         }
         getLevelCfg() {
             const list = GameCfg.getCfgListByName("LevelConfig") || [];
@@ -842,7 +846,9 @@
             this.level += 1;
             this.clearData();
             this.updateData();
-            AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level);
+            AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level, (success) => {
+                console.log(`11111 setItem: `, this.level);
+            });
         }
         showResult(param) {
             eventMgr.event("mahjong_show_result");
