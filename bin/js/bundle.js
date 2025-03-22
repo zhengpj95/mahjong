@@ -427,7 +427,183 @@
         }
     }
 
+    var PlatformType;
+    (function (PlatformType) {
+        PlatformType["WX"] = "wx";
+        PlatformType["TT"] = "tt";
+        PlatformType["QQ"] = "qq";
+        PlatformType["WEB"] = "web";
+        PlatformType["UNKNOWN"] = "unknown";
+    })(PlatformType || (PlatformType = {}));
+
+    class Platform {
+        static get platform() {
+            if (typeof wx !== "undefined" && wx.getSystemInfoSync) {
+                return PlatformType.WX;
+            }
+            else if (typeof window !== "undefined") {
+                return PlatformType.WEB;
+            }
+            else {
+                return PlatformType.UNKNOWN;
+            }
+        }
+        static get isWx() {
+            return this.platform === PlatformType.WX;
+        }
+        static get isWeb() {
+            return this.platform === PlatformType.WEB;
+        }
+    }
+
+    class WechatAdapter {
+        get storage() {
+            if (!this._storage) {
+                this._storage = new WechatPlatformStorage();
+            }
+            return this._storage;
+        }
+    }
+    class WechatPlatformStorage {
+        clear() {
+            wx.clearStorage();
+        }
+        getItem(key, callback) {
+            try {
+                wx.getStorage({
+                    key: key,
+                    success: (result) => {
+                        if (callback)
+                            callback(JSON.parse(result.data));
+                    },
+                    fail: () => {
+                        if (callback)
+                            callback(undefined);
+                    },
+                    complete: () => {
+                    }
+                });
+            }
+            catch (e) {
+                return undefined;
+            }
+        }
+        removeItem(key, callback) {
+            try {
+                wx.removeStorage({
+                    key: key,
+                    success: () => {
+                        if (callback)
+                            callback(true);
+                    },
+                    fail: () => {
+                        if (callback)
+                            callback(false);
+                    },
+                    complete: () => {
+                    }
+                });
+            }
+            catch (e) {
+                if (callback)
+                    callback(false);
+            }
+        }
+        setItem(key, val, callback) {
+            try {
+                wx.setStorage({
+                    key: key,
+                    data: JSON.stringify(val),
+                    success: () => {
+                        if (callback)
+                            callback(true);
+                    },
+                    fail: () => {
+                        if (callback)
+                            callback(false);
+                    },
+                    complete: () => {
+                    }
+                });
+            }
+            catch (e) {
+                if (callback)
+                    callback(false);
+            }
+        }
+    }
+
+    class WebAdapter {
+        get storage() {
+            if (!this._storage) {
+                this._storage = new WebPlatformStorage();
+            }
+            return this._storage;
+        }
+    }
+    class WebPlatformStorage {
+        setItem(key, val, callback) {
+            try {
+                localStorage.setItem(key, JSON.stringify(val));
+                if (callback) {
+                    callback(true);
+                }
+            }
+            catch (e) {
+                if (callback) {
+                    callback(false);
+                }
+            }
+        }
+        getItem(key, callback) {
+            try {
+                const data = localStorage.getItem(key);
+                const parsed = data ? JSON.parse(data) : null;
+                if (callback) {
+                    callback(parsed);
+                }
+                return parsed;
+            }
+            catch (e) {
+                if (callback) {
+                    callback(undefined);
+                }
+                return undefined;
+            }
+        }
+        removeItem(key, callback) {
+            try {
+                localStorage.removeItem(key);
+                if (callback) {
+                    callback(true);
+                }
+            }
+            catch (e) {
+                if (callback) {
+                    callback(false);
+                }
+            }
+        }
+        clear() {
+            localStorage.clear();
+        }
+    }
+
+    class AdapterFactory {
+        static getAdapter() {
+            switch (Platform.platform) {
+                case PlatformType.WX:
+                    return new WechatAdapter();
+                case PlatformType.WEB:
+                    return new WebAdapter();
+                default:
+                    throw new Error(`Unsupported platform!`);
+            }
+        }
+    }
+
     var Scene$1 = Laya.Scene;
+    const MAHJONG_LEVEL = "mahjong_level";
     class MahjongModel {
         constructor() {
             this.row = 0;
@@ -437,6 +613,7 @@
             this.levelScore = 0;
             this._pathData = [];
             this._sameCardMap = {};
+            this.level = AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL) || 0;
         }
         getLevelCfg() {
             const list = GameCfg.getCfgListByName("LevelConfig") || [];
@@ -665,6 +842,7 @@
             this.level += 1;
             this.clearData();
             this.updateData();
+            AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level);
         }
         showResult(param) {
             eventMgr.event("mahjong_show_result");
