@@ -53,8 +53,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
   }
 
   private onClickNext(): void {
-    console.warn("MahjongResultMdr.onClickNext...");
     const challengeAgain = this._param && this._param.type === 1;
+    console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
     eventMgr.event(MahjongEvent.UPDATE_NEXT, challengeAgain); // true 是重新挑战
     this.close();
   }

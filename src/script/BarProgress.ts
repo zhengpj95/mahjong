@@ -5,9 +5,9 @@ import Label = Laya.Label;
 
 function createImgMask(): Image {
   const img = new Image();
-  img.skin = `common/img_progress.png`;
+  img.skin = `common/bg0.png`;
   img.width = img.height = 0;
-  img.sizeGrid = "11,49,8,46";
+  img.sizeGrid = "4,5,7,6";
   return img;
 }
 

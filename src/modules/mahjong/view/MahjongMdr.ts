@@ -4,8 +4,8 @@ import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
 import { showTips } from "../../misc/TipsMdr";
-import BarProgress from "../../../script/BarProgress";
 import { MahjongCardData } from "../model/MahjongCardData";
+import { BarProgressComp } from "@script/index";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -99,9 +99,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private updateBar(): void {
     const now = Date.now() / 1000 >> 0;
     this._endTime = now + this._proxy.model.getChallengeTime();
-    const bar = <Box>this.getChildByName("bar");
-    const barComp = <BarProgress>bar.getComponent(BarProgress);
-    barComp.value = 1;
+    const bar = <BarProgressComp>this.getChildByName("bar");
+    bar.value = 1;
     base.tweenMgr.remove(bar);
     base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
   }

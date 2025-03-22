@@ -917,189 +917,6 @@
         mdr.addTips(str);
     }
 
-    var Script = Laya.Script;
-    var Image$1 = Laya.Image;
-    function createImgMask() {
-        const img = new Image$1();
-        img.skin = `common/img_progress.png`;
-        img.width = img.height = 0;
-        img.sizeGrid = "11,49,8,46";
-        return img;
-    }
-    class BarProgress extends Script {
-        onAwake() {
-            super.onAwake();
-            const owner = this.owner;
-            this._imgBar = owner.getChildByName("imgBar");
-            this._lab = owner.getChildByName("lab");
-            if (!this._imgMask) {
-                this._imgMask = createImgMask();
-                this._imgMask.height = this._imgBar.height;
-                this._imgBar.mask = this._imgMask;
-            }
-            Object.defineProperty(this.owner, "value", {
-                configurable: true,
-                enumerable: true,
-                get: () => {
-                    return this.value;
-                },
-                set: (v) => {
-                    this.value = v;
-                }
-            });
-        }
-        onEnable() {
-            super.onEnable();
-        }
-        onDestroy() {
-            super.onDestroy();
-        }
-        set value(val) {
-            if (this._imgMask && this._imgBar) {
-                this._imgMask.width = val * this._imgBar.width;
-            }
-        }
-        get value() {
-            if (this._imgMask && this._imgBar) {
-                return this._imgMask.width / this._imgBar.width;
-            }
-            return 0;
-        }
-    }
-
-    class StringUtils {
-        static padString(str, totalLen, paddingChar = "0") {
-            let n = +totalLen | 0;
-            if (paddingChar == null || n == 0) {
-                return str;
-            }
-            let i;
-            let buf = [];
-            for (i = 0, n = Math.abs(n) - str.length; i < n; i++) {
-                buf.push(paddingChar);
-            }
-            if (totalLen < 0) {
-                buf.unshift(str);
-            }
-            else {
-                buf.push(str);
-            }
-            return buf.join("");
-        }
-    }
-    StringUtils.ChineseNum = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
-    StringUtils.ChineseWeekNum = ["日", "一", "二", "三", "四", "五", "六", "日"];
-    StringUtils.ChineseWeekNum2 = ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
-
-    const Second = {
-        Day: 86400,
-        Hour: 3600,
-        Minute: 60
-    };
-    const WeekChinese = ["日", "一", "二", "三", "四", "五", "六", "日"];
-    const WeekName = [
-        "\u661F\u671F\u65E5",
-        "\u661F\u671F\u4E00",
-        "\u661F\u671F\u4E8C",
-        "\u661F\u671F\u4E09",
-        "\u661F\u671F\u56DB",
-        "\u661F\u671F\u4E94",
-        "\u661F\u671F\u516D",
-        "\u661F\u671F\u65E5"
-    ];
-    const ZhouName = [
-        "\u5468\u65E5",
-        "\u5468\u4E00",
-        "\u5468\u4E8C",
-        "\u5468\u4E09",
-        "\u5468\u56DB",
-        "\u5468\u4E94",
-        "\u5468\u516D",
-        "\u5468\u65E5"
-    ];
-    class TimeUtils {
-        static _tmpReplacer(k) {
-            let obj = TimeUtils._tmpObj;
-            let type = k.charAt(0);
-            let v = obj[type];
-            if (type === "E") {
-                let day = WeekChinese.indexOf(v);
-                return k.length <= 2 ? ZhouName[day] : WeekName[day];
-            }
-            if (v.length < k.length) {
-                return StringUtils.padString(v, k.length);
-            }
-            return v;
-        }
-        static formatTime(time, format = "yyyy-MM-dd HH:mm:ss.SSS") {
-            let date = this._tmpDate;
-            date.setTime(time);
-            let obj = this._tmpObj;
-            obj["y"] = "" + date.getFullYear();
-            obj["q"] = "" + Math.floor((date.getMonth() + 3) / 3);
-            obj["M"] = "" + (date.getMonth() + 1);
-            obj["E"] = WeekChinese[date.getDay()];
-            obj["d"] = "" + date.getDate();
-            obj["h"] = "" + (date.getHours() % 12 === 0 ? 12 : date.getHours() % 12);
-            obj["H"] = "" + date.getHours();
-            obj["m"] = "" + date.getMinutes();
-            obj["s"] = "" + date.getSeconds();
-            obj["S"] = "" + date.getMilliseconds();
-            return format.replace(/y+|q+|M+|E+|d+|h+|H+|m+|s+|S+/g, this._tmpReplacer);
-        }
-        static formatTimeSecond(second, format = "yyyy-MM-dd HH:mm:ss") {
-            return this.formatTime(second * 1000, format);
-        }
-        static formatSecond(second, format = "dd:HH:mm:ss", adaption = false) {
-            let obj = this._tmpObj;
-            let remain = second;
-            if (adaption) {
-                if (remain < Second.Hour) {
-                    format = "m分s秒";
-                }
-                else if (remain < Second.Day) {
-                    format = "H时m分";
-                }
-            }
-            obj["y"] = "";
-            obj["q"] = "";
-            obj["M"] = "";
-            obj["E"] = "";
-            if (format.indexOf("d") > -1) {
-                obj["d"] = "" + Math.floor(remain / Second.Day);
-                remain = remain % Second.Day;
-            }
-            else {
-                obj["d"] = "";
-            }
-            obj["h"] = "";
-            if (format.indexOf("H") > -1) {
-                obj["H"] = "" + Math.floor(remain / Second.Hour);
-                remain = remain % Second.Hour;
-            }
-            else {
-                obj["H"] = "";
-            }
-            if (format.indexOf("m") > -1) {
-                obj["m"] = "" + Math.floor(remain / Second.Minute);
-                remain = remain % Second.Minute;
-            }
-            else {
-                obj["m"] = "";
-            }
-            if (format.indexOf("s") > -1) {
-                obj["s"] = "" + Math.floor(remain % Second.Minute);
-            }
-            else {
-                obj["s"] = "";
-            }
-            obj["S"] = "";
-            return format.replace(/y+|M+|d+|H+|m+|s+|S+/g, this._tmpReplacer);
-        }
-    }
-    TimeUtils._tmpDate = new Date();
-    TimeUtils._tmpObj = {};
-
     var Handler$2 = Laya.Handler;
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
@@ -1160,10 +977,8 @@
             const now = Date.now() / 1000 >> 0;
             this._endTime = now + this._proxy.model.getChallengeTime();
             const bar = this.getChildByName("bar");
-            const barComp = bar.getComponent(BarProgress);
-            barComp.value = 1;
+            bar.value = 1;
             base.tweenMgr.remove(bar);
-            console.log(111111, TimeUtils.formatTime(Date.now()));
             base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
         }
         showResultToClear() {
@@ -1171,7 +986,6 @@
             base.tweenMgr.remove(bar);
         }
         onTimeOut() {
-            console.log(111112, TimeUtils.formatTime(Date.now()));
             this._proxy.model.showResult({ type: 1 });
         }
         onRenderListItem(item, index) {
@@ -1280,6 +1094,56 @@
         }
     }
 
+    var Script = Laya.Script;
+    var Image$1 = Laya.Image;
+    function createImgMask() {
+        const img = new Image$1();
+        img.skin = `common/bg0.png`;
+        img.width = img.height = 0;
+        img.sizeGrid = "4,5,7,6";
+        return img;
+    }
+    class BarProgress extends Script {
+        onAwake() {
+            super.onAwake();
+            const owner = this.owner;
+            this._imgBar = owner.getChildByName("imgBar");
+            this._lab = owner.getChildByName("lab");
+            if (!this._imgMask) {
+                this._imgMask = createImgMask();
+                this._imgMask.height = this._imgBar.height;
+                this._imgBar.mask = this._imgMask;
+            }
+            Object.defineProperty(this.owner, "value", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    return this.value;
+                },
+                set: (v) => {
+                    this.value = v;
+                }
+            });
+        }
+        onEnable() {
+            super.onEnable();
+        }
+        onDestroy() {
+            super.onDestroy();
+        }
+        set value(val) {
+            if (this._imgMask && this._imgBar) {
+                this._imgMask.width = val * this._imgBar.width;
+            }
+        }
+        get value() {
+            if (this._imgMask && this._imgBar) {
+                return this._imgMask.width / this._imgBar.width;
+            }
+            return 0;
+        }
+    }
+
     var Scene$3 = Laya.Scene;
     var Handler$3 = Laya.Handler;
     class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
@@ -1334,8 +1198,8 @@
             this.close();
         }
         onClickNext() {
-            console.warn("MahjongResultMdr.onClickNext...");
             const challengeAgain = this._param && this._param.type === 1;
+            console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
             eventMgr.event("mahjong_update_next", challengeAgain);
             this.close();
         }

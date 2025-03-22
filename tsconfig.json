@@ -17,6 +17,9 @@
       ],
       "@ui/*": [
         "src/ui/*"
+      ],
+      "@script/*": [
+        "src/script/*"
       ]
     }
   },

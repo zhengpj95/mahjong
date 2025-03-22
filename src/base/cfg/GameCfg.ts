@@ -38,7 +38,7 @@ export class GameCfg {
   }
 
   private static onLoadedJson(jsonName: string, data: any): void {
-    console.log(jsonName, data);
+    // console.log(jsonName, data);
     jsonName = jsonName.replace(".json", "");
     this.cfgMap[jsonName] = data;
 

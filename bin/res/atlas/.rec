@@ -9,9 +9,9 @@ P 5B258D17 button.png
 P C05839CD img_progress.png
 P B017E53E img_progress_bg.png
 D json
-R A657A7A4 CardConfig.json
-R AEA89201 cfglist.json
-R AC93D16B LevelConfig.json
+R 43F598FF CardConfig.json
+R 0A1CD7ED cfglist.json
+R 914CECD7 LevelConfig.json
 D login
 R 60C481D1 mahjong_login_bg.jpg
 D mahjong
