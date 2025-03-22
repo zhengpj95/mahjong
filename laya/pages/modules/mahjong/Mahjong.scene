@@ -58,7 +58,7 @@
                             "selectedBox":3,
                             "selecteID":4,
                             "searchKey":"Box",
-                            "props":{"y":35,"x":26,"width":130,"scaleY":0.4,"scaleX":0.4,"presetID":1,"preset":"laya/pages/prefab/MahjongBoxCard.prefab","pivotY":88,"pivotX":65,"height":175},
+                            "props":{"y":35,"x":26,"width":130,"scaleY":0.4,"scaleX":0.4,"presetID":1,"preset":"laya/pages/modules/mahjong/MahjongBoxCard.prefab","pivotY":88,"pivotX":65,"height":175},
                             "nodeParent":8,
                             "maxID":5,
                             "label":"boxCard",
@@ -71,7 +71,7 @@
                                 {
                                     "type":"Image",
                                     "searchKey":"Image",
-                                    "props":{"presetID":2,"preset":"laya/pages/prefab/MahjongBoxCard.prefab"},
+                                    "props":{"presetID":2,"preset":"laya/pages/modules/mahjong/MahjongBoxCard.prefab"},
                                     "nodeParent":9,
                                     "label":"img",
                                     "isDirectory":false,

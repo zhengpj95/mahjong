@@ -356,7 +356,6 @@
             }
         }
         static onLoadedJson(jsonName, data) {
-            console.log(jsonName, data);
             jsonName = jsonName.replace(".json", "");
             this.cfgMap[jsonName] = data;
             const list = [];
