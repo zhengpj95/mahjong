@@ -31,7 +31,7 @@ export class MahjongModel {
   constructor() {
     AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data: number) => {
       console.log(`11111 before getItem: ${this.level}`);
-      this.level = data;
+      this.level = data || 0;
       console.log(`11111 after getItem: ${this.level}`);
     });
   }
