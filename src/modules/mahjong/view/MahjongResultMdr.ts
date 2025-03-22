@@ -34,6 +34,7 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
     if (!this._param || !this._param.type) {
       this._lab.text = `得分: ` + this._proxy.model.levelScore;
       this.btnNext.text.text = `下一关`;
+      this._proxy.model.challengeSuccess();
     } else {
       this._lab.text = `挑战时间已到，挑战失败！`;
       this.btnNext.text.text = `重新挑战`;

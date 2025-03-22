@@ -16,6 +16,12 @@ export class MahjongProxy {
     return this._instance;
   }
 
+  constructor() {
+    if (!this._model) {
+      this._model = new MahjongModel();
+    }
+  }
+
   public get model(): MahjongModel {
     if (!this._model) {
       this._model = new MahjongModel();

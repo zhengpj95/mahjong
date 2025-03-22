@@ -1,4 +1,5 @@
 import { ui } from "@ui/layaMaxUI";
+import { MahjongProxy } from "../model/MahjongProxy";
 import Button = Laya.Button;
 import Scene = Laya.Scene;
 import Handler = Laya.Handler;
@@ -12,6 +13,7 @@ export default class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
 
   public createChildren(): void {
     super.createChildren();
+    MahjongProxy.ins();
     this._btnStart = <Button>this.getChildByName("btnStart");
     this._btnStart.clickHandler = Handler.create(this, this.onClickBtnStart, undefined, true);
   }
