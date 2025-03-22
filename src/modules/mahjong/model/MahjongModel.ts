@@ -5,14 +5,16 @@ import { eventMgr } from "@base/event/EventManager";
 import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "../MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
+import { AdapterFactory } from "../../../platform/AdapterFactory";
 import Scene = Laya.Scene;
 import ConfigName = config.ConfigName;
 import LevelConfig = config.LevelConfig;
 
+const MAHJONG_LEVEL = "mahjong_level";
+
 /**
  * @date 2024/12/22
  */
-
 export class MahjongModel {
   public row = 0;
   public col = 0;
@@ -25,6 +27,10 @@ export class MahjongModel {
   private _pathData: number[][] = [];
   private _astarMgr: AStarMgr;
   private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
+
+  constructor() {
+    this.level = AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL) || 0;
+  }
 
   private getLevelCfg(): LevelConfig {
     const list = GameCfg.getCfgListByName<LevelConfig>(ConfigName.LEVEl) || [];
@@ -274,6 +280,7 @@ export class MahjongModel {
     this.level += 1;
     this.clearData();
     this.updateData();
+    AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level);
   }
 
   /**展示结算弹窗*/
