@@ -616,7 +616,7 @@
             AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data) => {
                 console.log(`11111 before getItem: ${this.level}`);
                 this.level = data || 0;
-                console.log(`11111 after getItem: ${this.level}`);
+                console.log(`11111 after getItem: ${this.level} ${data}`);
             });
         }
         getLevelCfg() {
@@ -846,6 +846,8 @@
             this.level += 1;
             this.clearData();
             this.updateData();
+        }
+        challengeSuccess() {
             AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level, (success) => {
                 console.log(`11111 setItem: `, this.level);
             });
@@ -857,6 +859,11 @@
     }
 
     class MahjongProxy {
+        constructor() {
+            if (!this._model) {
+                this._model = new MahjongModel();
+            }
+        }
         static ins() {
             if (!this._instance) {
                 this._instance = new MahjongProxy();
@@ -1127,7 +1134,7 @@
         }
         onOpened(param) {
             super.onOpened(param);
-            this._proxy.model.clearData(true);
+            this._proxy.model.clearData();
             Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
         }
         onClosed(type) {
@@ -1332,6 +1339,7 @@
     class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
         createChildren() {
             super.createChildren();
+            MahjongProxy.ins();
             this._btnStart = this.getChildByName("btnStart");
             this._btnStart.clickHandler = Handler$3.create(this, this.onClickBtnStart, undefined, true);
         }
@@ -1364,6 +1372,7 @@
             if (!this._param || !this._param.type) {
                 this._lab.text = `得分: ` + this._proxy.model.levelScore;
                 this.btnNext.text.text = `下一关`;
+                this._proxy.model.challengeSuccess();
             }
             else {
                 this._lab.text = `挑战时间已到，挑战失败！`;
