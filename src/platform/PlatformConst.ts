@@ -16,7 +16,7 @@ export interface IPlatformAdapter {
   share?: () => void;
   pay?: () => void;
 
-  readonly storage?: IPlatformStorage;
+  readonly storage: IPlatformStorage;
 }
 
 // 缓存系统
