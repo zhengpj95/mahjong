@@ -14,8 +14,6 @@ D json
 R 43F598FF CardConfig.json
 R 0A1CD7ED cfglist.json
 R 914CECD7 LevelConfig.json
-D login
-R 60C481D1 mahjong_login_bg.jpg
 D mahjong
 P 3895FCA2 feng1.png
 P 0556B1B0 feng2.png
