@@ -23,11 +23,12 @@ type BoxRender = Box & {
 }
 
 type BoxCard = Box & {
-  img: Image;
+  img: Image
+  imgSelected: Image;
 }
 
 const INIT_SCALE = 0.4;
-const BIG_SCALE = 0.45;
+const BIG_SCALE = 0.42;
 
 /**
  * @date 2024/12/22
@@ -102,7 +103,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     const bar = <BarProgressComp>this.getChildByName("bar");
     bar.value = 1;
     base.tweenMgr.remove(bar);
-    base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+    base.tweenMgr.get(bar).to({value: 0}, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
   }
 
   // 展示结算弹窗时候，清除操作
@@ -113,11 +114,12 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   // 失败结束
   private onTimeOut(): void {
-    this._proxy.model.showResult({ type: 1 });
+    this._proxy.model.showResult({type: 1});
   }
 
   private onRenderListItem(item: BoxRender, index: number): void {
-    const img = ComUtils.getNodeByNameList<Image>(item, ["boxCard", "img"]);
+    const boxCard = <BoxCard>item.getChildByName("boxCard");
+    const img = ComUtils.getNodeByNameList<Image>(boxCard, ["img"]);
     const data: MahjongCardData = item.dataSource;
     if (!data) {
       img.skin = "";
@@ -125,7 +127,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     }
     item.tag = data;
     img.skin = data.getIcon();
-    ComUtils.setScale(<BoxCard>item.getChildByName("boxCard"), INIT_SCALE);
+    ComUtils.setScale(boxCard, INIT_SCALE);
+    this.setSelect(boxCard, false);
 
     item.on(Event.CLICK, this, this.onClickItem, [index]);
   }
@@ -136,6 +139,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       const boxCard = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       this._preIdx = -1;
       ComUtils.setScale(boxCard, INIT_SCALE);
+      this.setSelect(boxCard, false);
       return;
     }
 
@@ -149,11 +153,14 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         && this._proxy.model.canConnect(preItemData, curItemData)) {
         ComUtils.setScale(curItem, BIG_SCALE);
         this.clearCardItem(curItem, index);
+        this.setSelect(curItem, true);
         this.clearCardItem(preItem, this._preIdx);
         this.addScore();
       } else {
         ComUtils.setScale(curItem, INIT_SCALE);
         ComUtils.setScale(preItem, INIT_SCALE);
+        this.setSelect(curItem, false);
+        this.setSelect(preItem, false);
       }
       this._preIdx = -1;
     } else {
@@ -166,6 +173,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
       this._preIdx = index;
       const boxCard = <BoxCard>item.getChildByName("boxCard");
       ComUtils.setScale(boxCard, BIG_SCALE);
+      this.setSelect(boxCard, true);
     }
   }
 
@@ -200,8 +208,15 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     ComUtils.setTween(box, true, Handler.create(this, () => {
       const curImg = box.getChildByName("img") as Image;
       curImg.skin = "";
+      const imgSel = box.getChildByName("imgSelected") as Image;
+      imgSel.visible = false;
       this._proxy.model.deleteCard(idx);
     }));
+  }
+
+  private setSelect(boxCard: BoxCard, isSel = false): void {
+    const imgSel = ComUtils.getNodeByNameList<Image>(boxCard, ["imgSelected"]);
+    if (imgSel) imgSel.visible = isSel;
   }
 
   // 提示
