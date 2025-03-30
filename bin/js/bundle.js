@@ -613,9 +613,12 @@
             this.levelScore = 0;
             this._pathData = [];
             this._sameCardMap = {};
+            this.init();
+        }
+        init() {
             AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data) => {
                 console.log(`11111 before getItem: ${this.level}`);
-                this.level = data || 0;
+                this.level = 13 || data || 0;
                 console.log(`11111 after getItem: ${this.level} ${data}`);
             });
         }
@@ -1339,7 +1342,7 @@
     class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
         createChildren() {
             super.createChildren();
-            MahjongProxy.ins();
+            MahjongProxy.ins().model.init();
             this._btnStart = this.getChildByName("btnStart");
             this._btnStart.clickHandler = Handler$3.create(this, this.onClickBtnStart, undefined, true);
         }
