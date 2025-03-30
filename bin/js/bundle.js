@@ -618,7 +618,7 @@
         init() {
             AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data) => {
                 console.log(`11111 before getItem: ${this.level}`);
-                this.level = 13 || data || 0;
+                this.level = data || 0;
                 console.log(`11111 after getItem: ${this.level} ${data}`);
             });
         }
@@ -1115,7 +1115,7 @@
     var SoundManager = Laya.SoundManager;
     var CallBack = base.CallBack;
     const INIT_SCALE = 0.4;
-    const BIG_SCALE = 0.45;
+    const BIG_SCALE = 0.42;
     class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         constructor() {
             super();
@@ -1182,7 +1182,8 @@
             this._proxy.model.showResult({ type: 1 });
         }
         onRenderListItem(item, index) {
-            const img = ComUtils.getNodeByNameList(item, ["boxCard", "img"]);
+            const boxCard = item.getChildByName("boxCard");
+            const img = ComUtils.getNodeByNameList(boxCard, ["img"]);
             const data = item.dataSource;
             if (!data) {
                 img.skin = "";
@@ -1190,7 +1191,8 @@
             }
             item.tag = data;
             img.skin = data.getIcon();
-            ComUtils.setScale(item.getChildByName("boxCard"), INIT_SCALE);
+            ComUtils.setScale(boxCard, INIT_SCALE);
+            this.setSelect(boxCard, false);
             item.on(Event$1.CLICK, this, this.onClickItem, [index]);
         }
         onClickItem(index) {
@@ -1198,6 +1200,7 @@
                 const boxCard = this._list.getCell(index).getChildByName("boxCard");
                 this._preIdx = -1;
                 ComUtils.setScale(boxCard, INIT_SCALE);
+                this.setSelect(boxCard, false);
                 return;
             }
             SoundManager.playSound("audio/mixkit-flop.wav");
@@ -1210,12 +1213,15 @@
                     && this._proxy.model.canConnect(preItemData, curItemData)) {
                     ComUtils.setScale(curItem, BIG_SCALE);
                     this.clearCardItem(curItem, index);
+                    this.setSelect(curItem, true);
                     this.clearCardItem(preItem, this._preIdx);
                     this.addScore();
                 }
                 else {
                     ComUtils.setScale(curItem, INIT_SCALE);
                     ComUtils.setScale(preItem, INIT_SCALE);
+                    this.setSelect(curItem, false);
+                    this.setSelect(preItem, false);
                 }
                 this._preIdx = -1;
             }
@@ -1229,6 +1235,7 @@
                 this._preIdx = index;
                 const boxCard = item.getChildByName("boxCard");
                 ComUtils.setScale(boxCard, BIG_SCALE);
+                this.setSelect(boxCard, true);
             }
         }
         updateLevel() {
@@ -1260,8 +1267,15 @@
             ComUtils.setTween(box, true, Handler$2.create(this, () => {
                 const curImg = box.getChildByName("img");
                 curImg.skin = "";
+                const imgSel = box.getChildByName("imgSelected");
+                imgSel.visible = false;
                 this._proxy.model.deleteCard(idx);
             }));
+        }
+        setSelect(boxCard, isSel = false) {
+            const imgSel = ComUtils.getNodeByNameList(boxCard, ["imgSelected"]);
+            if (imgSel)
+                imgSel.visible = isSel;
         }
         onBtnTips() {
             const cardList = this._proxy.model.getTipsCardDataList();
