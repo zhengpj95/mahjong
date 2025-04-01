@@ -602,6 +602,14 @@
         }
     }
 
+    const globalAdapter = AdapterFactory.getAdapter();
+    if (typeof globalThis !== "undefined") {
+        globalThis["globalAdapter"] = globalAdapter;
+    }
+    else if (typeof window !== "undefined") {
+        window["globalAdapter"] = globalAdapter;
+    }
+
     var Scene$1 = Laya.Scene;
     const MAHJONG_LEVEL = "mahjong_level";
     class MahjongModel {
@@ -616,7 +624,7 @@
             this.init();
         }
         init() {
-            AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data) => {
+            globalAdapter.storage.getItem(MAHJONG_LEVEL, (data) => {
                 console.log(`11111 before getItem: ${this.level}`);
                 this.level = data || 0;
                 console.log(`11111 after getItem: ${this.level} ${data}`);
@@ -854,7 +862,7 @@
         }
         challengeSuccess() {
             let lev = this.level;
-            AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, lev, (success) => {
+            globalAdapter.storage.setItem(MAHJONG_LEVEL, lev, (success) => {
                 if (success) {
                     console.log(`11111 setItem success: `, lev);
                 }

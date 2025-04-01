@@ -5,7 +5,7 @@ import { eventMgr } from "@base/event/EventManager";
 import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "../MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { AdapterFactory } from "../../../platform/AdapterFactory";
+import { globalAdapter } from "@platform/index";
 import Scene = Laya.Scene;
 import ConfigName = config.ConfigName;
 import LevelConfig = config.LevelConfig;
@@ -33,7 +33,7 @@ export class MahjongModel {
   }
 
   public init(): void {
-    AdapterFactory.getAdapter().storage.getItem(MAHJONG_LEVEL, (data: number) => {
+    globalAdapter.storage.getItem(MAHJONG_LEVEL, (data: number) => {
       console.log(`11111 before getItem: ${this.level}`);
       this.level = data || 0;
       console.log(`11111 after getItem: ${this.level} ${data}`);
@@ -295,7 +295,7 @@ export class MahjongModel {
   /**挑战成功*/
   public challengeSuccess(): void {
     let lev = this.level;
-    AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, lev, (success?: boolean) => {
+    globalAdapter.storage.setItem(MAHJONG_LEVEL, lev, (success?: boolean) => {
       if (success) {
         console.log(`11111 setItem success: `, lev);
       } else {
