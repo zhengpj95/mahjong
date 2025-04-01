@@ -284,16 +284,23 @@ export class MahjongModel {
   }
 
   /**下一关*/
-  public showNext(): void {
-    this.level += 1;
+  public showNext(isAgain?: boolean): void {
+    if (!isAgain) {
+      this.level += 1;
+    }
     this.clearData();
     this.updateData();
   }
 
   /**挑战成功*/
   public challengeSuccess(): void {
-    AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level, (success?: boolean) => {
-      console.log(`11111 setItem: `, this.level);
+    let lev = this.level;
+    AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, lev, (success?: boolean) => {
+      if (success) {
+        console.log(`11111 setItem success: `, lev);
+      } else {
+        console.log(`11111 setItem fail: `, lev);
+      }
     });
   }
 

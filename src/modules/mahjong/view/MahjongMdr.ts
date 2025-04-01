@@ -82,13 +82,9 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this.onRefreshNext();
   }
 
-  private onRefreshNext(data?: any): void {
-    console.warn(`11111 onRefreshNext`);
-    if (data) {
-      this._proxy.model.challengeAgain();
-    } else {
-      this._proxy.model.showNext();
-    }
+  private onRefreshNext(data?: boolean): void {
+    console.warn(`11111 onRefreshNext level:${this._proxy.model.level}`);
+    this._proxy.model.showNext(data);
 
     this.resetScore();
     this.updateLevel();
@@ -103,7 +99,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     const bar = <BarProgressComp>this.getChildByName("bar");
     bar.value = 1;
     base.tweenMgr.remove(bar);
-    base.tweenMgr.get(bar).to({value: 0}, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+    base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
   }
 
   // 展示结算弹窗时候，清除操作
@@ -114,7 +110,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   // 失败结束
   private onTimeOut(): void {
-    this._proxy.model.showResult({type: 1});
+    this._proxy.model.showResult({ type: 1 });
   }
 
   private onRenderListItem(item: BoxRender, index: number): void {

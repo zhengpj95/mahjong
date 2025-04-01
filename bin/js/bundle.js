@@ -845,14 +845,22 @@
             this.clearData();
             this.updateData();
         }
-        showNext() {
-            this.level += 1;
+        showNext(isAgain) {
+            if (!isAgain) {
+                this.level += 1;
+            }
             this.clearData();
             this.updateData();
         }
         challengeSuccess() {
-            AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, this.level, (success) => {
-                console.log(`11111 setItem: `, this.level);
+            let lev = this.level;
+            AdapterFactory.getAdapter().storage.setItem(MAHJONG_LEVEL, lev, (success) => {
+                if (success) {
+                    console.log(`11111 setItem success: `, lev);
+                }
+                else {
+                    console.log(`11111 setItem fail: `, lev);
+                }
             });
         }
         showResult(param) {
@@ -1153,13 +1161,8 @@
             this.onRefreshNext();
         }
         onRefreshNext(data) {
-            console.warn(`11111 onRefreshNext`);
-            if (data) {
-                this._proxy.model.challengeAgain();
-            }
-            else {
-                this._proxy.model.showNext();
-            }
+            console.warn(`11111 onRefreshNext level:${this._proxy.model.level}`);
+            this._proxy.model.showNext(data);
             this.resetScore();
             this.updateLevel();
             const list = this._proxy.model.getMahjongData();

@@ -11,9 +11,9 @@ P B017E53E img_progress_bg.png
 P 0506019A img_select.png
 P 6267509A img_select1.png
 D json
-R 43F598FF CardConfig.json
-R 0A1CD7ED cfglist.json
-R 914CECD7 LevelConfig.json
+R A657A7A4 CardConfig.json
+R AEA89201 cfglist.json
+R AC93D16B LevelConfig.json
 D mahjong
 P 3895FCA2 feng1.png
 P 0556B1B0 feng2.png
