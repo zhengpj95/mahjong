@@ -246,88 +246,6 @@
         }
     }
 
-    function getQualifiedClassName(value) {
-        const type = typeof value;
-        if (!value || (type !== "object" && !value.prototype)) {
-            return type;
-        }
-        const prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
-        if (prototype.hasOwnProperty("__class__") && prototype["__class__"]) {
-            return prototype["__class__"];
-        }
-        else if (type === "function" && value.name) {
-            return value.name;
-        }
-        else if (prototype.constructor && prototype.constructor.name) {
-            return prototype.constructor.name;
-        }
-        const constructorString = prototype.constructor.toString().trim();
-        const index = constructorString.indexOf("(");
-        const className = constructorString.substring(9, index);
-        Object.defineProperty(prototype, "__class__", {
-            value: className,
-            enumerable: false,
-            writable: true
-        });
-        return className;
-    }
-    const PoolObjectName = "__PoolObjectName__";
-    class PoolManager {
-        constructor() {
-            this._poolMap = {};
-        }
-        alloc(cls, ...args) {
-            let className = getQualifiedClassName(cls);
-            if (!this._poolMap[className]) {
-                this._poolMap[className] = [];
-            }
-            let list = this._poolMap[className];
-            if (list.length) {
-                let vo = list.pop();
-                if (vo["onAlloc"] && typeof (vo["onAlloc"]) === "function") {
-                    vo["onAlloc"]();
-                }
-                return vo;
-            }
-            let clazz = new cls(...args);
-            if (clazz["onAlloc"] && typeof (clazz["onAlloc"]) === "function") {
-                clazz["onAlloc"]();
-            }
-            clazz[`${PoolObjectName}`] = className;
-            return clazz;
-        }
-        free(obj) {
-            if (!obj) {
-                return false;
-            }
-            let refKey = obj[`${PoolObjectName}`];
-            if (!refKey || !this._poolMap[refKey] || this._poolMap[refKey].indexOf(obj) > -1) {
-                return false;
-            }
-            if (obj["onFree"] && typeof (obj["onFree"]) === "function") {
-                obj["onFree"]();
-            }
-            this._poolMap[refKey].push(obj);
-            return true;
-        }
-        clear() {
-            this._poolMap = {};
-        }
-        getContent() {
-            return this._poolMap;
-        }
-        setCount(count = 5) {
-            for (let key in this._poolMap) {
-                let list = this._poolMap[key];
-                if (list.length > count) {
-                    list.length = count;
-                }
-            }
-        }
-    }
-    const poolMgr = new PoolManager();
-    DebugUtils.debug("poolMgr", poolMgr);
-
     var EventDispatcher = Laya.EventDispatcher;
     class EventManager extends EventDispatcher {
         on(type, caller, listener, args) {
@@ -603,14 +521,9 @@
     }
 
     const globalAdapter = AdapterFactory.getAdapter();
-    if (typeof globalThis !== "undefined") {
-        globalThis["globalAdapter"] = globalAdapter;
-    }
-    else if (typeof window !== "undefined") {
-        window["globalAdapter"] = globalAdapter;
-    }
 
     var Scene$1 = Laya.Scene;
+    var poolMgr = base.poolMgr;
     const MAHJONG_LEVEL = "mahjong_level";
     class MahjongModel {
         constructor() {
@@ -1023,6 +936,7 @@
     var Tween = Laya.Tween;
     var Handler$1 = Laya.Handler;
     var Sprite$1 = Laya.Sprite;
+    var poolMgr$1 = base.poolMgr;
     class TipsItem extends Box {
         onAlloc() {
             this.size(600, 35);
@@ -1062,7 +976,7 @@
         execTweenEnd() {
             this.removeSelf();
             Tween.clearAll(this);
-            poolMgr.free(this);
+            poolMgr$1.free(this);
         }
     }
     class TipsMdr extends Box {
@@ -1081,13 +995,13 @@
         addTips(str) {
             if (Array.isArray(str)) {
                 for (let strItem of str) {
-                    const tipsItem = poolMgr.alloc(TipsItem);
+                    const tipsItem = poolMgr$1.alloc(TipsItem);
                     tipsItem.text = strItem;
                     this._tipsList.push(tipsItem);
                 }
             }
             else {
-                const tipsItem = poolMgr.alloc(TipsItem);
+                const tipsItem = poolMgr$1.alloc(TipsItem);
                 tipsItem.text = str;
                 this._tipsList.push(tipsItem);
             }

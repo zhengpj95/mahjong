@@ -1,6 +1,5 @@
 import { CardType, IMahjongResultParam, MahjongEvent } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar";
-import { poolMgr } from "@base/pool/PoolManager";
 import { eventMgr } from "@base/event/EventManager";
 import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "../MahjongConst";
@@ -9,6 +8,7 @@ import { globalAdapter } from "@platform/index";
 import Scene = Laya.Scene;
 import ConfigName = config.ConfigName;
 import LevelConfig = config.LevelConfig;
+import poolMgr = base.poolMgr;
 
 const MAHJONG_LEVEL = "mahjong_level";
 

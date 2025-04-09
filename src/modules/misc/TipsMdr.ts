@@ -5,9 +5,9 @@ import Timer = Laya.Timer;
 import Tween = Laya.Tween;
 import Handler = Laya.Handler;
 import Sprite = Laya.Sprite;
+import poolMgr = base.poolMgr;
+import PoolObject = base.PoolObject;
 import { layerMgr } from "@base/LayerManager";
-import { PoolObject } from "@base/pool/PoolConst";
-import { poolMgr } from "@base/pool/PoolManager";
 
 class TipsItem extends Box implements PoolObject {
   private _img: Image;

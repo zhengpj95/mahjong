@@ -3,11 +3,11 @@
  * @date 2025/3/21
  */
 
-import { PoolObject } from "@base/pool/PoolConst";
 import { CardData, getCardTypeRes } from "../MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
 import ConfigName = config.ConfigName;
 import CardConfig = config.CardConfig;
+import PoolObject = base.PoolObject;
 
 /**单张麻将的数据*/
 export class MahjongCardData implements PoolObject {

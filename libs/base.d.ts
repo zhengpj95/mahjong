@@ -122,6 +122,6 @@ declare module base {
   
   function baseLoop(): void;
   
-  export { CallBack, Ease, GEvent, type PoolObject, _loopTween, baseLoop, eventMgr, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
+  export { CallBack, Ease, GEvent, PoolObject, _loopTween, baseLoop, eventMgr, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
   
 }
