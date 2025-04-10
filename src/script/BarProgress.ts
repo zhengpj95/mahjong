@@ -51,9 +51,21 @@ export default class BarProgress extends Script {
     super.onDestroy();
   }
 
+  private getImgWidth(): number {
+    if (!this._imgBar || !this._imgBar.width) {
+      const func = this._imgBar["_sizeChanged"];
+      if (func) {
+        func();
+      }
+    }
+    return this._imgBar ? this._imgBar.width : 0;
+  }
+
   public set value(val: number) {
     if (this._imgMask && this._imgBar) {
-      this._imgMask.width = val * this._imgBar.width;
+      const width = val * this.getImgWidth() >> 0;
+      this._imgMask.width = width;
+      this._imgBar.visible = width >= 1;
     }
   }
 

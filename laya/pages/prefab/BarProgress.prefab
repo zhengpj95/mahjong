@@ -2,7 +2,7 @@
     "x":0,
     "type":"Box",
     "selectedBox":26,
-    "selecteID":32,
+    "selecteID":29,
     "searchKey":"Box,bar",
     "props":{"y":0,"x":0,"width":500,"presetID":1,"preset":"laya/pages/prefab/BarProgress.prefab","name":"bar","isPresetRoot":true,"height":30},
     "nodeParent":-1,
@@ -42,13 +42,13 @@
             "compId":28,
             "child":[
                 ],
-            "$HIDDEN":true
+            "$HIDDEN":false
         },
         {
             "x":15,
             "type":"Label",
             "searchKey":"Label,lab",
-            "props":{"strokeColor":"#000000","stroke":1,"presetID":4,"preset":"laya/pages/prefab/BarProgress.prefab","name":"lab","fontSize":22,"color":"#f2ede2","centerY":0,"centerX":0},
+            "props":{"strokeColor":"#000000","stroke":3,"presetID":4,"preset":"laya/pages/prefab/BarProgress.prefab","name":"lab","fontSize":22,"color":"#f2ede2","centerY":2,"centerX":0},
             "nodeParent":26,
             "label":"lab",
             "isDirectory":false,
