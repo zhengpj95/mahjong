@@ -1263,9 +1263,20 @@
         onDestroy() {
             super.onDestroy();
         }
+        getImgWidth() {
+            if (!this._imgBar || !this._imgBar.width) {
+                const func = this._imgBar["_sizeChanged"];
+                if (func) {
+                    func();
+                }
+            }
+            return this._imgBar ? this._imgBar.width : 0;
+        }
         set value(val) {
             if (this._imgMask && this._imgBar) {
-                this._imgMask.width = val * this._imgBar.width;
+                const width = val * this.getImgWidth() >> 0;
+                this._imgMask.width = width;
+                this._imgBar.visible = width >= 1;
             }
         }
         get value() {
@@ -1396,22 +1407,24 @@
             GameConfig.startScene && Laya.Scene.open(GameConfig.startScene);
         }
     }
-    let _rowLoop;
+    let _rawLoop;
+    let stage;
     function _loop() {
         try {
-            if (_rowLoop) {
-                _rowLoop.call(Laya.stage);
+            if (_rawLoop) {
+                _rawLoop.call(Laya.stage);
             }
-            base.baseLoop();
         }
         catch (e) {
             console.log(e);
         }
+        base.baseLoop();
+        return true;
     }
     function initLoop() {
-        let stage = Laya.stage;
-        _rowLoop = stage["_loop"];
-        stage["_loop"] = _loop;
+        stage = Laya.stage;
+        _rawLoop = stage._loop;
+        stage._loop = _loop;
     }
     new Main();
 
