@@ -41,23 +41,27 @@ class Main {
   }
 }
 
-let _rowLoop: () => boolean;
+let _rawLoop: () => boolean;
+let stage: {
+  _loop: () => boolean;
+};
 
-function _loop(): void {
+function _loop(): boolean {
   try {
-    if (_rowLoop) {
-      _rowLoop.call(Laya.stage);
+    if (_rawLoop) {
+      _rawLoop.call(Laya.stage);
     }
-    base.baseLoop();
   } catch (e) {
     console.log(e);
   }
+  base.baseLoop();
+  return true;
 }
 
 function initLoop(): void {
-  let stage = Laya.stage;
-  _rowLoop = stage["_loop"];
-  stage["_loop"] = _loop;
+  stage = <any>Laya.stage;
+  _rawLoop = stage._loop;
+  stage._loop = _loop;
 }
 
 //激活启动类
