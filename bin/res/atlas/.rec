@@ -2,6 +2,9 @@ D .
 D audio
 R 93E518F7 mixkit-flop.wav
 D bg
+R E0FA93A4 img_mahjong_bg.png
+R 4C28169E img_mahjong_bg1.jpg
+R 60C481D1 img_mahjong_login_bg.jpg
 D common
 P 5B258D17 button.png
 P 7D862B48 img_bg1.png
