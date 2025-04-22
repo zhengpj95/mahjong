@@ -41,12 +41,25 @@ class Main {
   }
 }
 
+let _lastLoop = 0;
 let _rawLoop: () => boolean;
 let stage: {
   _loop: () => boolean;
 };
 
+const enum UpdateFrame {
+  FAST = 16,
+  SLOW = 33,
+  SLEEP = 1000,
+}
+
 function _loop(): boolean {
+  const now = Date.now();
+  const elapsed = now - _lastLoop;
+  if (elapsed < UpdateFrame.SLOW) {
+    return false;
+  }
+  _lastLoop = now;
   try {
     if (_rawLoop) {
       _rawLoop.call(Laya.stage);
@@ -62,6 +75,17 @@ function initLoop(): void {
   stage = <any>Laya.stage;
   _rawLoop = stage._loop;
   stage._loop = _loop;
+}
+
+setInterval(_bgLoop, 1);
+
+function _bgLoop(): void {
+  const now = Date.now();
+  const elapsed = now - _lastLoop;
+  if (elapsed < UpdateFrame.SLOW * 1.5) {
+    return;
+  }
+  _loop();
 }
 
 //激活启动类
