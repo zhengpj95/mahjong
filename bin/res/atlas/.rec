@@ -3,9 +3,10 @@ D audio
 R 93E518F7 mixkit-flop.wav
 D bg
 D common
-P 07B8FD00 bg0.png
-P 7D862B48 bg1.png
 P 5B258D17 button.png
+P 7D862B48 img_bg1.png
+P 07B8FD00 img_blank.png
+P 27F240EF img_common_wenhao.png
 P C05839CD img_progress.png
 P B017E53E img_progress_bg.png
 P 0506019A img_select.png

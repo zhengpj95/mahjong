@@ -18,7 +18,7 @@
             "x":15,
             "type":"Image",
             "searchKey":"Image",
-            "props":{"top":0,"skin":"bg/mahjong_login_bg.jpg","centerX":0,"bottom":0},
+            "props":{"top":0,"skin":"bg/img_mahjong_login_bg.jpg","centerX":0,"bottom":0},
             "nodeParent":2,
             "label":"Image",
             "isDirectory":false,

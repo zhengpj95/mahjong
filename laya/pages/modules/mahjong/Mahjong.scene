@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":7,
+    "selecteID":14,
     "searchKey":"Scene",
     "props":{"width":640,"runtime":"modules/mahjong/view/MahjongMdr.ts","height":1136},
     "nodeParent":-1,
-    "maxID":40,
+    "maxID":41,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -18,7 +18,7 @@
             "x":15,
             "type":"Image",
             "searchKey":"Image",
-            "props":{"y":210,"skin":"bg/mahjong_bg.png","centerX":0},
+            "props":{"y":210,"skin":"bg/img_mahjong_bg.png","centerX":0},
             "nodeParent":2,
             "label":"Image",
             "isDirectory":false,
@@ -35,14 +35,13 @@
             "props":{"width":555,"spaceY":3,"spaceX":3,"repeatY":8,"repeatX":10,"name":"listItem","height":590,"centerY":0,"centerX":0},
             "nodeParent":2,
             "label":"listItem",
-            "isOpen":true,
+            "isOpen":false,
             "isDirectory":true,
             "isAniNode":true,
             "hasChild":true,
             "compId":7,
             "child":[
                 {
-                    "x":30,
                     "type":"Box",
                     "searchKey":"Box,render",
                     "props":{"y":4,"x":4,"width":52,"name":"render","height":70},
@@ -55,7 +54,6 @@
                     "compId":8,
                     "child":[
                         {
-                            "x":45,
                             "type":"Box",
                             "selectedBox":3,
                             "selecteID":4,
@@ -71,7 +69,6 @@
                             "compId":9,
                             "child":[
                                 {
-                                    "x":60,
                                     "type":"Image",
                                     "searchKey":"Image,img",
                                     "props":{"skin":"mahjong/tiao1.png","name":"img","centerY":0,"centerX":0},
@@ -85,7 +82,6 @@
                                         ]
                                 },
                                 {
-                                    "x":60,
                                     "type":"Image",
                                     "searchKey":"Image,imgSelected",
                                     "props":{"top":-6,"skin":"common/img_select1.png","right":-6,"name":"imgSelected","left":-6,"bottom":-6},
@@ -115,7 +111,7 @@
             "x":15,
             "type":"Button",
             "searchKey":"Button,btnTips",
-            "props":{"skin":"common/button.png","name":"btnTips","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"提示","centerX":-100,"bottom":50},
+            "props":{"skin":"common/button.png","name":"btnTips","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"提示","centerX":-100,"bottom":70},
             "nodeParent":2,
             "label":"btnTips",
             "isOpen":true,
@@ -130,7 +126,7 @@
             "x":15,
             "type":"Button",
             "searchKey":"Button,btnRefresh",
-            "props":{"stateNum":"3","skin":"common/button.png","name":"btnRefresh","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"洗牌","centerX":100,"bottom":50},
+            "props":{"stateNum":"3","skin":"common/button.png","name":"btnRefresh","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"洗牌","centerX":100,"bottom":70},
             "nodeParent":2,
             "label":"btnRefresh",
             "isDirectory":false,
@@ -275,6 +271,21 @@
                     "frameRate":24,
                     "action":0
                 }]
+        },
+        {
+            "x":15,
+            "type":"Image",
+            "searchKey":"Image,btnRule",
+            "props":{"y":156,"x":579,"visible":false,"skin":"common/img_common_wenhao.png","name":"btnRule"},
+            "nodeParent":2,
+            "label":"btnRule",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":40,
+            "child":[
+                ],
+            "$HIDDEN":true
         }],
     "animations":[
         {

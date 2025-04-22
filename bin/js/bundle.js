@@ -1230,7 +1230,7 @@
     var Image$1 = Laya.Image;
     function createImgMask() {
         const img = new Image$1();
-        img.skin = `common/bg0.png`;
+        img.skin = `common/img_blank.png`;
         img.width = img.height = 0;
         img.sizeGrid = "4,5,7,6";
         return img;
@@ -1407,9 +1407,16 @@
             GameConfig.startScene && Laya.Scene.open(GameConfig.startScene);
         }
     }
+    let _lastLoop = 0;
     let _rawLoop;
     let stage;
     function _loop() {
+        const now = Date.now();
+        const elapsed = now - _lastLoop;
+        if (elapsed < 33) {
+            return false;
+        }
+        _lastLoop = now;
         try {
             if (_rawLoop) {
                 _rawLoop.call(Laya.stage);
@@ -1425,6 +1432,15 @@
         stage = Laya.stage;
         _rawLoop = stage._loop;
         stage._loop = _loop;
+    }
+    setInterval(_bgLoop, 1);
+    function _bgLoop() {
+        const now = Date.now();
+        const elapsed = now - _lastLoop;
+        if (elapsed < 33 * 1.5) {
+            return;
+        }
+        _loop();
     }
     new Main();
 
