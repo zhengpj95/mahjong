@@ -159,6 +159,79 @@
         }
     }
 
+    var Script = Laya.Script;
+    var CallBack = base.CallBack;
+    const CLICK_SCALE_DOWN = 1.1;
+    const CLICK_SCALE_UP = 0.90;
+    const CLICK_SCALE_TIME = 100;
+    class ClickScale extends Script {
+        constructor() {
+            super(...arguments);
+            this.noScale = false;
+            this._originX = 0;
+            this._originY = 0;
+            this._originScaleX = 1;
+            this._originScaleY = 1;
+            this._isTween = false;
+        }
+        onAwake() {
+            super.onAwake();
+            this._comp = this.owner;
+            this._width = this._comp.width;
+            this._height = this._comp.height;
+            this._originX = this._comp.x;
+            this._originY = this._comp.y;
+            this._originScaleX = this._comp.scaleX;
+            this._originScaleY = this._comp.scaleY;
+            this._isTween = false;
+        }
+        onEnable() {
+            super.onEnable();
+            this.setAnchor();
+            this._comp.on(Laya.Event.MOUSE_DOWN, this, this.onClickMouseDown);
+            this._comp.on(Laya.Event.MOUSE_UP, this, this.onClickMouseUp);
+            this._comp.on(Laya.Event.MOUSE_OUT, this, this.onClickMouseUp);
+        }
+        destroy() {
+            super.destroy();
+        }
+        setAnchor() {
+            if (this.noScale)
+                return;
+            this._comp.anchorX = this._comp.anchorY = 0.5;
+            this._comp.x = this._originX + this._width * 0.5;
+            this._comp.y = this._originY + this._height * 0.5;
+        }
+        onClickMouseDown() {
+            if (this.noScale)
+                return;
+            this._isTween = false;
+            base.tweenMgr.remove(this._comp);
+            base.tweenMgr.get(this._comp).to({ scaleX: CLICK_SCALE_DOWN, scaleY: CLICK_SCALE_DOWN }, CLICK_SCALE_TIME);
+        }
+        onClickMouseUp() {
+            if (this.noScale
+                || this._isTween
+                || (this._comp.scaleX === this._originScaleX &&
+                    this._comp.scaleY === this._originScaleY)) {
+                return;
+            }
+            this._isTween = true;
+            base.tweenMgr.remove(this._comp);
+            base.tweenMgr.get(this._comp).to({
+                scaleX: CLICK_SCALE_UP,
+                scaleY: CLICK_SCALE_UP
+            }, CLICK_SCALE_TIME, undefined, CallBack.alloc(this, this.onMouseUpEnd));
+        }
+        onMouseUpEnd() {
+            base.tweenMgr.remove(this._comp);
+            base.tweenMgr.get(this._comp).to({
+                scaleX: this._originScaleX,
+                scaleY: this._originScaleY
+            }, CLICK_SCALE_TIME);
+        }
+    }
+
     class DebugUtils {
         static debug(key, cls) {
             if (!key || !cls) {
@@ -1107,7 +1180,7 @@
     var Handler$2 = Laya.Handler;
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
-    var CallBack = base.CallBack;
+    var CallBack$1 = base.CallBack;
     var Scene$3 = Laya.Scene;
     const INIT_SCALE = 0.4;
     const BIG_SCALE = 0.42;
@@ -1141,7 +1214,7 @@
         onOpened(param) {
             super.onOpened(param);
             this._proxy.model.clearData();
-            Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
+            this.onLoadedSuccess();
         }
         onClosed(type) {
             super.onClosed(type);
@@ -1168,7 +1241,7 @@
             const bar = this.getChildByName("bar");
             bar.value = 1;
             base.tweenMgr.remove(bar);
-            base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+            base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack$1.alloc(this, this.onTimeOut, true));
         }
         showResultToClear() {
             const bar = this.getChildByName("bar");
@@ -1303,79 +1376,6 @@
         }
         onClickRule() {
             Scene$3.open("modules/common/Rule.scene", false, ruleDesc);
-        }
-    }
-
-    var Script = Laya.Script;
-    var CallBack$1 = base.CallBack;
-    const CLICK_SCALE_DOWN = 1.1;
-    const CLICK_SCALE_UP = 0.90;
-    const CLICK_SCALE_TIME = 100;
-    class ClickScale extends Script {
-        constructor() {
-            super(...arguments);
-            this.noScale = false;
-            this._originX = 0;
-            this._originY = 0;
-            this._originScaleX = 1;
-            this._originScaleY = 1;
-            this._isTween = false;
-        }
-        onAwake() {
-            super.onAwake();
-            this._comp = this.owner;
-            this._width = this._comp.width;
-            this._height = this._comp.height;
-            this._originX = this._comp.x;
-            this._originY = this._comp.y;
-            this._originScaleX = this._comp.scaleX;
-            this._originScaleY = this._comp.scaleY;
-            this._isTween = false;
-        }
-        onEnable() {
-            super.onEnable();
-            this.setAnchor();
-            this._comp.on(Laya.Event.MOUSE_DOWN, this, this.onClickMouseDown);
-            this._comp.on(Laya.Event.MOUSE_UP, this, this.onClickMouseUp);
-            this._comp.on(Laya.Event.MOUSE_OUT, this, this.onClickMouseUp);
-        }
-        destroy() {
-            super.destroy();
-        }
-        setAnchor() {
-            if (this.noScale)
-                return;
-            this._comp.anchorX = this._comp.anchorY = 0.5;
-            this._comp.x = this._originX + this._width * 0.5;
-            this._comp.y = this._originY + this._height * 0.5;
-        }
-        onClickMouseDown() {
-            if (this.noScale)
-                return;
-            this._isTween = false;
-            base.tweenMgr.remove(this._comp);
-            base.tweenMgr.get(this._comp).to({ scaleX: CLICK_SCALE_DOWN, scaleY: CLICK_SCALE_DOWN }, CLICK_SCALE_TIME);
-        }
-        onClickMouseUp() {
-            if (this.noScale
-                || this._isTween
-                || (this._comp.scaleX === this._originScaleX &&
-                    this._comp.scaleY === this._originScaleY)) {
-                return;
-            }
-            this._isTween = true;
-            base.tweenMgr.remove(this._comp);
-            base.tweenMgr.get(this._comp).to({
-                scaleX: CLICK_SCALE_UP,
-                scaleY: CLICK_SCALE_UP
-            }, CLICK_SCALE_TIME, undefined, CallBack$1.alloc(this, this.onMouseUpEnd));
-        }
-        onMouseUpEnd() {
-            base.tweenMgr.remove(this._comp);
-            base.tweenMgr.get(this._comp).to({
-                scaleX: this._originScaleX,
-                scaleY: this._originScaleY
-            }, CLICK_SCALE_TIME);
         }
     }
 
@@ -1515,8 +1515,8 @@
         static init() {
             var reg = Laya.ClassUtils.regClass;
             reg("modules/misc/RuleMdr.ts", RuleMdr);
-            reg("modules/mahjong/view/MahjongMdr.ts", MahjongMdr);
             reg("script/ClickScale.ts", ClickScale);
+            reg("modules/mahjong/view/MahjongMdr.ts", MahjongMdr);
             reg("script/BarProgress.ts", BarProgress);
             reg("modules/mahjong/view/MahjongHomeMdr.ts", MahjongHomeMdr);
             reg("modules/mahjong/view/MahjongResultMdr.ts", MahjongResultMdr);
