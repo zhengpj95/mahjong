@@ -12,7 +12,6 @@ import Box = Laya.Box;
 import Image = Laya.Image;
 import Event = Laya.Event;
 import SoundManager = Laya.SoundManager;
-import Button = Laya.Button;
 import Label = Laya.Label;
 import CallBack = base.CallBack;
 import Scene = Laya.Scene;
@@ -44,8 +43,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private _proxy: MahjongProxy;
   private _list: List;
   private _preIdx = -1;
-  private _btnTips: Button;
-  private _btnRefresh: Button;
+  private _btnTips: Image;
+  private _btnRefresh: Image;
   private _lastScoreTime = 0;
   private _endTime = 0;
   private _btnRule: Image;
@@ -55,15 +54,15 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._proxy = MahjongProxy.ins();
   }
 
-  createChildren() {
+  public createChildren(): void {
     super.createChildren();
     this._list = <List>this.getChildByName("listItem");
     this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
 
-    this._btnTips = <Button>this.getChildByName("btnTips");
-    this._btnRefresh = <Button>this.getChildByName("btnRefresh");
-    this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
-    this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
+    this._btnTips = <Image>this.getChildByName("btnTips");
+    this._btnRefresh = <Image>this.getChildByName("btnRefresh");
+    this._btnTips.on(Laya.Event.CLICK, this, this.onBtnTips);
+    this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
 
     this._btnRule = <Image>this.getChildByName("btnRule");
     this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
@@ -73,19 +72,17 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     eventMgr.on(MahjongEvent.UPDATE_SCORE, this, this.updateScore);
   }
 
-  onOpened(param: any) {
+  public onOpened(param: any): void {
     super.onOpened(param);
     this._proxy.model.clearData();
     Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
   }
 
-  onClosed(type?: string) {
+  public onClosed(type?: string): void {
     super.onClosed(type);
     this._preIdx = -1;
-    this._btnTips.clickHandler.clear();
-    this._btnTips.clickHandler = undefined;
-    this._btnRefresh.clickHandler.clear();
-    this._btnRefresh.clickHandler = undefined;
+    this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
+    this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
   }
 
   private onLoadedSuccess(): void {

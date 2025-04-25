@@ -31,8 +31,8 @@ export module ui.modules.mahjong {
     }
     REG("ui.modules.mahjong.MahjongHomeUI",MahjongHomeUI);
     export class MahjongResultUI extends View {
-		public btnHome:Laya.Button;
-		public btnNext:Laya.Button;
+		public btnNext:Laya.Image;
+		public btnHome:Laya.Image;
         constructor(){ super()}
         createChildren():void {
             super.createChildren();

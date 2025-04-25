@@ -30,16 +30,17 @@ export default class MahjongResultMdr extends MahjongResultUI {
     this._param = param;
 
     this._lab = ComUtils.getNodeByNameList<Label>(this, ["boxHtml", "lab"]);
-    this.btnHome.once(Laya.Event.CLICK, this, this.onClickHome);
-    this.btnNext.once(Laya.Event.CLICK, this, this.onClickNext);
+    this.btnHome.on(Laya.Event.CLICK, this, this.onClickHome);
+    this.btnNext.on(Laya.Event.CLICK, this, this.onClickNext);
 
+    const btnNextLab = <Label>this.btnNext.getChildByName("lab");
     if (!this._param || !this._param.type) {
       this._lab.text = `得分: ` + this._proxy.model.levelScore;
-      this.btnNext.text.text = `下一关`;
+      btnNextLab.text = `下一关`;
       this._proxy.model.challengeSuccess();
     } else {
       this._lab.text = `挑战时间已到，挑战失败！`;
-      this.btnNext.text.text = `重新挑战`;
+      btnNextLab.text = `重新挑战`;
     }
   }
 

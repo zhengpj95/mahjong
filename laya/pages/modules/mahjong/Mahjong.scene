@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":40,
+    "selecteID":14,
     "searchKey":"Scene",
     "props":{"width":640,"runtime":"modules/mahjong/view/MahjongMdr.ts","height":1136},
     "nodeParent":-1,
-    "maxID":43,
+    "maxID":53,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -123,32 +123,89 @@
         },
         {
             "x":15,
-            "type":"Button",
-            "searchKey":"Button,btnTips",
-            "props":{"skin":"common/button.png","name":"btnTips","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"提示","centerX":-100,"bottom":70},
+            "type":"Image",
+            "searchKey":"Image,btnTips",
+            "props":{"y":1008,"x":150,"skin":"common/img_common_btn_yellow.png","name":"btnTips"},
             "nodeParent":2,
             "label":"btnTips",
-            "isOpen":true,
-            "isDirectory":false,
+            "isOpen":false,
+            "isDirectory":true,
             "isAniNode":true,
-            "hasChild":false,
-            "compId":13,
+            "hasChild":true,
+            "compId":50,
             "child":[
-                ]
+                {
+                    "type":"Label",
+                    "searchKey":"Label,lab",
+                    "props":{"y":0,"x":0,"text":"提 示","stroke":2,"name":"lab","fontSize":26,"color":"#FF9800","centerY":2,"centerX":0},
+                    "nodeParent":50,
+                    "label":"lab",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":51,
+                    "child":[
+                        ]
+                },
+                {
+                    "type":"Script",
+                    "switchAble":true,
+                    "source":"src/script/ClickScale.ts",
+                    "searchKey":"Script,ClickScale",
+                    "removeAble":true,
+                    "props":{},
+                    "nodeParent":50,
+                    "label":"ClickScale",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":52,
+                    "child":[
+                        ]
+                }]
         },
         {
             "x":15,
-            "type":"Button",
-            "searchKey":"Button,btnRefresh",
-            "props":{"stateNum":"3","skin":"common/button.png","name":"btnRefresh","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"洗牌","centerX":100,"bottom":70},
+            "type":"Image",
+            "searchKey":"Image,btnRefresh",
+            "props":{"y":1008,"stateNum":"3","skin":"common/img_common_btn_yellow.png","name":"btnRefresh","labelSize":22,"labelFont":"SimHei","labelColors":"#ffffff,#ffffff,#ffffff","label":"洗牌","centerX":100},
             "nodeParent":2,
             "label":"btnRefresh",
-            "isDirectory":false,
+            "isOpen":false,
+            "isDirectory":true,
             "isAniNode":true,
-            "hasChild":false,
+            "hasChild":true,
             "compId":14,
             "child":[
-                ]
+                {
+                    "type":"Label",
+                    "searchKey":"Label,lab",
+                    "props":{"x":0,"text":"洗 牌","stroke":2,"name":"lab","fontSize":26,"color":"#FF9800","centerY":2,"centerX":0},
+                    "nodeParent":14,
+                    "label":"lab",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":47,
+                    "child":[
+                        ]
+                },
+                {
+                    "type":"Script",
+                    "switchAble":true,
+                    "source":"src/script/ClickScale.ts",
+                    "searchKey":"Script,ClickScale",
+                    "removeAble":true,
+                    "props":{},
+                    "nodeParent":14,
+                    "label":"ClickScale",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":49,
+                    "child":[
+                        ]
+                }]
         },
         {
             "x":15,
@@ -290,15 +347,31 @@
             "x":15,
             "type":"Image",
             "searchKey":"Image,btnRule",
-            "props":{"y":156,"x":579,"skin":"common/img_common_wenhao.png","name":"btnRule"},
+            "props":{"y":157,"x":580,"skin":"common/img_common_wenhao.png","name":"btnRule"},
             "nodeParent":2,
             "label":"btnRule",
-            "isDirectory":false,
+            "isOpen":false,
+            "isDirectory":true,
             "isAniNode":true,
-            "hasChild":false,
+            "hasChild":true,
             "compId":40,
             "child":[
-                ],
+                {
+                    "type":"Script",
+                    "switchAble":true,
+                    "source":"src/script/ClickScale.ts",
+                    "searchKey":"Script,ClickScale",
+                    "removeAble":true,
+                    "props":{},
+                    "nodeParent":40,
+                    "label":"ClickScale",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":43,
+                    "child":[
+                        ]
+                }],
             "$HIDDEN":false
         }],
     "animations":[
