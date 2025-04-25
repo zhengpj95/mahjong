@@ -5,7 +5,7 @@ import Label = Laya.Label;
 
 function createImgMask(): Image {
   const img = new Image();
-  img.skin = `common/img_blank.png`;
+  img.skin = `modules/common/img_blank.png`;
   img.width = img.height = 0;
   img.sizeGrid = "4,5,7,6";
   return img;

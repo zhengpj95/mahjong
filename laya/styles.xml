@@ -1,9 +1,9 @@
 <res>
-   <item name="common/img_bg1.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=4,4,4,4" picType="0" scale="0"/>
-   <item name="common/img_blank.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=4,4,4,4" picType="0" scale="0"/>
-   <item name="common/img_progress_bg.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=16,47,13,51" picType="0" scale="0"/>
-   <item name="common/img_progress.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=11,49,8,46" picType="0" scale="0"/>
-   <item name="common/img_select.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=42,39,41,42" picType="0" scale="0"/>
-   <item name="common/img_select1.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=18,18,20,19" picType="0" scale="0"/>
+   <item name="modules/common/img_bg1.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=4,4,4,4" picType="0" scale="0"/>
+   <item name="modules/common/img_blank.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=4,4,4,4" picType="0" scale="0"/>
+   <item name="modules/common/img_progress_bg.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=16,47,13,51" picType="0" scale="0"/>
+   <item name="modules/common/img_progress.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=11,49,8,46" picType="0" scale="0"/>
+   <item name="modules/common/img_select.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=42,39,41,42" picType="0" scale="0"/>
+   <item name="modules/common/img_select1.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=18,18,20,19" picType="0" scale="0"/>
    <item name="bg" type="" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
 </res>
