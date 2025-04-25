@@ -1008,7 +1008,7 @@
             this.centerY = -100;
             if (!this._img) {
                 this._img = new Image();
-                this._img.skin = `common/img_blank.png`;
+                this._img.skin = `modules/common/img_blank.png`;
                 this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
                 this._img.sizeGrid = `3,8,6,5`;
                 this.addChild(this._img);
@@ -1383,7 +1383,7 @@
     var Image$1 = Laya.Image;
     function createImgMask() {
         const img = new Image$1();
-        img.skin = `common/img_blank.png`;
+        img.skin = `modules/common/img_blank.png`;
         img.width = img.height = 0;
         img.sizeGrid = "4,5,7,6";
         return img;

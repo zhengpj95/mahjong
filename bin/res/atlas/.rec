@@ -2,7 +2,12 @@ D .
 D audio
 R 93E518F7 mixkit-flop.wav
 D bg
-D common
+D json
+R 43F598FF CardConfig.json
+R 0A1CD7ED cfglist.json
+R 4B1373AC LevelConfig.json
+D modules
+D modules/common
 P 7D862B48 img_bg1.png
 P 07B8FD00 img_blank.png
 P D99150C1 img_btn_close.png
@@ -18,11 +23,6 @@ P B017E53E img_progress_bg.png
 P 0506019A img_select.png
 P 6267509A img_select1.png
 P 4CD0F06E img_start_game.png
-D json
-R 43F598FF CardConfig.json
-R 0A1CD7ED cfglist.json
-R 4B1373AC LevelConfig.json
-D modules
 D modules/mahjong
 P 3895FCA2 feng1.png
 P 0556B1B0 feng2.png
