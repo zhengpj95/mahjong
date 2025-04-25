@@ -418,7 +418,7 @@
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     function getCardTypeRes(type, num) {
         const cardCfg = GameCfg.getCfgByNameId("CardConfig", type);
-        return `mahjong/${cardCfg.res + num}.png`;
+        return `modules/mahjong/${cardCfg.res + num}.png`;
     }
 
     class MahjongCardData {
