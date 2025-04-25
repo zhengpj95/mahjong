@@ -75,7 +75,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   public onOpened(param: any): void {
     super.onOpened(param);
     this._proxy.model.clearData();
-    Laya.loader.load("res/atlas/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
+    // Laya.loader.load("res/atlas/modules/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
+    this.onLoadedSuccess();
   }
 
   public onClosed(type?: string): void {

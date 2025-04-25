@@ -1,12 +1,12 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":2,
-    "selecteID":6,
+    "selectedBox":6,
+    "selecteID":8,
     "searchKey":"View",
     "props":{"width":640,"runtime":"modules/misc/RuleMdr.ts","height":1136},
     "nodeParent":-1,
-    "maxID":12,
+    "maxID":13,
     "label":"View",
     "isOpen":true,
     "isDirectory":true,
@@ -88,15 +88,31 @@
                     "x":30,
                     "type":"Image",
                     "searchKey":"Image,btnClose",
-                    "props":{"y":-18,"skin":"modules/common/img_btn_close.png","right":-19,"name":"btnClose"},
+                    "props":{"y":-18,"x":494,"skin":"modules/common/img_btn_close.png","name":"btnClose"},
                     "nodeParent":6,
                     "label":"btnClose",
-                    "isDirectory":false,
+                    "isOpen":null,
+                    "isDirectory":true,
                     "isAniNode":true,
-                    "hasChild":false,
+                    "hasChild":true,
                     "compId":8,
                     "child":[
-                        ]
+                        {
+                            "type":"Script",
+                            "switchAble":true,
+                            "source":"src/script/ClickScale.ts",
+                            "searchKey":"Script,ClickScale",
+                            "removeAble":true,
+                            "props":{},
+                            "nodeParent":8,
+                            "label":"ClickScale",
+                            "isDirectory":false,
+                            "isAniNode":true,
+                            "hasChild":false,
+                            "compId":12,
+                            "child":[
+                                ]
+                        }]
                 }]
         }],
     "animations":[
