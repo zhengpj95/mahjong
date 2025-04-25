@@ -85,7 +85,7 @@
                                 {
                                     "type":"Image",
                                     "searchKey":"Image,img",
-                                    "props":{"skin":"mahjong/tiao1.png","name":"img","centerY":0,"centerX":0},
+                                    "props":{"skin":"modules/mahjong/tiao1.png","name":"img","centerY":0,"centerX":0},
                                     "nodeParent":9,
                                     "label":"img",
                                     "isDirectory":false,

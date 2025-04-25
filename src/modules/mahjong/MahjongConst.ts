@@ -17,5 +17,5 @@ export type CardData = [CardType, number | FengType]
 
 export function getCardTypeRes(type: CardType, num: number): string {
   const cardCfg = GameCfg.getCfgByNameId<CardConfig>(ConfigName.CARD, type);
-  return `mahjong/${cardCfg.res + num}.png`;
+  return `modules/mahjong/${cardCfg.res + num}.png`;
 }

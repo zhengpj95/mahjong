@@ -18,7 +18,7 @@
             "x":15,
             "type":"Image",
             "searchKey":"Image,img",
-            "props":{"y":87,"x":65,"skin":"mahjong/tiao1.png","presetID":2,"preset":"laya/pages/modules/mahjong/MahjongBoxCard.prefab","name":"img","anchorY":0.5,"anchorX":0.5},
+            "props":{"y":87,"x":65,"skin":"modules/mahjong/tiao1.png","presetID":2,"preset":"laya/pages/modules/mahjong/MahjongBoxCard.prefab","name":"img","anchorY":0.5,"anchorX":0.5},
             "nodeParent":3,
             "label":"img",
             "isDirectory":false,
