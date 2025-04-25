@@ -3,7 +3,6 @@ D audio
 R 93E518F7 mixkit-flop.wav
 D bg
 D common
-P 5B258D17 button.png
 P 7D862B48 img_bg1.png
 P 07B8FD00 img_blank.png
 P D99150C1 img_btn_close.png
@@ -18,6 +17,7 @@ P C05839CD img_progress.png
 P B017E53E img_progress_bg.png
 P 0506019A img_select.png
 P 6267509A img_select1.png
+P 4CD0F06E img_start_game.png
 D json
 R 43F598FF CardConfig.json
 R 0A1CD7ED cfglist.json

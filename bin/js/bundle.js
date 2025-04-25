@@ -1441,13 +1441,12 @@
     }
 
     var Scene$4 = Laya.Scene;
-    var Handler$3 = Laya.Handler;
     class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
         createChildren() {
             super.createChildren();
             MahjongProxy.ins().model.init();
             this._btnStart = this.getChildByName("btnStart");
-            this._btnStart.clickHandler = Handler$3.create(this, this.onClickBtnStart, undefined, true);
+            this._btnStart.on(Laya.Event.CLICK, this, this.onClickBtnStart);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -1455,6 +1454,7 @@
         }
         onClosed(type) {
             super.onClosed(type);
+            this._btnStart.offAll(Laya.Event.CLICK);
         }
         onClickBtnStart() {
             Scene$4.open("modules/mahjong/Mahjong.scene");
