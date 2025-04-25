@@ -66,9 +66,34 @@ class LayerManager {
   }
 }
 
+// 弹窗遮罩层处理
+let sprite: Sprite;
+
+function createPopupMask(): Sprite {
+  if (!sprite) {
+    sprite = new Sprite();
+    sprite.graphics.drawRect(0, 0, Laya.stage.width, Laya.stage.height, "#000000CC");
+  }
+  sprite.name = "popup_mask";
+  // sprite.mouseThrough = true;
+  // sprite.mouseEnabled = true;
+  return sprite;
+}
+
+export function addPopupMask(): void {
+  const mask = createPopupMask();
+  mask.removeSelf();
+  layerMgr.modal.addChildAt(mask, 0);
+}
+
+export function removePopupMask(): void {
+  const mask = createPopupMask();
+  mask.removeSelf();
+}
+
 export let layerMgr: LayerManager;
 
 export function initLayerMgr(): void {
   layerMgr = new LayerManager();
-  layerMgr.init()
+  layerMgr.init();
 }

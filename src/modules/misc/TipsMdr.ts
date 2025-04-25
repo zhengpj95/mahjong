@@ -19,7 +19,7 @@ class TipsItem extends Box implements PoolObject {
     this.centerY = -100;
     if (!this._img) {
       this._img = new Image();
-      this._img.skin = `common/bg0.png`;
+      this._img.skin = `common/img_blank.png`;
       this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
       this._img.sizeGrid = `3,8,6,5`;
       this.addChild(this._img);
@@ -49,7 +49,7 @@ class TipsItem extends Box implements PoolObject {
 
   public execTween(): void {
     Tween.clearAll(this);
-    Tween.to(this, { alpha: 0.6 }, 800, null, Handler.create(this, this.execTweenEnd, null, true), 800);
+    Tween.to(this, { alpha: 0.8 }, 800, null, Handler.create(this, this.execTweenEnd, null, true), 800);
   }
 
   private execTweenEnd(): void {

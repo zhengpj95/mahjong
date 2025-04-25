@@ -1,18 +1,19 @@
 import { ui } from "@ui/layaMaxUI";
-import { LayerIndex, setLayerIndex } from "@base/LayerManager";
+import { addPopupMask, LayerIndex, removePopupMask, setLayerIndex } from "@base/LayerManager";
 import { IMahjongResultParam, MahjongEvent } from "@def/mahjong";
-import { eventMgr } from "@base/event/EventManager";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
+import { eventMgr } from "@base/event/EventManager";
 import Label = Laya.Label;
+import MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
 import Scene = Laya.Scene;
-import Event = Laya.Event;
+
 
 /**
  * 结算弹窗
  * @date 2025/1/19
  */
-export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
+export default class MahjongResultMdr extends MahjongResultUI {
   private _lab: Label;
   private _proxy: MahjongProxy;
   private _param?: IMahjongResultParam;
@@ -20,16 +21,17 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
   createChildren() {
     super.createChildren();
     setLayerIndex(this, LayerIndex.MODAL);
-
-    this._proxy = MahjongProxy.ins();
-    this._lab = ComUtils.getNodeByNameList<Label>(this, ["boxHtml", "lab"]);
-    this.btnHome.once(Event.CLICK, this, this.onClickHome);
-    this.btnNext.once(Event.CLICK, this, this.onClickNext);
+    addPopupMask();
   }
 
   onOpened(param: any) {
     super.onOpened(param);
+    this._proxy = MahjongProxy.ins();
     this._param = param;
+
+    this._lab = ComUtils.getNodeByNameList<Label>(this, ["boxHtml", "lab"]);
+    this.btnHome.once(Laya.Event.CLICK, this, this.onClickHome);
+    this.btnNext.once(Laya.Event.CLICK, this, this.onClickNext);
 
     if (!this._param || !this._param.type) {
       this._lab.text = `得分: ` + this._proxy.model.levelScore;
@@ -43,8 +45,8 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
 
   onClosed(type?: string) {
     super.onClosed(type);
-    this.btnHome.off(Event.CLICK, this, this.onClickHome);
-    this.btnNext.off(Event.CLICK, this, this.onClickNext);
+    this.btnHome.off(Laya.Event.CLICK, this, this.onClickHome);
+    this.btnNext.off(Laya.Event.CLICK, this, this.onClickNext);
   }
 
   private onClickHome(): void {
@@ -58,5 +60,10 @@ export default class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI
     console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
     eventMgr.event(MahjongEvent.UPDATE_NEXT, challengeAgain); // true 是重新挑战
     this.close();
+  }
+
+  public close(type?: string) {
+    super.close(type);
+    removePopupMask();
   }
 }

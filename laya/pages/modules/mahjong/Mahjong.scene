@@ -2,7 +2,7 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":41,
+    "selecteID":40,
     "searchKey":"Scene",
     "props":{"width":640,"runtime":"modules/mahjong/view/MahjongMdr.ts","height":1136},
     "nodeParent":-1,
@@ -290,7 +290,7 @@
             "x":15,
             "type":"Image",
             "searchKey":"Image,btnRule",
-            "props":{"y":156,"x":579,"visible":false,"skin":"common/img_common_wenhao.png","name":"btnRule"},
+            "props":{"y":156,"x":579,"skin":"common/img_common_wenhao.png","name":"btnRule"},
             "nodeParent":2,
             "label":"btnRule",
             "isDirectory":false,
@@ -299,7 +299,7 @@
             "compId":40,
             "child":[
                 ],
-            "$HIDDEN":true
+            "$HIDDEN":false
         }],
     "animations":[
         {

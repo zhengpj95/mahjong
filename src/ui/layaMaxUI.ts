@@ -3,6 +3,16 @@ import View=Laya.View;
 import Dialog=Laya.Dialog;
 import Scene=Laya.Scene;
 var REG: Function = Laya.ClassUtils.regClass;
+export module ui.modules.common {
+    export class RuleUI extends View {
+        constructor(){ super()}
+        createChildren():void {
+            super.createChildren();
+            this.loadScene("modules/common/Rule");
+        }
+    }
+    REG("ui.modules.common.RuleUI",RuleUI);
+}
 export module ui.modules.mahjong {
     export class MahjongUI extends Scene {
         constructor(){ super()}

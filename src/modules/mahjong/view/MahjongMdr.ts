@@ -15,6 +15,7 @@ import SoundManager = Laya.SoundManager;
 import Button = Laya.Button;
 import Label = Laya.Label;
 import CallBack = base.CallBack;
+import Scene = Laya.Scene;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -30,6 +31,12 @@ type BoxCard = Box & {
 const INIT_SCALE = 0.4;
 const BIG_SCALE = 0.42;
 
+const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯）\n
+2.路径无阻挡即可消除\n 
+3.⚡连击加分，消除间隔越短，分数加成越高！\n
+4.💡 用 提示（扣5分） 👉 显示可消的一对牌\n
+5.用 洗牌（扣10分）👉 重置剩余牌位置`;
+
 /**
  * @date 2024/12/22
  */
@@ -41,6 +48,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private _btnRefresh: Button;
   private _lastScoreTime = 0;
   private _endTime = 0;
+  private _btnRule: Image;
 
   constructor() {
     super();
@@ -57,6 +65,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._btnTips.clickHandler = Handler.create(this, this.onBtnTips, undefined, false);
     this._btnRefresh.clickHandler = Handler.create(this, this.onBtnRefresh, undefined, false);
 
+    this._btnRule = <Image>this.getChildByName("btnRule");
+    this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
 
     eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
     eventMgr.on(MahjongEvent.SHOW_RESULT, this, this.showResultToClear);
@@ -240,5 +250,9 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._list.array = list.reduce((a, b) => a.concat(b));
     this._list.refresh();
     showTips("洗牌成功！");
+  }
+
+  private onClickRule(): void {
+    Scene.open("modules/common/Rule.scene", false, ruleDesc);
   }
 }
