@@ -1,7 +1,7 @@
 import { ui } from "@ui/layaMaxUI";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
-import { MahjongEvent } from "@def/mahjong";
+import { MahjongEvent, MahjongScoreType } from "@def/mahjong";
 import { eventMgr } from "@base/event/EventManager";
 import { showTips } from "../../misc/TipsMdr";
 import { MahjongCardData } from "../model/MahjongCardData";
@@ -70,6 +70,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
     eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
     eventMgr.on(MahjongEvent.SHOW_RESULT, this, this.showResultToClear);
+    eventMgr.on(MahjongEvent.UPDATE_SCORE, this, this.updateScore);
   }
 
   onOpened(param: any) {
@@ -197,10 +198,15 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     } else if (diffTime < 5 * 1000) {
       score = 3;
     }
-    this._proxy.model.levelScore += score;
     this._lastScoreTime = now;
+    this._proxy.model.updateScore(score);
+    this.updateScore();
+  }
+
+  private updateScore(): void {
     const lab = ComUtils.getNodeByNameList<Label>(this, ["boxScore", "lab"]);
     lab.text = this._proxy.model.levelScore + "";
+    lab.color = this._proxy.model.levelScore > 0 ? "#42e422" : "#ff4646";
   }
 
   private resetScore(): void {
@@ -241,6 +247,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     } else {
       showTips("无可消除的卡牌，请洗牌");
     }
+    this._proxy.model.updateScore(-MahjongScoreType.TIPS);
   }
 
   // 洗牌
@@ -250,6 +257,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._list.array = list.reduce((a, b) => a.concat(b));
     this._list.refresh();
     showTips("洗牌成功！");
+    this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
   }
 
   private onClickRule(): void {

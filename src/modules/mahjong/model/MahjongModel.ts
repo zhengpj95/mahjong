@@ -48,6 +48,11 @@ export class MahjongModel {
     return GameCfg.getCfgByNameId<LevelConfig>(ConfigName.LEVEl, this.level || 1);
   }
 
+  public updateScore(score: number): void {
+    this.levelScore += score;
+    eventMgr.event(MahjongEvent.UPDATE_SCORE);
+  }
+
   public updateData(): void {
     const cfg = this.getLevelCfg();
     this.row = cfg && cfg.layout ? cfg.layout[0] : 8;

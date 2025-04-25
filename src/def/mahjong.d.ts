@@ -22,10 +22,16 @@ export const enum FengType {
 
 export const enum MahjongEvent {
   UPDATE_NEXT = "mahjong_update_next",
-  SHOW_RESULT = "mahjong_show_result"
+  SHOW_RESULT = "mahjong_show_result",
+  UPDATE_SCORE = "mahjong_update_score",
 }
 
 export interface IMahjongResultParam {
   /**0成功，1失败*/
   type: number;
+}
+
+export const enum MahjongScoreType {
+  TIPS = 5,
+  REFRESH = 10
 }
