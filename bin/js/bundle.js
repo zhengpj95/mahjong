@@ -1130,8 +1130,8 @@
             this._list.renderHandler = Handler$2.create(this, this.onRenderListItem, undefined, false);
             this._btnTips = this.getChildByName("btnTips");
             this._btnRefresh = this.getChildByName("btnRefresh");
-            this._btnTips.clickHandler = Handler$2.create(this, this.onBtnTips, undefined, false);
-            this._btnRefresh.clickHandler = Handler$2.create(this, this.onBtnRefresh, undefined, false);
+            this._btnTips.on(Laya.Event.CLICK, this, this.onBtnTips);
+            this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
             this._btnRule = this.getChildByName("btnRule");
             this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
             eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
@@ -1146,10 +1146,8 @@
         onClosed(type) {
             super.onClosed(type);
             this._preIdx = -1;
-            this._btnTips.clickHandler.clear();
-            this._btnTips.clickHandler = undefined;
-            this._btnRefresh.clickHandler.clear();
-            this._btnRefresh.clickHandler = undefined;
+            this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
+            this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
         }
         onLoadedSuccess() {
             console.warn("11111 onLoadedSuccess");
@@ -1309,6 +1307,79 @@
     }
 
     var Script = Laya.Script;
+    var CallBack$1 = base.CallBack;
+    const CLICK_SCALE_DOWN = 1.1;
+    const CLICK_SCALE_UP = 0.90;
+    const CLICK_SCALE_TIME = 100;
+    class ClickScale extends Script {
+        constructor() {
+            super(...arguments);
+            this.noScale = false;
+            this._originX = 0;
+            this._originY = 0;
+            this._originScaleX = 1;
+            this._originScaleY = 1;
+            this._isTween = false;
+        }
+        onAwake() {
+            super.onAwake();
+            this._comp = this.owner;
+            this._width = this._comp.width;
+            this._height = this._comp.height;
+            this._originX = this._comp.x;
+            this._originY = this._comp.y;
+            this._originScaleX = this._comp.scaleX;
+            this._originScaleY = this._comp.scaleY;
+            this._isTween = false;
+        }
+        onEnable() {
+            super.onEnable();
+            this.setAnchor();
+            this._comp.on(Laya.Event.MOUSE_DOWN, this, this.onClickMouseDown);
+            this._comp.on(Laya.Event.MOUSE_UP, this, this.onClickMouseUp);
+            this._comp.on(Laya.Event.MOUSE_OUT, this, this.onClickMouseUp);
+        }
+        destroy() {
+            super.destroy();
+        }
+        setAnchor() {
+            if (this.noScale)
+                return;
+            this._comp.anchorX = this._comp.anchorY = 0.5;
+            this._comp.x = this._originX + this._width * 0.5;
+            this._comp.y = this._originY + this._height * 0.5;
+        }
+        onClickMouseDown() {
+            if (this.noScale)
+                return;
+            this._isTween = false;
+            base.tweenMgr.remove(this._comp);
+            base.tweenMgr.get(this._comp).to({ scaleX: CLICK_SCALE_DOWN, scaleY: CLICK_SCALE_DOWN }, CLICK_SCALE_TIME);
+        }
+        onClickMouseUp() {
+            if (this.noScale
+                || this._isTween
+                || (this._comp.scaleX === this._originScaleX &&
+                    this._comp.scaleY === this._originScaleY)) {
+                return;
+            }
+            this._isTween = true;
+            base.tweenMgr.remove(this._comp);
+            base.tweenMgr.get(this._comp).to({
+                scaleX: CLICK_SCALE_UP,
+                scaleY: CLICK_SCALE_UP
+            }, CLICK_SCALE_TIME, undefined, CallBack$1.alloc(this, this.onMouseUpEnd));
+        }
+        onMouseUpEnd() {
+            base.tweenMgr.remove(this._comp);
+            base.tweenMgr.get(this._comp).to({
+                scaleX: this._originScaleX,
+                scaleY: this._originScaleY
+            }, CLICK_SCALE_TIME);
+        }
+    }
+
+    var Script$1 = Laya.Script;
     var Image$1 = Laya.Image;
     function createImgMask() {
         const img = new Image$1();
@@ -1317,7 +1388,7 @@
         img.sizeGrid = "4,5,7,6";
         return img;
     }
-    class BarProgress extends Script {
+    class BarProgress extends Script$1 {
         onAwake() {
             super.onAwake();
             const owner = this.owner;
@@ -1403,16 +1474,17 @@
             this._proxy = MahjongProxy.ins();
             this._param = param;
             this._lab = ComUtils.getNodeByNameList(this, ["boxHtml", "lab"]);
-            this.btnHome.once(Laya.Event.CLICK, this, this.onClickHome);
-            this.btnNext.once(Laya.Event.CLICK, this, this.onClickNext);
+            this.btnHome.on(Laya.Event.CLICK, this, this.onClickHome);
+            this.btnNext.on(Laya.Event.CLICK, this, this.onClickNext);
+            const btnNextLab = this.btnNext.getChildByName("lab");
             if (!this._param || !this._param.type) {
                 this._lab.text = `得分: ` + this._proxy.model.levelScore;
-                this.btnNext.text.text = `下一关`;
+                btnNextLab.text = `下一关`;
                 this._proxy.model.challengeSuccess();
             }
             else {
                 this._lab.text = `挑战时间已到，挑战失败！`;
-                this.btnNext.text.text = `重新挑战`;
+                btnNextLab.text = `重新挑战`;
             }
         }
         onClosed(type) {
@@ -1444,6 +1516,7 @@
             var reg = Laya.ClassUtils.regClass;
             reg("modules/misc/RuleMdr.ts", RuleMdr);
             reg("modules/mahjong/view/MahjongMdr.ts", MahjongMdr);
+            reg("script/ClickScale.ts", ClickScale);
             reg("script/BarProgress.ts", BarProgress);
             reg("modules/mahjong/view/MahjongHomeMdr.ts", MahjongHomeMdr);
             reg("modules/mahjong/view/MahjongResultMdr.ts", MahjongResultMdr);

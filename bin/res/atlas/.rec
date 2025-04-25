@@ -7,16 +7,21 @@ P 5B258D17 button.png
 P 7D862B48 img_bg1.png
 P 07B8FD00 img_blank.png
 P D99150C1 img_btn_close.png
+P 5447FD7D img_com_btn_green.png
+P 789E39B1 img_common_btn_yellow.png
+P 261DCFBD img_common_gantanhao.png
 P DA67CA52 img_common_line.png
+P 2D0F6AFA img_common_redpoint1.png
+P DC17D32F img_common_redpoint2.png
 P 27F240EF img_common_wenhao.png
 P C05839CD img_progress.png
 P B017E53E img_progress_bg.png
 P 0506019A img_select.png
 P 6267509A img_select1.png
 D json
-R A657A7A4 CardConfig.json
-R AEA89201 cfglist.json
-R AC93D16B LevelConfig.json
+R 43F598FF CardConfig.json
+R 0A1CD7ED cfglist.json
+R 4B1373AC LevelConfig.json
 D mahjong
 P 3895FCA2 feng1.png
 P 0556B1B0 feng2.png
