@@ -8,6 +8,23 @@
     (function (ui) {
         var modules;
         (function (modules) {
+            var common;
+            (function (common) {
+                class RuleUI extends View {
+                    constructor() { super(); }
+                    createChildren() {
+                        super.createChildren();
+                        this.loadScene("modules/common/Rule");
+                    }
+                }
+                common.RuleUI = RuleUI;
+                REG("ui.modules.common.RuleUI", RuleUI);
+            })(common = modules.common || (modules.common = {}));
+        })(modules = ui.modules || (ui.modules = {}));
+    })(ui || (ui = {}));
+    (function (ui) {
+        var modules;
+        (function (modules) {
             var mahjong;
             (function (mahjong) {
                 class MahjongUI extends Scene {
@@ -40,6 +57,107 @@
             })(mahjong = modules.mahjong || (modules.mahjong = {}));
         })(modules = ui.modules || (ui.modules = {}));
     })(ui || (ui = {}));
+
+    var Sprite = Laya.Sprite;
+    var Scene$1 = Laya.Scene;
+    var LayerIndex;
+    (function (LayerIndex) {
+        LayerIndex[LayerIndex["ROOT"] = 1] = "ROOT";
+        LayerIndex[LayerIndex["MODAL"] = 2] = "MODAL";
+        LayerIndex[LayerIndex["TIPS"] = 3] = "TIPS";
+    })(LayerIndex || (LayerIndex = {}));
+    function setLayerIndex(scene, idx = LayerIndex.ROOT) {
+        if (scene) {
+            scene["_layerIndex_"] = idx;
+        }
+    }
+    class LayerManager {
+        init() {
+            Scene$1.root;
+            this.modal;
+            this.tips;
+        }
+        get modal() {
+            if (!this._modal) {
+                this._modal = new Sprite();
+                Scene$1["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
+                const modal = Scene$1["_modal_"];
+                modal.name = "modal";
+                modal.mouseThrough = true;
+                Laya.stage.on("resize", null, () => {
+                    modal.size(Laya.stage.width, Laya.stage.height);
+                    modal.event(Laya.Event.RESIZE);
+                });
+                modal.size(Laya.stage.width, Laya.stage.height);
+                modal.event(Laya.Event.RESIZE);
+            }
+            return this._modal;
+        }
+        get tips() {
+            if (!this._tips) {
+                this._tips = new Sprite();
+                Scene$1["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
+                const tips = Scene$1["_tips_"];
+                tips.name = "tips";
+                tips.mouseThrough = true;
+                Laya.stage.on("resize", null, () => {
+                    tips.size(Laya.stage.width, Laya.stage.height);
+                    tips.event(Laya.Event.RESIZE);
+                });
+                tips.size(Laya.stage.width, Laya.stage.height);
+                tips.event(Laya.Event.RESIZE);
+            }
+            return this._tips;
+        }
+    }
+    let sprite;
+    function createPopupMask() {
+        if (!sprite) {
+            sprite = new Sprite();
+            sprite.graphics.drawRect(0, 0, Laya.stage.width, Laya.stage.height, "#000000CC");
+        }
+        sprite.name = "popup_mask";
+        return sprite;
+    }
+    function addPopupMask() {
+        const mask = createPopupMask();
+        mask.removeSelf();
+        layerMgr.modal.addChildAt(mask, 0);
+    }
+    function removePopupMask() {
+        const mask = createPopupMask();
+        mask.removeSelf();
+    }
+    let layerMgr;
+    function initLayerMgr() {
+        layerMgr = new LayerManager();
+        layerMgr.init();
+    }
+
+    var RuleUI = ui.modules.common.RuleUI;
+    class RuleMdr extends RuleUI {
+        createChildren() {
+            super.createChildren();
+            setLayerIndex(this, LayerIndex.MODAL);
+            addPopupMask();
+        }
+        onOpened(param) {
+            super.onOpened(param);
+            const labDesc = this.getChildByName("boxInfo").getChildByName("labDesc");
+            labDesc.text = param;
+            this._btnClose = this.getChildByName("boxInfo").getChildByName("btnClose");
+            this._btnClose.once(Laya.Event.CLICK, this, this.close);
+        }
+        onDestroy() {
+            super.onDestroy();
+            console.log(`11111 destroy`);
+        }
+        onClosed(type) {
+            super.onClosed(type);
+            console.log(`11111 closed`);
+            removePopupMask();
+        }
+    }
 
     class DebugUtils {
         static debug(key, cls) {
@@ -522,7 +640,7 @@
 
     const globalAdapter = AdapterFactory.getAdapter();
 
-    var Scene$1 = Laya.Scene;
+    var Scene$2 = Laya.Scene;
     var poolMgr = base.poolMgr;
     const MAHJONG_LEVEL = "mahjong_level";
     class MahjongModel {
@@ -549,6 +667,10 @@
                 return list[list.length - 1];
             }
             return GameCfg.getCfgByNameId("LevelConfig", this.level || 1);
+        }
+        updateScore(score) {
+            this.levelScore += score;
+            eventMgr.event("mahjong_update_score");
         }
         updateData() {
             const cfg = this.getLevelCfg();
@@ -786,7 +908,7 @@
         }
         showResult(param) {
             eventMgr.event("mahjong_show_result");
-            Scene$1.open("modules/mahjong/MahjongResult.scene", false, param);
+            Scene$2.open("modules/mahjong/MahjongResult.scene", false, param);
         }
     }
 
@@ -871,64 +993,6 @@
         }
     }
 
-    var Sprite = Laya.Sprite;
-    var Scene$2 = Laya.Scene;
-    var LayerIndex;
-    (function (LayerIndex) {
-        LayerIndex[LayerIndex["ROOT"] = 1] = "ROOT";
-        LayerIndex[LayerIndex["MODAL"] = 2] = "MODAL";
-        LayerIndex[LayerIndex["TIPS"] = 3] = "TIPS";
-    })(LayerIndex || (LayerIndex = {}));
-    function setLayerIndex(scene, idx = LayerIndex.ROOT) {
-        if (scene) {
-            scene["_layerIndex_"] = idx;
-        }
-    }
-    class LayerManager {
-        init() {
-            Scene$2.root;
-            this.modal;
-            this.tips;
-        }
-        get modal() {
-            if (!this._modal) {
-                this._modal = new Sprite();
-                Scene$2["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
-                const modal = Scene$2["_modal_"];
-                modal.name = "modal";
-                modal.mouseThrough = true;
-                Laya.stage.on("resize", null, () => {
-                    modal.size(Laya.stage.width, Laya.stage.height);
-                    modal.event(Laya.Event.RESIZE);
-                });
-                modal.size(Laya.stage.width, Laya.stage.height);
-                modal.event(Laya.Event.RESIZE);
-            }
-            return this._modal;
-        }
-        get tips() {
-            if (!this._tips) {
-                this._tips = new Sprite();
-                Scene$2["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
-                const tips = Scene$2["_tips_"];
-                tips.name = "tips";
-                tips.mouseThrough = true;
-                Laya.stage.on("resize", null, () => {
-                    tips.size(Laya.stage.width, Laya.stage.height);
-                    tips.event(Laya.Event.RESIZE);
-                });
-                tips.size(Laya.stage.width, Laya.stage.height);
-                tips.event(Laya.Event.RESIZE);
-            }
-            return this._tips;
-        }
-    }
-    let layerMgr;
-    function initLayerMgr() {
-        layerMgr = new LayerManager();
-        layerMgr.init();
-    }
-
     var Box = Laya.Box;
     var Label = Laya.Label;
     var Image = Laya.Image;
@@ -944,7 +1008,7 @@
             this.centerY = -100;
             if (!this._img) {
                 this._img = new Image();
-                this._img.skin = `common/bg0.png`;
+                this._img.skin = `common/img_blank.png`;
                 this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
                 this._img.sizeGrid = `3,8,6,5`;
                 this.addChild(this._img);
@@ -971,7 +1035,7 @@
         }
         execTween() {
             Tween.clearAll(this);
-            Tween.to(this, { alpha: 0.6 }, 800, null, Handler$1.create(this, this.execTweenEnd, null, true), 800);
+            Tween.to(this, { alpha: 0.8 }, 800, null, Handler$1.create(this, this.execTweenEnd, null, true), 800);
         }
         execTweenEnd() {
             this.removeSelf();
@@ -1044,8 +1108,14 @@
     var Event$1 = Laya.Event;
     var SoundManager = Laya.SoundManager;
     var CallBack = base.CallBack;
+    var Scene$3 = Laya.Scene;
     const INIT_SCALE = 0.4;
     const BIG_SCALE = 0.42;
+    const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯）\n
+2.路径无阻挡即可消除\n 
+3.⚡连击加分，消除间隔越短，分数加成越高！\n
+4.💡 用 提示（扣5分） 👉 显示可消的一对牌\n
+5.用 洗牌（扣10分）👉 重置剩余牌位置`;
     class MahjongMdr extends ui.modules.mahjong.MahjongUI {
         constructor() {
             super();
@@ -1062,8 +1132,11 @@
             this._btnRefresh = this.getChildByName("btnRefresh");
             this._btnTips.clickHandler = Handler$2.create(this, this.onBtnTips, undefined, false);
             this._btnRefresh.clickHandler = Handler$2.create(this, this.onBtnRefresh, undefined, false);
+            this._btnRule = this.getChildByName("btnRule");
+            this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
             eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
             eventMgr.on("mahjong_show_result", this, this.showResultToClear);
+            eventMgr.on("mahjong_update_score", this, this.updateScore);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -1177,10 +1250,14 @@
             else if (diffTime < 5 * 1000) {
                 score = 3;
             }
-            this._proxy.model.levelScore += score;
             this._lastScoreTime = now;
+            this._proxy.model.updateScore(score);
+            this.updateScore();
+        }
+        updateScore() {
             const lab = ComUtils.getNodeByNameList(this, ["boxScore", "lab"]);
             lab.text = this._proxy.model.levelScore + "";
+            lab.color = this._proxy.model.levelScore > 0 ? "#42e422" : "#ff4646";
         }
         resetScore() {
             this._lastScoreTime = 0;
@@ -1217,12 +1294,17 @@
             else {
                 showTips("无可消除的卡牌，请洗牌");
             }
+            this._proxy.model.updateScore(-5);
         }
         onBtnRefresh() {
             const list = this._proxy.model.getRefreshCardDataList();
             this._list.array = list.reduce((a, b) => a.concat(b));
             this._list.refresh();
             showTips("洗牌成功！");
+            this._proxy.model.updateScore(-10);
+        }
+        onClickRule() {
+            Scene$3.open("modules/common/Rule.scene", false, ruleDesc);
         }
     }
 
@@ -1287,7 +1369,7 @@
         }
     }
 
-    var Scene$3 = Laya.Scene;
+    var Scene$4 = Laya.Scene;
     var Handler$3 = Laya.Handler;
     class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
         createChildren() {
@@ -1304,24 +1386,25 @@
             super.onClosed(type);
         }
         onClickBtnStart() {
-            Scene$3.open("modules/mahjong/Mahjong.scene");
+            Scene$4.open("modules/mahjong/Mahjong.scene");
         }
     }
 
-    var Scene$4 = Laya.Scene;
-    var Event$2 = Laya.Event;
-    class MahjongResultMdr extends ui.modules.mahjong.MahjongResultUI {
+    var MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
+    var Scene$5 = Laya.Scene;
+    class MahjongResultMdr extends MahjongResultUI {
         createChildren() {
             super.createChildren();
             setLayerIndex(this, LayerIndex.MODAL);
-            this._proxy = MahjongProxy.ins();
-            this._lab = ComUtils.getNodeByNameList(this, ["boxHtml", "lab"]);
-            this.btnHome.once(Event$2.CLICK, this, this.onClickHome);
-            this.btnNext.once(Event$2.CLICK, this, this.onClickNext);
+            addPopupMask();
         }
         onOpened(param) {
             super.onOpened(param);
+            this._proxy = MahjongProxy.ins();
             this._param = param;
+            this._lab = ComUtils.getNodeByNameList(this, ["boxHtml", "lab"]);
+            this.btnHome.once(Laya.Event.CLICK, this, this.onClickHome);
+            this.btnNext.once(Laya.Event.CLICK, this, this.onClickNext);
             if (!this._param || !this._param.type) {
                 this._lab.text = `得分: ` + this._proxy.model.levelScore;
                 this.btnNext.text.text = `下一关`;
@@ -1334,12 +1417,12 @@
         }
         onClosed(type) {
             super.onClosed(type);
-            this.btnHome.off(Event$2.CLICK, this, this.onClickHome);
-            this.btnNext.off(Event$2.CLICK, this, this.onClickNext);
+            this.btnHome.off(Laya.Event.CLICK, this, this.onClickHome);
+            this.btnNext.off(Laya.Event.CLICK, this, this.onClickNext);
         }
         onClickHome() {
             console.warn("MahjongResultMdr.onClickHome...");
-            Scene$4.open("modules/mahjong/MahjongHome.scene");
+            Scene$5.open("modules/mahjong/MahjongHome.scene");
             this.close();
         }
         onClickNext() {
@@ -1348,6 +1431,10 @@
             eventMgr.event("mahjong_update_next", challengeAgain);
             this.close();
         }
+        close(type) {
+            super.close(type);
+            removePopupMask();
+        }
     }
 
     class GameConfig {
@@ -1355,6 +1442,7 @@
         }
         static init() {
             var reg = Laya.ClassUtils.regClass;
+            reg("modules/misc/RuleMdr.ts", RuleMdr);
             reg("modules/mahjong/view/MahjongMdr.ts", MahjongMdr);
             reg("script/BarProgress.ts", BarProgress);
             reg("modules/mahjong/view/MahjongHomeMdr.ts", MahjongHomeMdr);
