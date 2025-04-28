@@ -78,7 +78,6 @@ declare module base {
   }
   
   const tweenMgr: TweenManger;
-  function _loopTween(): void;
   
   class TimerManager {
       tick(): boolean;
@@ -120,8 +119,98 @@ declare module base {
   }
   const resourceMgr: ResourceManager;
   
-  function baseLoop(): void;
+  type VoidFunc = (...args: any) => void;
+  class BaseEmitter {
+      emit(event: string, args?: any): void;
+      on(event: string, method: VoidFunc, caller: any): void;
+      off(event: string, method: (...args: any) => void, caller: any): void;
+      offAll(event: string, caller: any): void;
+  }
   
-  export { CallBack, Ease, GEvent, PoolObject, _loopTween, baseLoop, eventMgr, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
+  abstract class BaseProxy extends BaseEmitter {
+      abstract init(): void;
+  }
+  
+  abstract class BaseCommand extends BaseEmitter {
+      abstract exec(args: any): void;
+  }
+  
+  const MdrKey = "_mediator_";
+  function findMediator<T extends BaseMediator<any>>(comp: Laya.Node & {
+      [MdrKey]?: T;
+  }): T | undefined;
+  type ModuleType$2 = number;
+  abstract class BaseMediator<T extends Laya.Sprite = Laya.Sprite> extends BaseEmitter {
+      protected ui: T | undefined;
+      protected params?: any;
+      protected isOpened: boolean;
+      protected parent: Laya.Sprite;
+      protected uiUrl?: string;
+      protected _module: BaseModule;
+      protected _moduleName: ModuleType$2;
+      protected _viewType: number;
+      private __name__;
+      protected constructor(url: string, parent: any);
+      setModule(module: BaseModule): void;
+      setViewType(view: number): void;
+      getViewType(): number;
+      setName(name: string): void;
+      getName(): string;
+      open(params?: any): void;
+      close(): void;
+      protected initView(handler: Laya.Handler): void;
+      private onUILoaded;
+      protected abstract initUI(): void;
+      protected abstract addEvents(): void;
+      protected abstract onOpen(): void;
+      protected abstract onClose(): void;
+      protected abstract removeEvents(): void;
+      protected destroyUI(): void;
+  }
+  
+  type MdrCls = new () => BaseMediator;
+  type CmdCls = new () => BaseCommand;
+  type ModuleType$1 = number;
+  type ProxyType$1 = number;
+  abstract class BaseModule {
+      name: ModuleType$1;
+      private _cmdMap;
+      private _proxyInsMap;
+      private _mdrMap;
+      private _mdrInsMap;
+      protected constructor(module: ModuleType$1);
+      onReg(): void;
+      protected abstract initCmd(): void;
+      protected abstract initProxy(): void;
+      protected abstract initMdr(): void;
+      regCmd(event: string, cls: CmdCls): void;
+      private exeCmd;
+      regProxy(type: ProxyType$1, proxy: new () => BaseProxy): void;
+      retProxy<T extends BaseProxy>(type: ProxyType$1): T;
+      regMdr(viewType: number, mdr: MdrCls): void;
+      retMdr(viewType: number): MdrCls;
+      regMdrIns(mdr: BaseMediator): void;
+      retMdrIns(viewType: number): BaseMediator;
+      removeMdrIns(viewType: number): void;
+  }
+  
+  let facade: Facade;
+  type ModuleType = number;
+  type ProxyType = number;
+  type BaseModuleCls = new () => BaseModule;
+  class Facade {
+      private readonly _moduleMap;
+      private readonly _moduleList;
+      regModule(m: BaseModule): void;
+      retModule(type: ModuleType): BaseModule;
+      push<T extends BaseModuleCls>(cls: T): void;
+      instantiate(): void;
+      getProxy<T extends BaseProxy>(module: ModuleType, proxy: ProxyType): T | undefined;
+  }
+  
+  function baseLoop(): void;
+  function baseInit(): void;
+  
+  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, GEvent, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
   
 }
