@@ -596,7 +596,6 @@
   }(B);
   t.BaseCommand = F, t.BaseMediator = A, t.BaseModule = S, t.BaseProxy = R, t.CallBack = e, t.Ease = P, t.GEvent = d, t.baseInit = function () {
     t.facade = new f;
-    console.log(11111, t, t.facade);
   }, t.baseLoop = function () {
     l.update(), u.tick();
   }, t.eventMgr = _, t.findMediator = function (t) {
