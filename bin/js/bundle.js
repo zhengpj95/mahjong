@@ -475,6 +475,7 @@
             this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
             this._btnRule = this.getChildByName("btnRule");
             this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
+            eventMgr.on("mahjong_update_info", this, this.onRefreshNext);
             eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
             eventMgr.on("mahjong_show_result", this, this.showResultToClear);
             eventMgr.on("mahjong_update_score", this, this.updateScore);
@@ -482,7 +483,7 @@
         onOpened(param) {
             super.onOpened(param);
             this._proxy.model.clearData();
-            this.onLoadedSuccess();
+            this.onRefreshNext();
         }
         onClosed(type) {
             super.onClosed(type);
@@ -490,12 +491,8 @@
             this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
             this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
         }
-        onLoadedSuccess() {
-            console.warn("11111 onLoadedSuccess");
-            this.onRefreshNext();
-        }
         onRefreshNext(data) {
-            console.warn(`11111 onRefreshNext level:${this._proxy.model.level}`);
+            console.warn(`11111 onRefreshNext cLv:${this._proxy.model.level}, nLv:${this._proxy.model.getNextLevel()}`);
             this._proxy.model.showNext(data);
             this.resetScore();
             this.updateLevel();
@@ -577,7 +574,7 @@
         }
         updateLevel() {
             const lab = this.getChildByName("labLevel");
-            lab.text = "关卡：" + this._proxy.model.level;
+            lab.text = "关卡：" + this._proxy.model.getNextLevel();
         }
         addScore() {
             const now = Date.now();
@@ -747,7 +744,7 @@
             if (!this._param || !this._param.type) {
                 this._lab.text = `得分: ` + this._proxy.model.levelScore;
                 btnNextLab.text = `下一关`;
-                this._proxy.model.challengeSuccess();
+                this._proxy.cMahjongSuccess();
             }
             else {
                 this._lab.text = `挑战时间已到，挑战失败！`;
@@ -1078,183 +1075,6 @@
         }
     }
 
-    var PlatformType;
-    (function (PlatformType) {
-        PlatformType["WX"] = "wx";
-        PlatformType["TT"] = "tt";
-        PlatformType["QQ"] = "qq";
-        PlatformType["WEB"] = "web";
-        PlatformType["UNKNOWN"] = "unknown";
-    })(PlatformType || (PlatformType = {}));
-
-    class Platform {
-        static get platform() {
-            if (typeof wx !== "undefined" && wx.getSystemInfoSync) {
-                return PlatformType.WX;
-            }
-            else if (typeof window !== "undefined") {
-                return PlatformType.WEB;
-            }
-            else {
-                return PlatformType.UNKNOWN;
-            }
-        }
-        static get isWx() {
-            return this.platform === PlatformType.WX;
-        }
-        static get isWeb() {
-            return this.platform === PlatformType.WEB;
-        }
-    }
-
-    class WechatAdapter {
-        get storage() {
-            if (!this._storage) {
-                this._storage = new WechatPlatformStorage();
-            }
-            return this._storage;
-        }
-    }
-    class WechatPlatformStorage {
-        clear() {
-            wx.clearStorage();
-        }
-        getItem(key, callback) {
-            try {
-                wx.getStorage({
-                    key: key,
-                    success: (result) => {
-                        if (callback)
-                            callback(JSON.parse(result.data));
-                    },
-                    fail: () => {
-                        if (callback)
-                            callback(undefined);
-                    },
-                    complete: () => {
-                    }
-                });
-            }
-            catch (e) {
-                return undefined;
-            }
-        }
-        removeItem(key, callback) {
-            try {
-                wx.removeStorage({
-                    key: key,
-                    success: () => {
-                        if (callback)
-                            callback(true);
-                    },
-                    fail: () => {
-                        if (callback)
-                            callback(false);
-                    },
-                    complete: () => {
-                    }
-                });
-            }
-            catch (e) {
-                if (callback)
-                    callback(false);
-            }
-        }
-        setItem(key, val, callback) {
-            try {
-                wx.setStorage({
-                    key: key,
-                    data: JSON.stringify(val),
-                    success: () => {
-                        if (callback)
-                            callback(true);
-                    },
-                    fail: () => {
-                        if (callback)
-                            callback(false);
-                    },
-                    complete: () => {
-                    }
-                });
-            }
-            catch (e) {
-                if (callback)
-                    callback(false);
-            }
-        }
-    }
-
-    class WebAdapter {
-        get storage() {
-            if (!this._storage) {
-                this._storage = new WebPlatformStorage();
-            }
-            return this._storage;
-        }
-    }
-    class WebPlatformStorage {
-        setItem(key, val, callback) {
-            try {
-                localStorage.setItem(key, JSON.stringify(val));
-                if (callback) {
-                    callback(true);
-                }
-            }
-            catch (e) {
-                if (callback) {
-                    callback(false);
-                }
-            }
-        }
-        getItem(key, callback) {
-            try {
-                const data = localStorage.getItem(key);
-                const parsed = data ? JSON.parse(data) : null;
-                if (callback) {
-                    callback(parsed);
-                }
-                return parsed;
-            }
-            catch (e) {
-                if (callback) {
-                    callback(undefined);
-                }
-                return undefined;
-            }
-        }
-        removeItem(key, callback) {
-            try {
-                localStorage.removeItem(key);
-                if (callback) {
-                    callback(true);
-                }
-            }
-            catch (e) {
-                if (callback) {
-                    callback(false);
-                }
-            }
-        }
-        clear() {
-            localStorage.clear();
-        }
-    }
-
-    class AdapterFactory {
-        static getAdapter() {
-            switch (Platform.platform) {
-                case PlatformType.WX:
-                    return new WechatAdapter();
-                case PlatformType.WEB:
-                    return new WebAdapter();
-                default:
-                    throw new Error(`Unsupported platform!`);
-            }
-        }
-    }
-
-    const globalAdapter = AdapterFactory.getAdapter();
-
     var Scene$5 = Laya.Scene;
     var poolMgr$1 = base.poolMgr;
     const MAHJONG_LEVEL = "mahjong_level";
@@ -1268,19 +1088,13 @@
             this._pathData = [];
             this._sameCardMap = {};
         }
-        init() {
-            globalAdapter.storage.getItem(MAHJONG_LEVEL, (data) => {
-                console.warn(`11111 before getItem: ${this.level}`);
-                this.level = data || 0;
-                console.warn(`11111 after getItem: ${this.level} ${data}`);
-            });
-        }
         getLevelCfg() {
+            const lv = this.getNextLevel();
             const list = GameCfg.getCfgListByName("LevelConfig") || [];
-            if (this.level >= list.length) {
+            if (lv >= list.length) {
                 return list[list.length - 1];
             }
-            return GameCfg.getCfgByNameId("LevelConfig", this.level || 1);
+            return GameCfg.getCfgByNameId("LevelConfig", lv || 1);
         }
         updateScore(score) {
             this.levelScore += score;
@@ -1293,9 +1107,6 @@
             this.data = [];
         }
         clearData(isReset = false) {
-            if (isReset) {
-                this.level = 0;
-            }
             this.levelScore = 0;
             this.row = 0;
             this.col = 0;
@@ -1503,28 +1314,194 @@
             this.updateData();
         }
         showNext(isAgain) {
-            if (!isAgain) {
-                this.level += 1;
-            }
             this.clearData();
             this.updateData();
         }
-        challengeSuccess() {
-            let lev = this.level;
-            globalAdapter.storage.setItem(MAHJONG_LEVEL, lev, (success) => {
-                if (success) {
-                    console.log(`11111 setItem success: `, lev);
-                }
-                else {
-                    console.log(`11111 setItem fail: `, lev);
-                }
-            });
+        getNextLevel() {
+            return this.level + 1;
         }
         showResult(param) {
             eventMgr.event("mahjong_show_result");
             Scene$5.open("modules/mahjong/MahjongResult.scene", false, param);
         }
     }
+
+    var PlatformType;
+    (function (PlatformType) {
+        PlatformType["WX"] = "wx";
+        PlatformType["TT"] = "tt";
+        PlatformType["QQ"] = "qq";
+        PlatformType["WEB"] = "web";
+        PlatformType["UNKNOWN"] = "unknown";
+    })(PlatformType || (PlatformType = {}));
+
+    class Platform {
+        static get platform() {
+            if (typeof wx !== "undefined" && wx.getSystemInfoSync) {
+                return PlatformType.WX;
+            }
+            else if (typeof window !== "undefined") {
+                return PlatformType.WEB;
+            }
+            else {
+                return PlatformType.UNKNOWN;
+            }
+        }
+        static get isWx() {
+            return this.platform === PlatformType.WX;
+        }
+        static get isWeb() {
+            return this.platform === PlatformType.WEB;
+        }
+    }
+
+    class WechatAdapter {
+        get storage() {
+            if (!this._storage) {
+                this._storage = new WechatPlatformStorage();
+            }
+            return this._storage;
+        }
+    }
+    class WechatPlatformStorage {
+        clear() {
+            wx.clearStorage();
+        }
+        getItem(key, callback) {
+            try {
+                wx.getStorage({
+                    key: key,
+                    success: (result) => {
+                        if (callback)
+                            callback(JSON.parse(result.data));
+                    },
+                    fail: () => {
+                        if (callback)
+                            callback(undefined);
+                    },
+                    complete: () => {
+                    }
+                });
+            }
+            catch (e) {
+                return undefined;
+            }
+        }
+        removeItem(key, callback) {
+            try {
+                wx.removeStorage({
+                    key: key,
+                    success: () => {
+                        if (callback)
+                            callback(true);
+                    },
+                    fail: () => {
+                        if (callback)
+                            callback(false);
+                    },
+                    complete: () => {
+                    }
+                });
+            }
+            catch (e) {
+                if (callback)
+                    callback(false);
+            }
+        }
+        setItem(key, val, callback) {
+            try {
+                wx.setStorage({
+                    key: key,
+                    data: JSON.stringify(val),
+                    success: () => {
+                        if (callback)
+                            callback(true);
+                    },
+                    fail: () => {
+                        if (callback)
+                            callback(false);
+                    },
+                    complete: () => {
+                    }
+                });
+            }
+            catch (e) {
+                if (callback)
+                    callback(false);
+            }
+        }
+    }
+
+    class WebAdapter {
+        get storage() {
+            if (!this._storage) {
+                this._storage = new WebPlatformStorage();
+            }
+            return this._storage;
+        }
+    }
+    class WebPlatformStorage {
+        setItem(key, val, callback) {
+            try {
+                localStorage.setItem(key, JSON.stringify(val));
+                if (callback) {
+                    callback(true);
+                }
+            }
+            catch (e) {
+                if (callback) {
+                    callback(false);
+                }
+            }
+        }
+        getItem(key, callback) {
+            try {
+                const data = localStorage.getItem(key);
+                const parsed = data ? JSON.parse(data) : null;
+                if (callback) {
+                    callback(parsed);
+                }
+                return parsed;
+            }
+            catch (e) {
+                if (callback) {
+                    callback(undefined);
+                }
+                return undefined;
+            }
+        }
+        removeItem(key, callback) {
+            try {
+                localStorage.removeItem(key);
+                if (callback) {
+                    callback(true);
+                }
+            }
+            catch (e) {
+                if (callback) {
+                    callback(false);
+                }
+            }
+        }
+        clear() {
+            localStorage.clear();
+        }
+    }
+
+    class AdapterFactory {
+        static getAdapter() {
+            switch (Platform.platform) {
+                case PlatformType.WX:
+                    return new WechatAdapter();
+                case PlatformType.WEB:
+                    return new WebAdapter();
+                default:
+                    throw new Error(`Unsupported platform!`);
+            }
+        }
+    }
+
+    const globalAdapter = AdapterFactory.getAdapter();
 
     var BaseProxy = base.BaseProxy;
     class MahjongProxy extends BaseProxy {
@@ -1535,7 +1512,28 @@
             return this._model;
         }
         init() {
-            this.model.init();
+            this.sMahjongInfo();
+        }
+        cMahjongSuccess() {
+            let lev = this.model.level + 1;
+            globalAdapter.storage.setItem(MAHJONG_LEVEL, lev, (success) => {
+                if (success) {
+                    console.log(`cMahjongSuccess setItem success: `, lev);
+                }
+                else {
+                    console.log(`cMahjongSuccess setItem fail: `, lev);
+                }
+            });
+            this.model.level += 1;
+        }
+        sMahjongInfo() {
+            this.model.clearData();
+            globalAdapter.storage.getItem(MAHJONG_LEVEL, (data) => {
+                console.warn(`sMahjongInfo before getItem: ${this.model.level}`);
+                this.model.level = data || 0;
+                console.warn(`sMahjongInfo after getItem: ${this.model.level} ${data}`);
+                eventMgr.event("mahjong_update_info");
+            });
         }
     }
 
@@ -1566,6 +1564,49 @@
         insModules();
     }
 
+    function pad(n, len = 2) {
+        const str = "0".repeat(len) + n.toString();
+        return str.slice(-len);
+    }
+    function getTimestamp() {
+        const now = new Date();
+        return `[${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+            `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}.${pad(now.getMilliseconds(), 3)}]`;
+    }
+    function wrapConsoleMethod(originalMethod, color = "") {
+        return (...args) => {
+            const timestamp = getTimestamp();
+            const prefix = `${timestamp} zpj `;
+            const style = color ? `color: ${color}; font-weight: false;` : "";
+            originalMethod(`%c${prefix}`, style, ...args);
+        };
+    }
+    let originalMethods = {};
+    function initEnhancedConsole() {
+        if (!originalMethods.log) {
+            originalMethods.log = console.log;
+            originalMethods.warn = console.warn;
+            originalMethods.error = console.error;
+            originalMethods.info = console.info;
+            originalMethods.debug = console.debug;
+            console.log = wrapConsoleMethod(console.log);
+            console.warn = wrapConsoleMethod(console.warn, "orange");
+            console.error = wrapConsoleMethod(console.error, "red");
+            console.info = wrapConsoleMethod(console.info, "deepskyblue");
+            console.debug = wrapConsoleMethod(console.debug, "violet");
+        }
+    }
+    function restoreOriginalConsole() {
+        if (originalMethods.log) {
+            console.log = originalMethods.log;
+            console.warn = originalMethods.warn;
+            console.error = originalMethods.error;
+            console.info = originalMethods.info;
+            console.debug = originalMethods.debug;
+            originalMethods = {};
+        }
+    }
+
     var baseInit = base.baseInit;
     class Main {
         constructor() {
@@ -1587,6 +1628,7 @@
             if (GameConfig.stat)
                 Laya.Stat.show();
             Laya.alertGlobalError(true);
+            initEnhancedConsole();
             Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
             initLayerMgr();
             initLoop();
