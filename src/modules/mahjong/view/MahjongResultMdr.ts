@@ -37,7 +37,7 @@ export default class MahjongResultMdr extends MahjongResultUI {
     if (!this._param || !this._param.type) {
       this._lab.text = `得分: ` + this._proxy.model.levelScore;
       btnNextLab.text = `下一关`;
-      this._proxy.model.challengeSuccess();
+      this._proxy.cMahjongSuccess();
     } else {
       this._lab.text = `挑战时间已到，挑战失败！`;
       btnNextLab.text = `重新挑战`;
@@ -58,6 +58,9 @@ export default class MahjongResultMdr extends MahjongResultUI {
 
   private onClickNext(): void {
     const challengeAgain = this._param && this._param.type === 1;
+    if (!challengeAgain) {
+      this._proxy.cMahjongSuccess();
+    }
     console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
     eventMgr.event(MahjongEvent.UPDATE_NEXT, challengeAgain); // true 是重新挑战
     this.close();

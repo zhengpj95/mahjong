@@ -4,13 +4,12 @@ import { eventMgr } from "@base/event/EventManager";
 import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "../MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { globalAdapter } from "@platform/index";
 import Scene = Laya.Scene;
 import ConfigName = config.ConfigName;
 import LevelConfig = config.LevelConfig;
 import poolMgr = base.poolMgr;
 
-const MAHJONG_LEVEL = "mahjong_level";
+export const MAHJONG_LEVEL = "mahjong_level";
 
 /**
  * @date 2024/12/22
@@ -28,24 +27,25 @@ export class MahjongModel {
   private _astarMgr: AStarMgr;
   private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
 
-  constructor() {
-    // this.init();
-  }
-
-  public init(): void {
-    globalAdapter.storage.getItem(MAHJONG_LEVEL, (data: number) => {
-      console.warn(`11111 before getItem: ${this.level}`);
-      this.level = data || 0;
-      console.warn(`11111 after getItem: ${this.level} ${data}`);
-    });
-  }
+  // constructor() {
+  //   // this.init();
+  // }
+  //
+  // public init(): void {
+  //   globalAdapter.storage.getItem(MAHJONG_LEVEL, (data: number) => {
+  //     console.warn(`11111 before getItem: ${this.level}`);
+  //     this.level = data || 0;
+  //     console.warn(`11111 after getItem: ${this.level} ${data}`);
+  //   });
+  // }
 
   private getLevelCfg(): LevelConfig {
+    const lv = this.getNextLevel();
     const list = GameCfg.getCfgListByName<LevelConfig>(ConfigName.LEVEl) || [];
-    if (this.level >= list.length) {
+    if (lv >= list.length) {
       return list[list.length - 1];
     }
-    return GameCfg.getCfgByNameId<LevelConfig>(ConfigName.LEVEl, this.level || 1);
+    return GameCfg.getCfgByNameId<LevelConfig>(ConfigName.LEVEl, lv || 1);
   }
 
   public updateScore(score: number): void {
@@ -62,9 +62,9 @@ export class MahjongModel {
 
   // 清除当前关卡数据
   public clearData(isReset = false): void {
-    if (isReset) {
-      this.level = 0;
-    }
+    // if (isReset) {
+    //   this.level = 0;
+    // }
     this.levelScore = 0;
     this.row = 0;
     this.col = 0;
@@ -290,24 +290,28 @@ export class MahjongModel {
 
   /**下一关*/
   public showNext(isAgain?: boolean): void {
-    if (!isAgain) {
-      this.level += 1;
-    }
+    // if (!isAgain) {
+    //   this.level += 1;
+    // }
     this.clearData();
     this.updateData();
   }
 
-  /**挑战成功*/
-  public challengeSuccess(): void {
-    let lev = this.level;
-    globalAdapter.storage.setItem(MAHJONG_LEVEL, lev, (success?: boolean) => {
-      if (success) {
-        console.log(`11111 setItem success: `, lev);
-      } else {
-        console.log(`11111 setItem fail: `, lev);
-      }
-    });
+  public getNextLevel(): number {
+    return this.level + 1;
   }
+
+  // /**挑战成功*/
+  // public challengeSuccess(): void {
+  //   let lev = this.level;
+  //   globalAdapter.storage.setItem(MAHJONG_LEVEL, lev, (success?: boolean) => {
+  //     if (success) {
+  //       console.log(`11111 setItem success: `, lev);
+  //     } else {
+  //       console.log(`11111 setItem fail: `, lev);
+  //     }
+  //   });
+  // }
 
   /**展示结算弹窗*/
   public showResult(param?: IMahjongResultParam): void {

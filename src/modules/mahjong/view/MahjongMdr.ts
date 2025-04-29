@@ -68,6 +68,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._btnRule = <Image>this.getChildByName("btnRule");
     this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
 
+    eventMgr.on(MahjongEvent.UPDATE_INFO, this, this.onRefreshNext);
     eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
     eventMgr.on(MahjongEvent.SHOW_RESULT, this, this.showResultToClear);
     eventMgr.on(MahjongEvent.UPDATE_SCORE, this, this.updateScore);
@@ -76,8 +77,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   public onOpened(param: any): void {
     super.onOpened(param);
     this._proxy.model.clearData();
-    // Laya.loader.load("res/atlas/modules/mahjong.atlas", Laya.Handler.create(this, this.onLoadedSuccess, undefined, true));
-    this.onLoadedSuccess();
+    this.onRefreshNext();
   }
 
   public onClosed(type?: string): void {
@@ -87,13 +87,8 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
   }
 
-  private onLoadedSuccess(): void {
-    console.warn("11111 onLoadedSuccess");
-    this.onRefreshNext();
-  }
-
   private onRefreshNext(data?: boolean): void {
-    console.warn(`11111 onRefreshNext level:${this._proxy.model.level}`);
+    console.warn(`11111 onRefreshNext cLv:${this._proxy.model.level}, nLv:${this._proxy.model.getNextLevel()}`);
     this._proxy.model.showNext(data);
 
     this.resetScore();
@@ -185,7 +180,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   private updateLevel(): void {
     const lab = <Label>this.getChildByName("labLevel");
-    lab.text = "关卡：" + this._proxy.model.level;
+    lab.text = "关卡：" + this._proxy.model.getNextLevel();
   }
 
   private addScore(): void {

@@ -19,8 +19,8 @@ export const enum FengType {
   BAIBAN = 7
 }
 
-
 export const enum MahjongEvent {
+  UPDATE_INFO = "mahjong_update_info",
   UPDATE_NEXT = "mahjong_update_next",
   SHOW_RESULT = "mahjong_show_result",
   UPDATE_SCORE = "mahjong_update_score",
