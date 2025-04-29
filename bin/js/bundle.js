@@ -1573,12 +1573,12 @@
         return `[${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
             `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}.${pad(now.getMilliseconds(), 3)}]`;
     }
-    function wrapConsoleMethod(originalMethod, color = "") {
+    function wrapConsoleMethod(originalMethod, color = "", name = "") {
         return (...args) => {
             const timestamp = getTimestamp();
-            const prefix = `${timestamp} zpj `;
-            const style = color ? `color: ${color}; font-weight: false;` : "";
-            originalMethod(`%c${prefix}`, style, ...args);
+            const prefix = `${timestamp}`;
+            const style = color ? `background: ${color}; padding: 2px 4px; border-radius: 3px;` : "";
+            originalMethod.call(console, `%c${name || originalMethod.name}`, style, prefix, ...args);
         };
     }
     let originalMethods = {};
@@ -1589,9 +1589,9 @@
             originalMethods.error = console.error;
             originalMethods.info = console.info;
             originalMethods.debug = console.debug;
-            console.log = wrapConsoleMethod(console.log);
-            console.warn = wrapConsoleMethod(console.warn);
-            console.error = wrapConsoleMethod(console.error, "red");
+            console.warn = wrapConsoleMethod(console.log, "gold", "warn");
+            console.error = wrapConsoleMethod(console.log, "red", "error");
+            console.log = wrapConsoleMethod(console.log, "#909090");
             console.info = wrapConsoleMethod(console.info, "deepskyblue");
             console.debug = wrapConsoleMethod(console.debug, "violet");
         }

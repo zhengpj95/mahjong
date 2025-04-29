@@ -14,12 +14,12 @@ function getTimestamp(): string {
     `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}.${pad(now.getMilliseconds(), 3)}]`;
 }
 
-function wrapConsoleMethod(originalMethod: (...args: any[]) => void, color: string = ""): (...args: any[]) => void {
+function wrapConsoleMethod(originalMethod: (...args: any[]) => void, color: string = "", name = ""): (...args: any[]) => void {
   return (...args: any[]) => {
     const timestamp = getTimestamp();
     const prefix = `${timestamp}`;
-    const style = color ? `color: ${color}; font-weight: false;` : "";
-    originalMethod(`%c${prefix}`, style, ...args);
+    const style = color ? `background: ${color}; padding: 2px 4px; border-radius: 3px;` : "";
+    originalMethod.call(console, `%c${name || originalMethod.name}`, style, prefix, ...args);
   };
 }
 
@@ -35,11 +35,12 @@ export function initEnhancedConsole(): void {
     originalMethods.debug = console.debug;
 
     // 重写
-    console.log = wrapConsoleMethod(console.log);
-    console.warn = wrapConsoleMethod(console.warn);
-    console.error = wrapConsoleMethod(console.error, "red");
+    console.warn = wrapConsoleMethod(console.log, "gold", "warn"); // 用log来处理warn，去掉warn默认的一整行都有颜色的默认处理
+    console.error = wrapConsoleMethod(console.log, "red", "error");// 同上
+
     console.info = wrapConsoleMethod(console.info, "deepskyblue");
     console.debug = wrapConsoleMethod(console.debug, "violet");
+    console.log = wrapConsoleMethod(console.log, "#909090");
   }
 }
 
