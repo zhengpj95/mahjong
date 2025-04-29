@@ -232,6 +232,66 @@
         }
     }
 
+    var TimeLine = Laya.TimeLine;
+    var Event = Laya.Event;
+    class ComUtils {
+        static setTween(box, isTween = true, callback) {
+            if (!box) {
+                return undefined;
+            }
+            let timeLine = box["_timeLine_"];
+            if (timeLine) {
+                timeLine.reset();
+                if (!isTween) {
+                    timeLine.destroy();
+                    return undefined;
+                }
+            }
+            else {
+                box["_timeLine_"] = timeLine = new TimeLine();
+            }
+            timeLine.to(box, { rotation: 10 }, 100)
+                .to(box, { rotation: -10 }, 100)
+                .to(box, { rotation: 5 }, 100)
+                .to(box, { rotation: -5 }, 100)
+                .to(box, { rotation: 0 }, 50)
+                .play();
+            timeLine.on(Event.COMPLETE, this, () => {
+                if (callback) {
+                    callback.run();
+                }
+            });
+            return timeLine;
+        }
+        static setScale(box, scale = 1) {
+            if (!box) {
+                return;
+            }
+            if (box.scaleX !== scale) {
+                box.scaleX = box.scaleY = scale;
+            }
+        }
+        static getNodeByNameList(box, nameList) {
+            if (!box) {
+                return undefined;
+            }
+            if (Array.isArray(nameList)) {
+                let com = box;
+                while (nameList.length) {
+                    const name = nameList.shift();
+                    com = com.getChildByName(name);
+                    if (!com) {
+                        console.error(`ComUtils.getNodeByNameList error: `, name);
+                    }
+                }
+                return com;
+            }
+            else {
+                return box.getChildByName(nameList);
+            }
+        }
+    }
+
     class DebugUtils {
         static debug(key, cls) {
             if (!key || !cls) {
@@ -258,6 +318,538 @@
     }
     DebugUtils.showDebug = false;
     DebugUtils.debug("DebugUtils", DebugUtils);
+
+    var EventDispatcher = Laya.EventDispatcher;
+    class EventManager extends EventDispatcher {
+        on(type, caller, listener, args) {
+            return super.on(type, caller, listener, args);
+        }
+        off(type, caller, listener, onceOnly) {
+            return super.off(type, caller, listener, onceOnly);
+        }
+        event(type, data) {
+            return super.event(type, data);
+        }
+    }
+    const eventMgr = new EventManager();
+    DebugUtils.debug("eventMgr", eventMgr);
+
+    var Box = Laya.Box;
+    var Label = Laya.Label;
+    var Image = Laya.Image;
+    var Timer = Laya.Timer;
+    var Tween = Laya.Tween;
+    var Handler = Laya.Handler;
+    var Sprite$1 = Laya.Sprite;
+    var poolMgr = base.poolMgr;
+    class TipsItem extends Box {
+        onAlloc() {
+            this.size(600, 35);
+            this.centerX = 0;
+            this.centerY = -100;
+            if (!this._img) {
+                this._img = new Image();
+                this._img.skin = `modules/common/img_blank.png`;
+                this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
+                this._img.sizeGrid = `3,8,6,5`;
+                this.addChild(this._img);
+            }
+            if (!this._lab) {
+                this._lab = new Label();
+                this._lab.fontSize = 22;
+                this._lab.color = "#ffffff";
+                this._lab.centerX = 0;
+                this._lab.centerY = 1;
+                this.addChild(this._lab);
+            }
+            this.alpha = 1;
+            this._lab.text = "";
+        }
+        onFree() {
+            this.alpha = 1;
+            if (this._lab) {
+                this._lab.text = "";
+            }
+        }
+        set text(str) {
+            this._lab.text = str;
+        }
+        execTween() {
+            Tween.clearAll(this);
+            Tween.to(this, { alpha: 0.8 }, 800, null, Handler.create(this, this.execTweenEnd, null, true), 800);
+        }
+        execTweenEnd() {
+            this.removeSelf();
+            Tween.clearAll(this);
+            poolMgr.free(this);
+        }
+    }
+    class TipsMdr extends Box {
+        constructor() {
+            super();
+            this._tipsList = [];
+            this._showMaxNum = 5;
+            if (!this._sprite) {
+                this._sprite = new Sprite$1();
+                this._sprite.size(Laya.stage.width, Laya.stage.height);
+                this.addChild(this._sprite);
+            }
+            this.size(Laya.stage.width, Laya.stage.height);
+            layerMgr.tips.addChild(this);
+        }
+        addTips(str) {
+            if (Array.isArray(str)) {
+                for (let strItem of str) {
+                    const tipsItem = poolMgr.alloc(TipsItem);
+                    tipsItem.text = strItem;
+                    this._tipsList.push(tipsItem);
+                }
+            }
+            else {
+                const tipsItem = poolMgr.alloc(TipsItem);
+                tipsItem.text = str;
+                this._tipsList.push(tipsItem);
+            }
+            if (!this._timer) {
+                this._timer = new Timer();
+                this._timer.loop(100, this, this.onUpdate);
+                this.onUpdate();
+            }
+        }
+        onUpdate() {
+            if (!this._tipsList.length) {
+                this._timer.clearAll(this);
+                this._timer = undefined;
+                return;
+            }
+            const existSize = this._sprite.numChildren;
+            if (existSize >= this._showMaxNum) {
+                return;
+            }
+            for (let i = 0; i < existSize; i++) {
+                const item = this._sprite.getChildAt(i);
+                if (item) {
+                    item.y = item.y - (item.height + 5);
+                }
+            }
+            const tipsItem = this._tipsList.shift();
+            this._sprite.addChild(tipsItem);
+            tipsItem.execTween();
+        }
+    }
+    let mdr;
+    function showTips(str) {
+        if (!mdr) {
+            mdr = new TipsMdr();
+        }
+        mdr.addTips(str);
+    }
+
+    var Handler$1 = Laya.Handler;
+    var Event$1 = Laya.Event;
+    var SoundManager = Laya.SoundManager;
+    var CallBack$1 = base.CallBack;
+    var Scene$2 = Laya.Scene;
+    const INIT_SCALE = 0.4;
+    const BIG_SCALE = 0.42;
+    const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯）\n
+2.路径无阻挡即可消除\n 
+3.⚡连击加分，消除间隔越短，分数加成越高！\n
+4.💡 用 提示（扣5分） 👉 显示可消的一对牌\n
+5.用 洗牌（扣10分）👉 重置剩余牌位置`;
+    class MahjongMdr extends ui.modules.mahjong.MahjongUI {
+        constructor() {
+            super();
+            this._preIdx = -1;
+            this._lastScoreTime = 0;
+            this._endTime = 0;
+            this._proxy = base.facade.getProxy(2, 2);
+        }
+        createChildren() {
+            super.createChildren();
+            this._list = this.getChildByName("listItem");
+            this._list.renderHandler = Handler$1.create(this, this.onRenderListItem, undefined, false);
+            this._btnTips = this.getChildByName("btnTips");
+            this._btnRefresh = this.getChildByName("btnRefresh");
+            this._btnTips.on(Laya.Event.CLICK, this, this.onBtnTips);
+            this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
+            this._btnRule = this.getChildByName("btnRule");
+            this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
+            eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
+            eventMgr.on("mahjong_show_result", this, this.showResultToClear);
+            eventMgr.on("mahjong_update_score", this, this.updateScore);
+        }
+        onOpened(param) {
+            super.onOpened(param);
+            this._proxy.model.clearData();
+            this.onLoadedSuccess();
+        }
+        onClosed(type) {
+            super.onClosed(type);
+            this._preIdx = -1;
+            this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
+            this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
+        }
+        onLoadedSuccess() {
+            console.warn("11111 onLoadedSuccess");
+            this.onRefreshNext();
+        }
+        onRefreshNext(data) {
+            console.warn(`11111 onRefreshNext level:${this._proxy.model.level}`);
+            this._proxy.model.showNext(data);
+            this.resetScore();
+            this.updateLevel();
+            const list = this._proxy.model.getMahjongData();
+            this._list.array = list.reduce((a, b) => a.concat(b));
+            this.updateBar();
+        }
+        updateBar() {
+            const now = Date.now() / 1000 >> 0;
+            this._endTime = now + this._proxy.model.getChallengeTime();
+            const bar = this.getChildByName("bar");
+            bar.value = 1;
+            base.tweenMgr.remove(bar);
+            base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack$1.alloc(this, this.onTimeOut, true));
+        }
+        showResultToClear() {
+            const bar = this.getChildByName("bar");
+            base.tweenMgr.remove(bar);
+        }
+        onTimeOut() {
+            this._proxy.model.showResult({ type: 1 });
+        }
+        onRenderListItem(item, index) {
+            const boxCard = item.getChildByName("boxCard");
+            const img = ComUtils.getNodeByNameList(boxCard, ["img"]);
+            const data = item.dataSource;
+            if (!data) {
+                img.skin = "";
+                return;
+            }
+            item.tag = data;
+            img.skin = data.getIcon();
+            ComUtils.setScale(boxCard, INIT_SCALE);
+            this.setSelect(boxCard, false);
+            item.on(Event$1.CLICK, this, this.onClickItem, [index]);
+        }
+        onClickItem(index) {
+            if (this._preIdx > -1 && index === this._preIdx) {
+                const boxCard = this._list.getCell(index).getChildByName("boxCard");
+                this._preIdx = -1;
+                ComUtils.setScale(boxCard, INIT_SCALE);
+                this.setSelect(boxCard, false);
+                return;
+            }
+            SoundManager.playSound("audio/mixkit-flop.wav");
+            if (this._preIdx > -1 && index !== this._preIdx) {
+                const curItemData = this._list.getItem(index);
+                const preItemData = this._list.getItem(this._preIdx);
+                const curItem = this._list.getCell(index).getChildByName("boxCard");
+                const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
+                if (curItemData && curItemData.checkSame(preItemData)
+                    && this._proxy.model.canConnect(preItemData, curItemData)) {
+                    ComUtils.setScale(curItem, BIG_SCALE);
+                    this.clearCardItem(curItem, index);
+                    this.setSelect(curItem, true);
+                    this.clearCardItem(preItem, this._preIdx);
+                    this.addScore();
+                }
+                else {
+                    ComUtils.setScale(curItem, INIT_SCALE);
+                    ComUtils.setScale(preItem, INIT_SCALE);
+                    this.setSelect(curItem, false);
+                    this.setSelect(preItem, false);
+                }
+                this._preIdx = -1;
+            }
+            else {
+                const item = this._list.getCell(index);
+                const cardData = item.dataSource;
+                if (!cardData || !cardData.isValid()) {
+                    this._preIdx = -1;
+                    return;
+                }
+                this._preIdx = index;
+                const boxCard = item.getChildByName("boxCard");
+                ComUtils.setScale(boxCard, BIG_SCALE);
+                this.setSelect(boxCard, true);
+            }
+        }
+        updateLevel() {
+            const lab = this.getChildByName("labLevel");
+            lab.text = "关卡：" + this._proxy.model.level;
+        }
+        addScore() {
+            const now = Date.now();
+            const diffTime = now - this._lastScoreTime;
+            let score = 1;
+            if (diffTime < 2 * 1000) {
+                score = 5;
+            }
+            else if (diffTime < 5 * 1000) {
+                score = 3;
+            }
+            this._lastScoreTime = now;
+            this._proxy.model.updateScore(score);
+            this.updateScore();
+        }
+        updateScore() {
+            const lab = ComUtils.getNodeByNameList(this, ["boxScore", "lab"]);
+            lab.text = this._proxy.model.levelScore + "";
+            lab.color = this._proxy.model.levelScore > 0 ? "#42e422" : "#ff4646";
+        }
+        resetScore() {
+            this._lastScoreTime = 0;
+            const lab = ComUtils.getNodeByNameList(this, ["boxScore", "lab"]);
+            lab.text = "0";
+        }
+        clearCardItem(box, index) {
+            const idx = index;
+            ComUtils.setTween(box, true, Handler$1.create(this, () => {
+                const curImg = box.getChildByName("img");
+                curImg.skin = "";
+                const imgSel = box.getChildByName("imgSelected");
+                imgSel.visible = false;
+                this._proxy.model.deleteCard(idx);
+            }));
+        }
+        setSelect(boxCard, isSel = false) {
+            const imgSel = ComUtils.getNodeByNameList(boxCard, ["imgSelected"]);
+            if (imgSel)
+                imgSel.visible = isSel;
+        }
+        onBtnTips() {
+            const cardList = this._proxy.model.getTipsCardDataList();
+            if (cardList.length) {
+                const cells = this._list.cells || [];
+                for (let card of cardList) {
+                    const idx = card.row * this._proxy.model.col + card.col;
+                    const cardItem = cells[idx].getChildByName("boxCard");
+                    if (cardItem) {
+                        ComUtils.setTween(cardItem);
+                    }
+                }
+            }
+            else {
+                showTips("无可消除的卡牌，请洗牌");
+            }
+            this._proxy.model.updateScore(-5);
+        }
+        onBtnRefresh() {
+            const list = this._proxy.model.getRefreshCardDataList();
+            this._list.array = list.reduce((a, b) => a.concat(b));
+            this._list.refresh();
+            showTips("洗牌成功！");
+            this._proxy.model.updateScore(-10);
+        }
+        onClickRule() {
+            Scene$2.open("modules/common/Rule.scene", false, ruleDesc);
+        }
+    }
+
+    var Script$1 = Laya.Script;
+    var Image$1 = Laya.Image;
+    function createImgMask() {
+        const img = new Image$1();
+        img.skin = `modules/common/img_blank.png`;
+        img.width = img.height = 0;
+        img.sizeGrid = "4,5,7,6";
+        return img;
+    }
+    class BarProgress extends Script$1 {
+        onAwake() {
+            super.onAwake();
+            const owner = this.owner;
+            this._imgBar = owner.getChildByName("imgBar");
+            this._lab = owner.getChildByName("lab");
+            if (!this._imgMask) {
+                this._imgMask = createImgMask();
+                this._imgMask.height = this._imgBar.height;
+                this._imgBar.mask = this._imgMask;
+            }
+            Object.defineProperty(this.owner, "value", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    return this.value;
+                },
+                set: (v) => {
+                    this.value = v;
+                }
+            });
+        }
+        onEnable() {
+            super.onEnable();
+        }
+        onDestroy() {
+            super.onDestroy();
+        }
+        getImgWidth() {
+            if (!this._imgBar || !this._imgBar.width) {
+                const func = this._imgBar["_sizeChanged"];
+                if (func) {
+                    func();
+                }
+            }
+            return this._imgBar ? this._imgBar.width : 0;
+        }
+        set value(val) {
+            if (this._imgMask && this._imgBar) {
+                const width = val * this.getImgWidth() >> 0;
+                this._imgMask.width = width;
+                this._imgBar.visible = width >= 1;
+            }
+        }
+        get value() {
+            if (this._imgMask && this._imgBar) {
+                return this._imgMask.width / this._imgBar.width;
+            }
+            return 0;
+        }
+    }
+
+    var Scene$3 = Laya.Scene;
+    class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
+        createChildren() {
+            super.createChildren();
+            this._btnStart = this.getChildByName("btnStart");
+            this._btnStart.on(Laya.Event.CLICK, this, this.onClickBtnStart);
+        }
+        onOpened(param) {
+            super.onOpened(param);
+            console.warn(`11111 MahjongHomeMdr.onOpened...`, param);
+        }
+        onClosed(type) {
+            super.onClosed(type);
+            this._btnStart.offAll(Laya.Event.CLICK);
+        }
+        onClickBtnStart() {
+            Scene$3.open("modules/mahjong/Mahjong.scene");
+        }
+    }
+
+    var MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
+    var Scene$4 = Laya.Scene;
+    class MahjongResultMdr extends MahjongResultUI {
+        createChildren() {
+            super.createChildren();
+            setLayerIndex(this, LayerIndex.MODAL);
+            addPopupMask();
+        }
+        onOpened(param) {
+            super.onOpened(param);
+            this._proxy = base.facade.getProxy(2, 2);
+            this._param = param;
+            this._lab = ComUtils.getNodeByNameList(this, ["boxHtml", "lab"]);
+            this.btnHome.on(Laya.Event.CLICK, this, this.onClickHome);
+            this.btnNext.on(Laya.Event.CLICK, this, this.onClickNext);
+            const btnNextLab = this.btnNext.getChildByName("lab");
+            if (!this._param || !this._param.type) {
+                this._lab.text = `得分: ` + this._proxy.model.levelScore;
+                btnNextLab.text = `下一关`;
+                this._proxy.model.challengeSuccess();
+            }
+            else {
+                this._lab.text = `挑战时间已到，挑战失败！`;
+                btnNextLab.text = `重新挑战`;
+            }
+        }
+        onClosed(type) {
+            super.onClosed(type);
+            this.btnHome.off(Laya.Event.CLICK, this, this.onClickHome);
+            this.btnNext.off(Laya.Event.CLICK, this, this.onClickNext);
+        }
+        onClickHome() {
+            console.warn("MahjongResultMdr.onClickHome...");
+            Scene$4.open("modules/mahjong/MahjongHome.scene");
+            this.close();
+        }
+        onClickNext() {
+            const challengeAgain = this._param && this._param.type === 1;
+            console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
+            eventMgr.event("mahjong_update_next", challengeAgain);
+            this.close();
+        }
+        close(type) {
+            super.close(type);
+            removePopupMask();
+        }
+    }
+
+    class GameConfig {
+        constructor() {
+        }
+        static init() {
+            var reg = Laya.ClassUtils.regClass;
+            reg("modules/misc/RuleMdr.ts", RuleMdr);
+            reg("script/ClickScale.ts", ClickScale);
+            reg("modules/mahjong/view/MahjongMdr.ts", MahjongMdr);
+            reg("script/BarProgress.ts", BarProgress);
+            reg("modules/mahjong/view/MahjongHomeMdr.ts", MahjongHomeMdr);
+            reg("modules/mahjong/view/MahjongResultMdr.ts", MahjongResultMdr);
+        }
+    }
+    GameConfig.width = 640;
+    GameConfig.height = 1136;
+    GameConfig.scaleMode = "showall";
+    GameConfig.screenMode = "none";
+    GameConfig.alignV = "middle";
+    GameConfig.alignH = "center";
+    GameConfig.startScene = "modules/mahjong/MahjongHome.scene";
+    GameConfig.sceneRoot = "";
+    GameConfig.debug = false;
+    GameConfig.stat = false;
+    GameConfig.physicsDebug = false;
+    GameConfig.exportSceneToJson = true;
+    GameConfig.init();
+
+    var Handler$2 = Laya.Handler;
+    class GameCfg {
+        static init() {
+            Laya.loader.load(this.jsonCfgListPath, Handler$2.create(this, this.onLoaded), null, Laya.Loader.JSON, 0);
+        }
+        static onLoaded(data) {
+            if (data && data.length) {
+                for (const jsonName of data) {
+                    Laya.loader.load(this.jsonPath + jsonName, Handler$2.create(this, this.onLoadedJson, [jsonName]), null, Laya.Loader.JSON, 0);
+                }
+            }
+        }
+        static onLoadedJson(jsonName, data) {
+            jsonName = jsonName.replace(".json", "");
+            this.cfgMap[jsonName] = data;
+            const list = [];
+            for (const key in data) {
+                list.push(data[key]);
+            }
+            this.cfgListMap[jsonName] = list;
+        }
+        static getCfgListByName(cfgName) {
+            return this.cfgListMap[cfgName] || [];
+        }
+        static getCfgByNameId(cfgName, id) {
+            const obj = this.cfgMap[cfgName];
+            return obj ? obj[id] : undefined;
+        }
+    }
+    GameCfg.jsonPath = "json/";
+    GameCfg.jsonCfgListPath = "json/cfglist.json";
+    GameCfg.cfgMap = {};
+    GameCfg.cfgListMap = {};
+    DebugUtils.debug("GameCfg", GameCfg);
+
+    var BaseModule = base.BaseModule;
+    class MiscModule extends BaseModule {
+        constructor() {
+            super(1);
+        }
+        initCmd() {
+        }
+        initMdr() {
+        }
+        initProxy() {
+        }
+    }
 
     const DEFAULT_TURN_COUNT = 2;
     const DIRECTION = [[0, 1], [1, 0], [0, -1], [-1, 0]];
@@ -436,56 +1028,6 @@
             return [];
         }
     }
-
-    var EventDispatcher = Laya.EventDispatcher;
-    class EventManager extends EventDispatcher {
-        on(type, caller, listener, args) {
-            return super.on(type, caller, listener, args);
-        }
-        off(type, caller, listener, onceOnly) {
-            return super.off(type, caller, listener, onceOnly);
-        }
-        event(type, data) {
-            return super.event(type, data);
-        }
-    }
-    const eventMgr = new EventManager();
-    DebugUtils.debug("eventMgr", eventMgr);
-
-    var Handler = Laya.Handler;
-    class GameCfg {
-        static init() {
-            Laya.loader.load(this.jsonCfgListPath, Handler.create(this, this.onLoaded), null, Laya.Loader.JSON, 0);
-        }
-        static onLoaded(data) {
-            if (data && data.length) {
-                for (const jsonName of data) {
-                    Laya.loader.load(this.jsonPath + jsonName, Handler.create(this, this.onLoadedJson, [jsonName]), null, Laya.Loader.JSON, 0);
-                }
-            }
-        }
-        static onLoadedJson(jsonName, data) {
-            jsonName = jsonName.replace(".json", "");
-            this.cfgMap[jsonName] = data;
-            const list = [];
-            for (const key in data) {
-                list.push(data[key]);
-            }
-            this.cfgListMap[jsonName] = list;
-        }
-        static getCfgListByName(cfgName) {
-            return this.cfgListMap[cfgName] || [];
-        }
-        static getCfgByNameId(cfgName, id) {
-            const obj = this.cfgMap[cfgName];
-            return obj ? obj[id] : undefined;
-        }
-    }
-    GameCfg.jsonPath = "json/";
-    GameCfg.jsonCfgListPath = "json/cfglist.json";
-    GameCfg.cfgMap = {};
-    GameCfg.cfgListMap = {};
-    DebugUtils.debug("GameCfg", GameCfg);
 
     const CARD_COUNT = 4;
     const CARD_NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -713,8 +1255,8 @@
 
     const globalAdapter = AdapterFactory.getAdapter();
 
-    var Scene$2 = Laya.Scene;
-    var poolMgr = base.poolMgr;
+    var Scene$5 = Laya.Scene;
+    var poolMgr$1 = base.poolMgr;
     const MAHJONG_LEVEL = "mahjong_level";
     class MahjongModel {
         constructor() {
@@ -725,13 +1267,12 @@
             this.levelScore = 0;
             this._pathData = [];
             this._sameCardMap = {};
-            this.init();
         }
         init() {
             globalAdapter.storage.getItem(MAHJONG_LEVEL, (data) => {
-                console.log(`11111 before getItem: ${this.level}`);
+                console.warn(`11111 before getItem: ${this.level}`);
                 this.level = data || 0;
-                console.log(`11111 after getItem: ${this.level} ${data}`);
+                console.warn(`11111 after getItem: ${this.level} ${data}`);
             });
         }
         getLevelCfg() {
@@ -804,7 +1345,7 @@
                     if (!this.data[randomItemAry[0]]) {
                         this.data[randomItemAry[0]] = [];
                     }
-                    const cardData = poolMgr.alloc(MahjongCardData);
+                    const cardData = poolMgr$1.alloc(MahjongCardData);
                     cardData.updateInfo(randomItemAry[0], randomItemAry[1], item);
                     this.data[randomItemAry[0]][randomItemAry[1]] = cardData;
                 }
@@ -817,7 +1358,7 @@
             if (!this.data || !this.data[row]) {
                 return false;
             }
-            poolMgr.free(this.data[row][col]);
+            poolMgr$1.free(this.data[row][col]);
             this.data[row][col] = undefined;
             if (this._pathData.length) {
                 this._pathData[row + 1][col + 1] = 0;
@@ -981,561 +1522,51 @@
         }
         showResult(param) {
             eventMgr.event("mahjong_show_result");
-            Scene$2.open("modules/mahjong/MahjongResult.scene", false, param);
+            Scene$5.open("modules/mahjong/MahjongResult.scene", false, param);
         }
     }
 
-    class MahjongProxy {
-        constructor() {
-            if (!this._model) {
-                this._model = new MahjongModel();
-            }
-        }
-        static ins() {
-            if (!this._instance) {
-                this._instance = new MahjongProxy();
-                DebugUtils.debugClass(this._instance);
-            }
-            return this._instance;
-        }
+    var BaseProxy = base.BaseProxy;
+    class MahjongProxy extends BaseProxy {
         get model() {
             if (!this._model) {
                 this._model = new MahjongModel();
             }
             return this._model;
         }
-    }
-
-    var TimeLine = Laya.TimeLine;
-    var Event = Laya.Event;
-    class ComUtils {
-        static setTween(box, isTween = true, callback) {
-            if (!box) {
-                return undefined;
-            }
-            let timeLine = box["_timeLine_"];
-            if (timeLine) {
-                timeLine.reset();
-                if (!isTween) {
-                    timeLine.destroy();
-                    return undefined;
-                }
-            }
-            else {
-                box["_timeLine_"] = timeLine = new TimeLine();
-            }
-            timeLine.to(box, { rotation: 10 }, 100)
-                .to(box, { rotation: -10 }, 100)
-                .to(box, { rotation: 5 }, 100)
-                .to(box, { rotation: -5 }, 100)
-                .to(box, { rotation: 0 }, 50)
-                .play();
-            timeLine.on(Event.COMPLETE, this, () => {
-                if (callback) {
-                    callback.run();
-                }
-            });
-            return timeLine;
-        }
-        static setScale(box, scale = 1) {
-            if (!box) {
-                return;
-            }
-            if (box.scaleX !== scale) {
-                box.scaleX = box.scaleY = scale;
-            }
-        }
-        static getNodeByNameList(box, nameList) {
-            if (!box) {
-                return undefined;
-            }
-            if (Array.isArray(nameList)) {
-                let com = box;
-                while (nameList.length) {
-                    const name = nameList.shift();
-                    com = com.getChildByName(name);
-                    if (!com) {
-                        console.error(`ComUtils.getNodeByNameList error: `, name);
-                    }
-                }
-                return com;
-            }
-            else {
-                return box.getChildByName(nameList);
-            }
+        init() {
+            this.model.init();
         }
     }
 
-    var Box = Laya.Box;
-    var Label = Laya.Label;
-    var Image = Laya.Image;
-    var Timer = Laya.Timer;
-    var Tween = Laya.Tween;
-    var Handler$1 = Laya.Handler;
-    var Sprite$1 = Laya.Sprite;
-    var poolMgr$1 = base.poolMgr;
-    class TipsItem extends Box {
-        onAlloc() {
-            this.size(600, 35);
-            this.centerX = 0;
-            this.centerY = -100;
-            if (!this._img) {
-                this._img = new Image();
-                this._img.skin = `modules/common/img_blank.png`;
-                this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
-                this._img.sizeGrid = `3,8,6,5`;
-                this.addChild(this._img);
-            }
-            if (!this._lab) {
-                this._lab = new Label();
-                this._lab.fontSize = 22;
-                this._lab.color = "#ffffff";
-                this._lab.centerX = 0;
-                this._lab.centerY = 1;
-                this.addChild(this._lab);
-            }
-            this.alpha = 1;
-            this._lab.text = "";
-        }
-        onFree() {
-            this.alpha = 1;
-            if (this._lab) {
-                this._lab.text = "";
-            }
-        }
-        set text(str) {
-            this._lab.text = str;
-        }
-        execTween() {
-            Tween.clearAll(this);
-            Tween.to(this, { alpha: 0.8 }, 800, null, Handler$1.create(this, this.execTweenEnd, null, true), 800);
-        }
-        execTweenEnd() {
-            this.removeSelf();
-            Tween.clearAll(this);
-            poolMgr$1.free(this);
-        }
-    }
-    class TipsMdr extends Box {
+    var BaseModule$1 = base.BaseModule;
+    class MahjongModule extends BaseModule$1 {
         constructor() {
-            super();
-            this._tipsList = [];
-            this._showMaxNum = 5;
-            if (!this._sprite) {
-                this._sprite = new Sprite$1();
-                this._sprite.size(Laya.stage.width, Laya.stage.height);
-                this.addChild(this._sprite);
-            }
-            this.size(Laya.stage.width, Laya.stage.height);
-            layerMgr.tips.addChild(this);
+            super(2);
         }
-        addTips(str) {
-            if (Array.isArray(str)) {
-                for (let strItem of str) {
-                    const tipsItem = poolMgr$1.alloc(TipsItem);
-                    tipsItem.text = strItem;
-                    this._tipsList.push(tipsItem);
-                }
-            }
-            else {
-                const tipsItem = poolMgr$1.alloc(TipsItem);
-                tipsItem.text = str;
-                this._tipsList.push(tipsItem);
-            }
-            if (!this._timer) {
-                this._timer = new Timer();
-                this._timer.loop(100, this, this.onUpdate);
-                this.onUpdate();
-            }
+        initCmd() {
         }
-        onUpdate() {
-            if (!this._tipsList.length) {
-                this._timer.clearAll(this);
-                this._timer = undefined;
-                return;
-            }
-            const existSize = this._sprite.numChildren;
-            if (existSize >= this._showMaxNum) {
-                return;
-            }
-            for (let i = 0; i < existSize; i++) {
-                const item = this._sprite.getChildAt(i);
-                if (item) {
-                    item.y = item.y - (item.height + 5);
-                }
-            }
-            const tipsItem = this._tipsList.shift();
-            this._sprite.addChild(tipsItem);
-            tipsItem.execTween();
+        initMdr() {
         }
-    }
-    let mdr;
-    function showTips(str) {
-        if (!mdr) {
-            mdr = new TipsMdr();
-        }
-        mdr.addTips(str);
-    }
-
-    var Handler$2 = Laya.Handler;
-    var Event$1 = Laya.Event;
-    var SoundManager = Laya.SoundManager;
-    var CallBack$1 = base.CallBack;
-    var Scene$3 = Laya.Scene;
-    const INIT_SCALE = 0.4;
-    const BIG_SCALE = 0.42;
-    const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯）\n
-2.路径无阻挡即可消除\n 
-3.⚡连击加分，消除间隔越短，分数加成越高！\n
-4.💡 用 提示（扣5分） 👉 显示可消的一对牌\n
-5.用 洗牌（扣10分）👉 重置剩余牌位置`;
-    class MahjongMdr extends ui.modules.mahjong.MahjongUI {
-        constructor() {
-            super();
-            this._preIdx = -1;
-            this._lastScoreTime = 0;
-            this._endTime = 0;
-            this._proxy = MahjongProxy.ins();
-        }
-        createChildren() {
-            super.createChildren();
-            this._list = this.getChildByName("listItem");
-            this._list.renderHandler = Handler$2.create(this, this.onRenderListItem, undefined, false);
-            this._btnTips = this.getChildByName("btnTips");
-            this._btnRefresh = this.getChildByName("btnRefresh");
-            this._btnTips.on(Laya.Event.CLICK, this, this.onBtnTips);
-            this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
-            this._btnRule = this.getChildByName("btnRule");
-            this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
-            eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
-            eventMgr.on("mahjong_show_result", this, this.showResultToClear);
-            eventMgr.on("mahjong_update_score", this, this.updateScore);
-        }
-        onOpened(param) {
-            super.onOpened(param);
-            this._proxy.model.clearData();
-            this.onLoadedSuccess();
-        }
-        onClosed(type) {
-            super.onClosed(type);
-            this._preIdx = -1;
-            this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
-            this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
-        }
-        onLoadedSuccess() {
-            console.warn("11111 onLoadedSuccess");
-            this.onRefreshNext();
-        }
-        onRefreshNext(data) {
-            console.warn(`11111 onRefreshNext level:${this._proxy.model.level}`);
-            this._proxy.model.showNext(data);
-            this.resetScore();
-            this.updateLevel();
-            const list = this._proxy.model.getMahjongData();
-            this._list.array = list.reduce((a, b) => a.concat(b));
-            this.updateBar();
-        }
-        updateBar() {
-            const now = Date.now() / 1000 >> 0;
-            this._endTime = now + this._proxy.model.getChallengeTime();
-            const bar = this.getChildByName("bar");
-            bar.value = 1;
-            base.tweenMgr.remove(bar);
-            base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack$1.alloc(this, this.onTimeOut, true));
-        }
-        showResultToClear() {
-            const bar = this.getChildByName("bar");
-            base.tweenMgr.remove(bar);
-        }
-        onTimeOut() {
-            this._proxy.model.showResult({ type: 1 });
-        }
-        onRenderListItem(item, index) {
-            const boxCard = item.getChildByName("boxCard");
-            const img = ComUtils.getNodeByNameList(boxCard, ["img"]);
-            const data = item.dataSource;
-            if (!data) {
-                img.skin = "";
-                return;
-            }
-            item.tag = data;
-            img.skin = data.getIcon();
-            ComUtils.setScale(boxCard, INIT_SCALE);
-            this.setSelect(boxCard, false);
-            item.on(Event$1.CLICK, this, this.onClickItem, [index]);
-        }
-        onClickItem(index) {
-            if (this._preIdx > -1 && index === this._preIdx) {
-                const boxCard = this._list.getCell(index).getChildByName("boxCard");
-                this._preIdx = -1;
-                ComUtils.setScale(boxCard, INIT_SCALE);
-                this.setSelect(boxCard, false);
-                return;
-            }
-            SoundManager.playSound("audio/mixkit-flop.wav");
-            if (this._preIdx > -1 && index !== this._preIdx) {
-                const curItemData = this._list.getItem(index);
-                const preItemData = this._list.getItem(this._preIdx);
-                const curItem = this._list.getCell(index).getChildByName("boxCard");
-                const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
-                if (curItemData && curItemData.checkSame(preItemData)
-                    && this._proxy.model.canConnect(preItemData, curItemData)) {
-                    ComUtils.setScale(curItem, BIG_SCALE);
-                    this.clearCardItem(curItem, index);
-                    this.setSelect(curItem, true);
-                    this.clearCardItem(preItem, this._preIdx);
-                    this.addScore();
-                }
-                else {
-                    ComUtils.setScale(curItem, INIT_SCALE);
-                    ComUtils.setScale(preItem, INIT_SCALE);
-                    this.setSelect(curItem, false);
-                    this.setSelect(preItem, false);
-                }
-                this._preIdx = -1;
-            }
-            else {
-                const item = this._list.getCell(index);
-                const cardData = item.dataSource;
-                if (!cardData || !cardData.isValid()) {
-                    this._preIdx = -1;
-                    return;
-                }
-                this._preIdx = index;
-                const boxCard = item.getChildByName("boxCard");
-                ComUtils.setScale(boxCard, BIG_SCALE);
-                this.setSelect(boxCard, true);
-            }
-        }
-        updateLevel() {
-            const lab = this.getChildByName("labLevel");
-            lab.text = "关卡：" + this._proxy.model.level;
-        }
-        addScore() {
-            const now = Date.now();
-            const diffTime = now - this._lastScoreTime;
-            let score = 1;
-            if (diffTime < 2 * 1000) {
-                score = 5;
-            }
-            else if (diffTime < 5 * 1000) {
-                score = 3;
-            }
-            this._lastScoreTime = now;
-            this._proxy.model.updateScore(score);
-            this.updateScore();
-        }
-        updateScore() {
-            const lab = ComUtils.getNodeByNameList(this, ["boxScore", "lab"]);
-            lab.text = this._proxy.model.levelScore + "";
-            lab.color = this._proxy.model.levelScore > 0 ? "#42e422" : "#ff4646";
-        }
-        resetScore() {
-            this._lastScoreTime = 0;
-            const lab = ComUtils.getNodeByNameList(this, ["boxScore", "lab"]);
-            lab.text = "0";
-        }
-        clearCardItem(box, index) {
-            const idx = index;
-            ComUtils.setTween(box, true, Handler$2.create(this, () => {
-                const curImg = box.getChildByName("img");
-                curImg.skin = "";
-                const imgSel = box.getChildByName("imgSelected");
-                imgSel.visible = false;
-                this._proxy.model.deleteCard(idx);
-            }));
-        }
-        setSelect(boxCard, isSel = false) {
-            const imgSel = ComUtils.getNodeByNameList(boxCard, ["imgSelected"]);
-            if (imgSel)
-                imgSel.visible = isSel;
-        }
-        onBtnTips() {
-            const cardList = this._proxy.model.getTipsCardDataList();
-            if (cardList.length) {
-                const cells = this._list.cells || [];
-                for (let card of cardList) {
-                    const idx = card.row * this._proxy.model.col + card.col;
-                    const cardItem = cells[idx].getChildByName("boxCard");
-                    if (cardItem) {
-                        ComUtils.setTween(cardItem);
-                    }
-                }
-            }
-            else {
-                showTips("无可消除的卡牌，请洗牌");
-            }
-            this._proxy.model.updateScore(-5);
-        }
-        onBtnRefresh() {
-            const list = this._proxy.model.getRefreshCardDataList();
-            this._list.array = list.reduce((a, b) => a.concat(b));
-            this._list.refresh();
-            showTips("洗牌成功！");
-            this._proxy.model.updateScore(-10);
-        }
-        onClickRule() {
-            Scene$3.open("modules/common/Rule.scene", false, ruleDesc);
+        initProxy() {
+            this.regProxy(2, MahjongProxy);
         }
     }
 
-    var Script$1 = Laya.Script;
-    var Image$1 = Laya.Image;
-    function createImgMask() {
-        const img = new Image$1();
-        img.skin = `modules/common/img_blank.png`;
-        img.width = img.height = 0;
-        img.sizeGrid = "4,5,7,6";
-        return img;
+    function regModules() {
+        base.facade.push(MiscModule);
+        base.facade.push(MahjongModule);
     }
-    class BarProgress extends Script$1 {
-        onAwake() {
-            super.onAwake();
-            const owner = this.owner;
-            this._imgBar = owner.getChildByName("imgBar");
-            this._lab = owner.getChildByName("lab");
-            if (!this._imgMask) {
-                this._imgMask = createImgMask();
-                this._imgMask.height = this._imgBar.height;
-                this._imgBar.mask = this._imgMask;
-            }
-            Object.defineProperty(this.owner, "value", {
-                configurable: true,
-                enumerable: true,
-                get: () => {
-                    return this.value;
-                },
-                set: (v) => {
-                    this.value = v;
-                }
-            });
-        }
-        onEnable() {
-            super.onEnable();
-        }
-        onDestroy() {
-            super.onDestroy();
-        }
-        getImgWidth() {
-            if (!this._imgBar || !this._imgBar.width) {
-                const func = this._imgBar["_sizeChanged"];
-                if (func) {
-                    func();
-                }
-            }
-            return this._imgBar ? this._imgBar.width : 0;
-        }
-        set value(val) {
-            if (this._imgMask && this._imgBar) {
-                const width = val * this.getImgWidth() >> 0;
-                this._imgMask.width = width;
-                this._imgBar.visible = width >= 1;
-            }
-        }
-        get value() {
-            if (this._imgMask && this._imgBar) {
-                return this._imgMask.width / this._imgBar.width;
-            }
-            return 0;
-        }
+    function insModules() {
+        base.facade.instantiate();
+    }
+    function initModules() {
+        console.log(`[开始初始化模块]`);
+        regModules();
+        insModules();
     }
 
-    var Scene$4 = Laya.Scene;
-    class MahjongHomeMdr extends ui.modules.mahjong.MahjongHomeUI {
-        createChildren() {
-            super.createChildren();
-            MahjongProxy.ins().model.init();
-            this._btnStart = this.getChildByName("btnStart");
-            this._btnStart.on(Laya.Event.CLICK, this, this.onClickBtnStart);
-        }
-        onOpened(param) {
-            super.onOpened(param);
-            console.warn(`11111 MahjongHomeMdr.onOpened...`, param);
-        }
-        onClosed(type) {
-            super.onClosed(type);
-            this._btnStart.offAll(Laya.Event.CLICK);
-        }
-        onClickBtnStart() {
-            Scene$4.open("modules/mahjong/Mahjong.scene");
-        }
-    }
-
-    var MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
-    var Scene$5 = Laya.Scene;
-    class MahjongResultMdr extends MahjongResultUI {
-        createChildren() {
-            super.createChildren();
-            setLayerIndex(this, LayerIndex.MODAL);
-            addPopupMask();
-        }
-        onOpened(param) {
-            super.onOpened(param);
-            this._proxy = MahjongProxy.ins();
-            this._param = param;
-            this._lab = ComUtils.getNodeByNameList(this, ["boxHtml", "lab"]);
-            this.btnHome.on(Laya.Event.CLICK, this, this.onClickHome);
-            this.btnNext.on(Laya.Event.CLICK, this, this.onClickNext);
-            const btnNextLab = this.btnNext.getChildByName("lab");
-            if (!this._param || !this._param.type) {
-                this._lab.text = `得分: ` + this._proxy.model.levelScore;
-                btnNextLab.text = `下一关`;
-                this._proxy.model.challengeSuccess();
-            }
-            else {
-                this._lab.text = `挑战时间已到，挑战失败！`;
-                btnNextLab.text = `重新挑战`;
-            }
-        }
-        onClosed(type) {
-            super.onClosed(type);
-            this.btnHome.off(Laya.Event.CLICK, this, this.onClickHome);
-            this.btnNext.off(Laya.Event.CLICK, this, this.onClickNext);
-        }
-        onClickHome() {
-            console.warn("MahjongResultMdr.onClickHome...");
-            Scene$5.open("modules/mahjong/MahjongHome.scene");
-            this.close();
-        }
-        onClickNext() {
-            const challengeAgain = this._param && this._param.type === 1;
-            console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
-            eventMgr.event("mahjong_update_next", challengeAgain);
-            this.close();
-        }
-        close(type) {
-            super.close(type);
-            removePopupMask();
-        }
-    }
-
-    class GameConfig {
-        constructor() {
-        }
-        static init() {
-            var reg = Laya.ClassUtils.regClass;
-            reg("modules/misc/RuleMdr.ts", RuleMdr);
-            reg("script/ClickScale.ts", ClickScale);
-            reg("modules/mahjong/view/MahjongMdr.ts", MahjongMdr);
-            reg("script/BarProgress.ts", BarProgress);
-            reg("modules/mahjong/view/MahjongHomeMdr.ts", MahjongHomeMdr);
-            reg("modules/mahjong/view/MahjongResultMdr.ts", MahjongResultMdr);
-        }
-    }
-    GameConfig.width = 640;
-    GameConfig.height = 1136;
-    GameConfig.scaleMode = "showall";
-    GameConfig.screenMode = "none";
-    GameConfig.alignV = "middle";
-    GameConfig.alignH = "center";
-    GameConfig.startScene = "modules/mahjong/MahjongHome.scene";
-    GameConfig.sceneRoot = "";
-    GameConfig.debug = false;
-    GameConfig.stat = false;
-    GameConfig.physicsDebug = false;
-    GameConfig.exportSceneToJson = true;
-    GameConfig.init();
-
+    var baseInit = base.baseInit;
     class Main {
         constructor() {
             if (window["Laya3D"])
@@ -1559,6 +1590,8 @@
             Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
             initLayerMgr();
             initLoop();
+            baseInit();
+            initModules();
             GameCfg.init();
         }
         onVersionLoaded() {

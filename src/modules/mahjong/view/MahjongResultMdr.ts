@@ -4,10 +4,10 @@ import { IMahjongResultParam, MahjongEvent } from "@def/mahjong";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { eventMgr } from "@base/event/EventManager";
+import { ModuleType, ProxyType } from "@def/module-type";
 import Label = Laya.Label;
 import MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
 import Scene = Laya.Scene;
-
 
 /**
  * 结算弹窗
@@ -26,7 +26,7 @@ export default class MahjongResultMdr extends MahjongResultUI {
 
   onOpened(param: any) {
     super.onOpened(param);
-    this._proxy = MahjongProxy.ins();
+    this._proxy = base.facade.getProxy(ModuleType.MAHJONG, ProxyType.MAHJONG);
     this._param = param;
 
     this._lab = ComUtils.getNodeByNameList<Label>(this, ["boxHtml", "lab"]);

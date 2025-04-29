@@ -6,6 +6,7 @@ import { eventMgr } from "@base/event/EventManager";
 import { showTips } from "../../misc/TipsMdr";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { BarProgressComp } from "@script/index";
+import { ModuleType, ProxyType } from "@def/module-type";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -51,7 +52,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   constructor() {
     super();
-    this._proxy = MahjongProxy.ins();
+    this._proxy = base.facade.getProxy(ModuleType.MAHJONG, ProxyType.MAHJONG);
   }
 
   public createChildren(): void {

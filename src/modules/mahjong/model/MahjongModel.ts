@@ -29,7 +29,7 @@ export class MahjongModel {
   private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
 
   constructor() {
-    this.init();
+    // this.init();
   }
 
   public init(): void {
