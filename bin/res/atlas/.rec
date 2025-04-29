@@ -3,9 +3,9 @@ D audio
 R 93E518F7 mixkit-flop.wav
 D bg
 D json
-R 43F598FF CardConfig.json
-R 0A1CD7ED cfglist.json
-R 4B1373AC LevelConfig.json
+R A657A7A4 CardConfig.json
+R AEA89201 cfglist.json
+R B41C93D1 LevelConfig.json
 D modules
 D modules/common
 P 7D862B48 img_bg1.png
