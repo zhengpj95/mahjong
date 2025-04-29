@@ -17,7 +17,7 @@ function getTimestamp(): string {
 function wrapConsoleMethod(originalMethod: (...args: any[]) => void, color: string = ""): (...args: any[]) => void {
   return (...args: any[]) => {
     const timestamp = getTimestamp();
-    const prefix = `${timestamp} zpj `;
+    const prefix = `${timestamp}`;
     const style = color ? `color: ${color}; font-weight: false;` : "";
     originalMethod(`%c${prefix}`, style, ...args);
   };
