@@ -34,9 +34,9 @@ export class MahjongModel {
 
   public init(): void {
     globalAdapter.storage.getItem(MAHJONG_LEVEL, (data: number) => {
-      console.log(`11111 before getItem: ${this.level}`);
+      console.warn(`11111 before getItem: ${this.level}`);
       this.level = data || 0;
-      console.log(`11111 after getItem: ${this.level} ${data}`);
+      console.warn(`11111 after getItem: ${this.level} ${data}`);
     });
   }
 

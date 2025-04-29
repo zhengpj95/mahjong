@@ -1,6 +1,8 @@
 import GameConfig from "./GameConfig";
 import { initLayerMgr } from "@base/LayerManager";
 import { GameCfg } from "@base/cfg/GameCfg";
+import { initModules } from "./modules/index";
+import baseInit = base.baseInit;
 
 class Main {
   constructor() {
@@ -27,6 +29,8 @@ class Main {
 
     initLayerMgr();
     initLoop();
+    baseInit();
+    initModules();
     GameCfg.init();
   }
 

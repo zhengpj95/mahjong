@@ -1,10 +1,11 @@
 import { MahjongModel } from "./MahjongModel";
 import { DebugUtils } from "@base/utils/DebugUtils";
+import BaseProxy = base.BaseProxy;
 
 /**
  * @date 2024/12/22
  */
-export class MahjongProxy {
+export class MahjongProxy extends BaseProxy {
   private static _instance: MahjongProxy;
   private _model: MahjongModel;
 
@@ -17,10 +18,16 @@ export class MahjongProxy {
   }
 
   constructor() {
-    if (!this._model) {
-      this._model = new MahjongModel();
-    }
+    super();
+    // if (!this._model) {
+    //   this._model = new MahjongModel();
+    // }
   }
+
+  public init(): void {
+    //
+  }
+
 
   public get model(): MahjongModel {
     if (!this._model) {
