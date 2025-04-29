@@ -1590,7 +1590,7 @@
             originalMethods.info = console.info;
             originalMethods.debug = console.debug;
             console.log = wrapConsoleMethod(console.log);
-            console.warn = wrapConsoleMethod(console.warn, "orange");
+            console.warn = wrapConsoleMethod(console.warn);
             console.error = wrapConsoleMethod(console.error, "red");
             console.info = wrapConsoleMethod(console.info, "deepskyblue");
             console.debug = wrapConsoleMethod(console.debug, "violet");
