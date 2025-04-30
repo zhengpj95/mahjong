@@ -13,6 +13,7 @@ declare module base {
   }
   
   interface PoolObject {
+      recover?: () => void;
       onAlloc?: () => void;
       onFree?: () => void;
   }
@@ -27,6 +28,7 @@ declare module base {
       static alloc<T>(type: string, data: T): GEvent<T>;
       get type(): string;
       get data(): T;
+      recover(): void;
       onAlloc(): void;
       onFree(): void;
   }

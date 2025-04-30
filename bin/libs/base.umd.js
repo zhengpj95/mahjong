@@ -658,13 +658,15 @@
           enumerable: false,
           configurable: true
       });
+      GEvent.prototype.recover = function () {
+          poolMgr.free(this);
+      };
       GEvent.prototype.onAlloc = function () {
           this.onFree();
       };
       GEvent.prototype.onFree = function () {
           this._type = "";
           this._data = undefined;
-          poolMgr.free(this);
       };
       return GEvent;
   }());
@@ -714,7 +716,7 @@
               }
               var nt = GEvent.alloc(event, data);
               callBack.exec(nt);
-              nt.onFree();
+              nt.recover();
           }
           if (list.length === 0) {
               delete this._messages[event];
