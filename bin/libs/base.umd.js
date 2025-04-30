@@ -3,13 +3,14 @@
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.base = {}));
 })(this, (function (exports) { 'use strict';
-    if (typeof globalThis !== "undefined") {
-        globalThis.base = exports;
-    } else if (typeof window !== "undefined") {
-        window.base = exports;
-    } else if (typeof global !== "undefined") {
-        global.base = exports;
-    }
+          if (typeof globalThis !== "undefined") {
+              globalThis.base = exports;
+          } else if (typeof window !== "undefined") {
+              window.base = exports;
+          } else if (typeof global !== "undefined") {
+              global.base = exports;
+          }
+
   var CallBack = (function () {
       function CallBack() {
           this._id = 0;
@@ -165,7 +166,8 @@
       var prototype = value.prototype
           ? value.prototype
           : Object.getPrototypeOf(value);
-      if (prototype.hasOwnProperty("__class__") && prototype["__class__"]) {
+      if (Object.prototype.hasOwnProperty.call(prototype, "__class__") &&
+          prototype["__class__"]) {
           return prototype["__class__"];
       }
       else if (type === "function" && value.name) {
@@ -662,30 +664,31 @@
       GEvent.prototype.onFree = function () {
           this._type = "";
           this._data = undefined;
+          poolMgr.free(this);
       };
       return GEvent;
   }());
 
   var EventManager = (function () {
       function EventManager() {
-          this._event = {};
+          this._messages = {};
       }
-      EventManager.prototype.on = function (key, method, caller) {
-          if (!this._event[key]) {
-              this._event[key] = [];
+      EventManager.prototype.on = function (event, method, caller, args) {
+          if (!this._messages[event]) {
+              this._messages[event] = [];
           }
-          var list = this._event[key];
+          var list = this._messages[event];
           for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
               var callBack_1 = list_1[_i];
               if (callBack_1 === null || callBack_1 === undefined ? undefined : callBack_1.isEqual(caller, method)) {
                   return;
               }
           }
-          var callBack = CallBack.alloc(caller, method);
-          this._event[key].push(callBack);
+          var callBack = CallBack.alloc(caller, method, args);
+          this._messages[event].push(callBack);
       };
-      EventManager.prototype.off = function (key, method, caller) {
-          var list = this._event[key];
+      EventManager.prototype.off = function (event, method, caller) {
+          var list = this._messages[event];
           if (!list || !list.length) {
               return;
           }
@@ -697,8 +700,8 @@
               }
           }
       };
-      EventManager.prototype.emit = function (key, data) {
-          var list = this._event[key];
+      EventManager.prototype.emit = function (event, data) {
+          var list = this._messages[event];
           if (!list || !list.length) {
               return;
           }
@@ -709,31 +712,35 @@
                   i--;
                   continue;
               }
-              var nt = GEvent.alloc(key, data);
+              var nt = GEvent.alloc(event, data);
               callBack.exec(nt);
+              nt.onFree();
+          }
+          if (list.length === 0) {
+              delete this._messages[event];
           }
       };
-      EventManager.prototype.offAllByKey = function (key) {
-          var list = this._event[key];
+      EventManager.prototype.offAllByKey = function (event) {
+          var list = this._messages[event];
           if (!list || !list.length) {
               return;
           }
           for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
               var callBack = list_2[_i];
               if (callBack) {
-                  this.off(key, callBack.method, callBack.caller);
+                  this.off(event, callBack.method, callBack.caller);
               }
           }
-          delete this._event[key];
+          delete this._messages[event];
       };
       EventManager.prototype.offAll = function () {
-          var keys = Object.keys(this._event) || [];
+          var keys = Object.keys(this._messages) || [];
           for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
               var key = keys_1[_i];
               this.offAllByKey(key);
-              delete this._event[key];
+              delete this._messages[key];
           }
-          this._event = {};
+          this._messages = {};
       };
       return EventManager;
   }());
@@ -1109,8 +1116,6 @@
       };
       BaseEmitter.prototype.off = function (event, method, caller) {
           eventMgr.off(event, method, caller);
-      };
-      BaseEmitter.prototype.offAll = function (event, caller) {
       };
       return BaseEmitter;
   }());
