@@ -1553,9 +1553,36 @@
         insModules();
     }
 
-    function pad(n, len = 2) {
-        const str = "0".repeat(len) + n.toString();
+    const LOG_LEVEL_ORDER = {
+        log: 1,
+        info: 2,
+        warn: 3,
+        error: 4,
+        debug: 5,
+    };
+    const LEVEL_ICON = {
+        log: "📘",
+        info: "ℹ️",
+        warn: "⚠️",
+        error: "❌",
+        debug: "🐞",
+    };
+    const LEVEL_STYLES = {
+        debug: { color: "white", background: "purple" },
+        log: { color: "black", background: "#e0e0e0" },
+        info: { color: "white", background: "deepskyblue" },
+        warn: { color: "black", background: "gold" },
+        error: { color: "white", background: "crimson" },
+    };
+    const FILTER_LEVEL = "warn";
+    function pad(n, len = 2, prefix = "0") {
+        const str = prefix.repeat(len) + n.toString();
         return str.slice(-len);
+    }
+    function padString(n, len = 5, prefix = " ") {
+        const nLen = n.length;
+        const difLen = len - nLen;
+        return prefix.repeat(Math.ceil(difLen / 2)) + n + prefix.repeat(Math.floor(difLen / 2));
     }
     function getTimestamp() {
         const now = new Date();
@@ -1564,10 +1591,16 @@
     }
     function wrapConsoleMethod(originalMethod, color = "", name = "") {
         return (...args) => {
+            const logLevel = name || originalMethod.name;
+            if (LOG_LEVEL_ORDER[logLevel] > LOG_LEVEL_ORDER[FILTER_LEVEL]) {
+                return undefined;
+            }
             const timestamp = getTimestamp();
+            const logName = padString(logLevel, 5, " ");
+            const icon = LEVEL_ICON[logLevel] || "";
             const prefix = `${timestamp}`;
             const style = color ? `background: ${color}; padding: 2px 4px; border-radius: 3px;` : "";
-            originalMethod.call(console, `%c${name || originalMethod.name}`, style, prefix, ...args);
+            originalMethod.call(console, `%c${logName}`, style, icon, prefix, ...args);
         };
     }
     let originalMethods = {};
