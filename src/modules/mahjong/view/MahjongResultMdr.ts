@@ -3,11 +3,11 @@ import { addPopupMask, LayerIndex, removePopupMask, setLayerIndex } from "@base/
 import { IMahjongResultParam, MahjongEvent } from "@def/mahjong";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
-import { eventMgr } from "@base/event/EventManager";
 import { ModuleType, ProxyType } from "@def/module-type";
 import Label = Laya.Label;
 import MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
 import Scene = Laya.Scene;
+import eventMgr = base.eventMgr;
 
 /**
  * 结算弹窗
@@ -59,7 +59,7 @@ export default class MahjongResultMdr extends MahjongResultUI {
   private onClickNext(): void {
     const challengeAgain = this._param && this._param.type === 1;
     console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
-    eventMgr.event(MahjongEvent.UPDATE_NEXT, challengeAgain); // true 是重新挑战
+    eventMgr.emit(MahjongEvent.UPDATE_NEXT, challengeAgain); // true 是重新挑战
     this.close();
   }
 

@@ -1,8 +1,8 @@
 import { MAHJONG_LEVEL, MahjongModel } from "./MahjongModel";
 import { globalAdapter } from "@platform/index";
-import { eventMgr } from "@base/event/EventManager";
 import { MahjongEvent } from "@def/mahjong";
 import BaseProxy = base.BaseProxy;
+import eventMgr = base.eventMgr;
 
 /**
  * @date 2024/12/22
@@ -39,7 +39,7 @@ export class MahjongProxy extends BaseProxy {
       console.warn(`sMahjongInfo before getItem: ${this.model.level}`);
       this.model.level = data || 0;
       console.warn(`sMahjongInfo after getItem: ${this.model.level} ${data}`);
-      eventMgr.event(MahjongEvent.UPDATE_INFO);
+      eventMgr.emit(MahjongEvent.UPDATE_INFO);
     });
   }
 }

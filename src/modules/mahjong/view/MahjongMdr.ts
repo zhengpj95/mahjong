@@ -2,7 +2,6 @@ import { ui } from "@ui/layaMaxUI";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent, MahjongScoreType } from "@def/mahjong";
-import { eventMgr } from "@base/event/EventManager";
 import { showTips } from "../../misc/TipsMdr";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { BarProgressComp } from "@script/index";
@@ -16,6 +15,7 @@ import SoundManager = Laya.SoundManager;
 import Label = Laya.Label;
 import CallBack = base.CallBack;
 import Scene = Laya.Scene;
+import eventMgr = base.eventMgr;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -68,10 +68,10 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
     this._btnRule = <Image>this.getChildByName("btnRule");
     this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
 
-    eventMgr.on(MahjongEvent.UPDATE_INFO, this, this.onRefreshNext);
-    eventMgr.on(MahjongEvent.UPDATE_NEXT, this, this.onRefreshNext);
-    eventMgr.on(MahjongEvent.SHOW_RESULT, this, this.showResultToClear);
-    eventMgr.on(MahjongEvent.UPDATE_SCORE, this, this.updateScore);
+    eventMgr.on(MahjongEvent.UPDATE_INFO, this.onRefreshNext, this);
+    eventMgr.on(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
+    eventMgr.on(MahjongEvent.SHOW_RESULT, this.showResultToClear, this);
+    eventMgr.on(MahjongEvent.UPDATE_SCORE, this.updateScore, this);
   }
 
   public onOpened(param: any): void {

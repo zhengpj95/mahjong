@@ -292,48 +292,6 @@
         }
     }
 
-    class DebugUtils {
-        static debug(key, cls) {
-            if (!key || !cls) {
-                return;
-            }
-            if (window) {
-                window[key] = cls;
-            }
-        }
-        static debugClass(cls) {
-            if (!cls) {
-                return;
-            }
-            const name = cls.constructor && cls.constructor.name;
-            if (window && name) {
-                window[name] = cls;
-            }
-        }
-        static debugLog(str) {
-            if (this.showDebug) {
-                console.log(`DebugLog: `, str);
-            }
-        }
-    }
-    DebugUtils.showDebug = false;
-    DebugUtils.debug("DebugUtils", DebugUtils);
-
-    var EventDispatcher = Laya.EventDispatcher;
-    class EventManager extends EventDispatcher {
-        on(type, caller, listener, args) {
-            return super.on(type, caller, listener, args);
-        }
-        off(type, caller, listener, onceOnly) {
-            return super.off(type, caller, listener, onceOnly);
-        }
-        event(type, data) {
-            return super.event(type, data);
-        }
-    }
-    const eventMgr = new EventManager();
-    DebugUtils.debug("eventMgr", eventMgr);
-
     var Box = Laya.Box;
     var Label = Laya.Label;
     var Image = Laya.Image;
@@ -450,6 +408,7 @@
     var SoundManager = Laya.SoundManager;
     var CallBack$1 = base.CallBack;
     var Scene$2 = Laya.Scene;
+    var eventMgr = base.eventMgr;
     const INIT_SCALE = 0.4;
     const BIG_SCALE = 0.42;
     const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯）\n
@@ -475,10 +434,10 @@
             this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
             this._btnRule = this.getChildByName("btnRule");
             this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
-            eventMgr.on("mahjong_update_info", this, this.onRefreshNext);
-            eventMgr.on("mahjong_update_next", this, this.onRefreshNext);
-            eventMgr.on("mahjong_show_result", this, this.showResultToClear);
-            eventMgr.on("mahjong_update_score", this, this.updateScore);
+            eventMgr.on("mahjong_update_info", this.onRefreshNext, this);
+            eventMgr.on("mahjong_update_next", this.onRefreshNext, this);
+            eventMgr.on("mahjong_show_result", this.showResultToClear, this);
+            eventMgr.on("mahjong_update_score", this.updateScore, this);
         }
         onOpened(param) {
             super.onOpened(param);
@@ -727,6 +686,7 @@
 
     var MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
     var Scene$4 = Laya.Scene;
+    var eventMgr$1 = base.eventMgr;
     class MahjongResultMdr extends MahjongResultUI {
         createChildren() {
             super.createChildren();
@@ -764,7 +724,7 @@
         onClickNext() {
             const challengeAgain = this._param && this._param.type === 1;
             console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
-            eventMgr.event("mahjong_update_next", challengeAgain);
+            eventMgr$1.emit("mahjong_update_next", challengeAgain);
             this.close();
         }
         close(type) {
@@ -799,6 +759,33 @@
     GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
+
+    class DebugUtils {
+        static debug(key, cls) {
+            if (!key || !cls) {
+                return;
+            }
+            if (window) {
+                window[key] = cls;
+            }
+        }
+        static debugClass(cls) {
+            if (!cls) {
+                return;
+            }
+            const name = cls.constructor && cls.constructor.name;
+            if (window && name) {
+                window[name] = cls;
+            }
+        }
+        static debugLog(str) {
+            if (this.showDebug) {
+                console.log(`DebugLog: `, str);
+            }
+        }
+    }
+    DebugUtils.showDebug = false;
+    DebugUtils.debug("DebugUtils", DebugUtils);
 
     var Handler$2 = Laya.Handler;
     class GameCfg {
@@ -1077,6 +1064,7 @@
 
     var Scene$5 = Laya.Scene;
     var poolMgr$1 = base.poolMgr;
+    var eventMgr$2 = base.eventMgr;
     const MAHJONG_LEVEL = "mahjong_level";
     class MahjongModel {
         constructor() {
@@ -1098,7 +1086,7 @@
         }
         updateScore(score) {
             this.levelScore += score;
-            eventMgr.event("mahjong_update_score");
+            eventMgr$2.emit("mahjong_update_score");
         }
         updateData() {
             const cfg = this.getLevelCfg();
@@ -1321,7 +1309,7 @@
             return this.level + 1;
         }
         showResult(param) {
-            eventMgr.event("mahjong_show_result");
+            eventMgr$2.emit("mahjong_show_result");
             Scene$5.open("modules/mahjong/MahjongResult.scene", false, param);
         }
     }
@@ -1504,6 +1492,7 @@
     const globalAdapter = AdapterFactory.getAdapter();
 
     var BaseProxy = base.BaseProxy;
+    var eventMgr$3 = base.eventMgr;
     class MahjongProxy extends BaseProxy {
         get model() {
             if (!this._model) {
@@ -1532,7 +1521,7 @@
                 console.warn(`sMahjongInfo before getItem: ${this.model.level}`);
                 this.model.level = data || 0;
                 console.warn(`sMahjongInfo after getItem: ${this.model.level} ${data}`);
-                eventMgr.event("mahjong_update_info");
+                eventMgr$3.emit("mahjong_update_info");
             });
         }
     }
@@ -1591,9 +1580,9 @@
             originalMethods.debug = console.debug;
             console.warn = wrapConsoleMethod(console.log, "gold", "warn");
             console.error = wrapConsoleMethod(console.log, "red", "error");
-            console.log = wrapConsoleMethod(console.log, "#909090");
             console.info = wrapConsoleMethod(console.info, "deepskyblue");
             console.debug = wrapConsoleMethod(console.debug, "violet");
+            console.log = wrapConsoleMethod(console.log, "#909090");
         }
     }
     function restoreOriginalConsole() {
