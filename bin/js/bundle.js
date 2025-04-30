@@ -1603,14 +1603,14 @@
             originalMethod.call(console, `%c${logName}`, style, icon, prefix, ...args);
         };
     }
-    let originalMethods = {};
+    let _originalMethods = {};
     function initEnhancedConsole() {
-        if (!originalMethods.log) {
-            originalMethods.log = console.log;
-            originalMethods.warn = console.warn;
-            originalMethods.error = console.error;
-            originalMethods.info = console.info;
-            originalMethods.debug = console.debug;
+        if (!_originalMethods.log) {
+            _originalMethods.log = console.log;
+            _originalMethods.warn = console.warn;
+            _originalMethods.error = console.error;
+            _originalMethods.info = console.info;
+            _originalMethods.debug = console.debug;
             console.warn = wrapConsoleMethod(console.log, "gold", "warn");
             console.error = wrapConsoleMethod(console.log, "red", "error");
             console.info = wrapConsoleMethod(console.info, "deepskyblue");
@@ -1619,13 +1619,13 @@
         }
     }
     function restoreOriginalConsole() {
-        if (originalMethods.log) {
-            console.log = originalMethods.log;
-            console.warn = originalMethods.warn;
-            console.error = originalMethods.error;
-            console.info = originalMethods.info;
-            console.debug = originalMethods.debug;
-            originalMethods = {};
+        if (_originalMethods.log) {
+            console.log = _originalMethods.log;
+            console.warn = _originalMethods.warn;
+            console.error = _originalMethods.error;
+            console.info = _originalMethods.info;
+            console.debug = _originalMethods.debug;
+            _originalMethods = {};
         }
     }
 
