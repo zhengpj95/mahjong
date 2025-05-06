@@ -5,3 +5,7 @@
 export const enum MiscViewType {
   RULE = 1
 }
+
+export const enum MiscEvent {
+  SHOW_TIPS = "misc_show_tips", // 飘字提示
+}

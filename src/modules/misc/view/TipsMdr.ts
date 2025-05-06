@@ -64,7 +64,7 @@ class TipsItem extends Box implements PoolObject {
  * @author zpj
  * @date 2025/2/16
  */
-class TipsMdr extends Box {
+export class TipsMdr extends Box {
   private _sprite: Sprite;
   private _tipsList: TipsItem[] = [];
   private _timer: Timer;
@@ -121,13 +121,4 @@ class TipsMdr extends Box {
     this._sprite.addChild(tipsItem);
     tipsItem.execTween();
   }
-}
-
-let mdr: TipsMdr | undefined;
-
-export function showTips(str: string): void {
-  if (!mdr) {
-    mdr = new TipsMdr();
-  }
-  mdr.addTips(str);
 }

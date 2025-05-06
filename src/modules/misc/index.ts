@@ -1,7 +1,8 @@
 import BaseModule = base.BaseModule;
 import { ModuleType } from "@def/module-type";
-import { MiscViewType } from "@def/misc";
+import { MiscEvent, MiscViewType } from "@def/misc";
 import RuleMdr from "./view/RuleMdr";
+import { ShowTipsCmd } from "./cmd/ShowTipsCmd";
 
 /**
  * @author zpj
@@ -13,6 +14,7 @@ export class MiscModule extends BaseModule {
   }
 
   protected initCmd(): void {
+    this.regCmd(MiscEvent.SHOW_TIPS, ShowTipsCmd);
   }
 
   protected initMdr(): void {

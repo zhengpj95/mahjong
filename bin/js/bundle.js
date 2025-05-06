@@ -320,12 +320,128 @@
       }
   }
 
+  var Box = Laya.Box;
+  var Label = Laya.Label;
+  var Image$1 = Laya.Image;
+  var Timer = Laya.Timer;
+  var Tween = Laya.Tween;
+  var Handler$1 = Laya.Handler;
+  var Sprite$1 = Laya.Sprite;
+  var poolMgr = base.poolMgr;
+  class TipsItem extends Box {
+      onAlloc() {
+          this.size(600, 35);
+          this.centerX = 0;
+          this.centerY = -100;
+          if (!this._img) {
+              this._img = new Image$1();
+              this._img.skin = `modules/common/img_blank.png`;
+              this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
+              this._img.sizeGrid = `3,8,6,5`;
+              this.addChild(this._img);
+          }
+          if (!this._lab) {
+              this._lab = new Label();
+              this._lab.fontSize = 22;
+              this._lab.color = "#ffffff";
+              this._lab.centerX = 0;
+              this._lab.centerY = 1;
+              this.addChild(this._lab);
+          }
+          this.alpha = 1;
+          this._lab.text = "";
+      }
+      onFree() {
+          this.alpha = 1;
+          if (this._lab) {
+              this._lab.text = "";
+          }
+      }
+      set text(str) {
+          this._lab.text = str;
+      }
+      execTween() {
+          Tween.clearAll(this);
+          Tween.to(this, { alpha: 0.8 }, 800, null, Handler$1.create(this, this.execTweenEnd, null, true), 800);
+      }
+      execTweenEnd() {
+          this.removeSelf();
+          Tween.clearAll(this);
+          poolMgr.free(this);
+      }
+  }
+  class TipsMdr extends Box {
+      constructor() {
+          super();
+          this._tipsList = [];
+          this._showMaxNum = 5;
+          if (!this._sprite) {
+              this._sprite = new Sprite$1();
+              this._sprite.size(Laya.stage.width, Laya.stage.height);
+              this.addChild(this._sprite);
+          }
+          this.size(Laya.stage.width, Laya.stage.height);
+          layerMgr.tips.addChild(this);
+      }
+      addTips(str) {
+          if (Array.isArray(str)) {
+              for (let strItem of str) {
+                  const tipsItem = poolMgr.alloc(TipsItem);
+                  tipsItem.text = strItem;
+                  this._tipsList.push(tipsItem);
+              }
+          }
+          else {
+              const tipsItem = poolMgr.alloc(TipsItem);
+              tipsItem.text = str;
+              this._tipsList.push(tipsItem);
+          }
+          if (!this._timer) {
+              this._timer = new Timer();
+              this._timer.loop(100, this, this.onUpdate);
+              this.onUpdate();
+          }
+      }
+      onUpdate() {
+          if (!this._tipsList.length) {
+              this._timer.clearAll(this);
+              this._timer = undefined;
+              return;
+          }
+          const existSize = this._sprite.numChildren;
+          if (existSize >= this._showMaxNum) {
+              return;
+          }
+          for (let i = 0; i < existSize; i++) {
+              const item = this._sprite.getChildAt(i);
+              if (item) {
+                  item.y = item.y - (item.height + 5);
+              }
+          }
+          const tipsItem = this._tipsList.shift();
+          this._sprite.addChild(tipsItem);
+          tipsItem.execTween();
+      }
+  }
+
+  var BaseCommand = base.BaseCommand;
+  let mdr;
+  class ShowTipsCmd extends BaseCommand {
+      exec(str) {
+          if (!mdr) {
+              mdr = new TipsMdr();
+          }
+          mdr.addTips(str);
+      }
+  }
+
   var BaseModule = base.BaseModule;
   class MiscModule extends BaseModule {
       constructor() {
           super(1);
       }
       initCmd() {
+          this.regCmd("misc_show_tips", ShowTipsCmd);
       }
       initMdr() {
           this.regMdr(1, RuleMdr);
@@ -561,7 +677,7 @@
       }
   }
 
-  var poolMgr = base.poolMgr;
+  var poolMgr$1 = base.poolMgr;
   var eventMgr = base.eventMgr;
   var facade = base.facade;
   const MAHJONG_LEVEL = "mahjong_level";
@@ -643,7 +759,7 @@
                   if (!this.data[randomItemAry[0]]) {
                       this.data[randomItemAry[0]] = [];
                   }
-                  const cardData = poolMgr.alloc(MahjongCardData);
+                  const cardData = poolMgr$1.alloc(MahjongCardData);
                   cardData.updateInfo(randomItemAry[0], randomItemAry[1], item);
                   this.data[randomItemAry[0]][randomItemAry[1]] = cardData;
               }
@@ -656,7 +772,7 @@
           if (!this.data || !this.data[row]) {
               return false;
           }
-          poolMgr.free(this.data[row][col]);
+          poolMgr$1.free(this.data[row][col]);
           this.data[row][col] = undefined;
           if (this._pathData.length) {
               this._pathData[row + 1][col + 1] = 0;
@@ -1112,117 +1228,6 @@
       }
   }
 
-  var Box = Laya.Box;
-  var Label = Laya.Label;
-  var Image$1 = Laya.Image;
-  var Timer = Laya.Timer;
-  var Tween = Laya.Tween;
-  var Handler$1 = Laya.Handler;
-  var Sprite$1 = Laya.Sprite;
-  var poolMgr$1 = base.poolMgr;
-  class TipsItem extends Box {
-      onAlloc() {
-          this.size(600, 35);
-          this.centerX = 0;
-          this.centerY = -100;
-          if (!this._img) {
-              this._img = new Image$1();
-              this._img.skin = `modules/common/img_blank.png`;
-              this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
-              this._img.sizeGrid = `3,8,6,5`;
-              this.addChild(this._img);
-          }
-          if (!this._lab) {
-              this._lab = new Label();
-              this._lab.fontSize = 22;
-              this._lab.color = "#ffffff";
-              this._lab.centerX = 0;
-              this._lab.centerY = 1;
-              this.addChild(this._lab);
-          }
-          this.alpha = 1;
-          this._lab.text = "";
-      }
-      onFree() {
-          this.alpha = 1;
-          if (this._lab) {
-              this._lab.text = "";
-          }
-      }
-      set text(str) {
-          this._lab.text = str;
-      }
-      execTween() {
-          Tween.clearAll(this);
-          Tween.to(this, { alpha: 0.8 }, 800, null, Handler$1.create(this, this.execTweenEnd, null, true), 800);
-      }
-      execTweenEnd() {
-          this.removeSelf();
-          Tween.clearAll(this);
-          poolMgr$1.free(this);
-      }
-  }
-  class TipsMdr extends Box {
-      constructor() {
-          super();
-          this._tipsList = [];
-          this._showMaxNum = 5;
-          if (!this._sprite) {
-              this._sprite = new Sprite$1();
-              this._sprite.size(Laya.stage.width, Laya.stage.height);
-              this.addChild(this._sprite);
-          }
-          this.size(Laya.stage.width, Laya.stage.height);
-          layerMgr.tips.addChild(this);
-      }
-      addTips(str) {
-          if (Array.isArray(str)) {
-              for (let strItem of str) {
-                  const tipsItem = poolMgr$1.alloc(TipsItem);
-                  tipsItem.text = strItem;
-                  this._tipsList.push(tipsItem);
-              }
-          }
-          else {
-              const tipsItem = poolMgr$1.alloc(TipsItem);
-              tipsItem.text = str;
-              this._tipsList.push(tipsItem);
-          }
-          if (!this._timer) {
-              this._timer = new Timer();
-              this._timer.loop(100, this, this.onUpdate);
-              this.onUpdate();
-          }
-      }
-      onUpdate() {
-          if (!this._tipsList.length) {
-              this._timer.clearAll(this);
-              this._timer = undefined;
-              return;
-          }
-          const existSize = this._sprite.numChildren;
-          if (existSize >= this._showMaxNum) {
-              return;
-          }
-          for (let i = 0; i < existSize; i++) {
-              const item = this._sprite.getChildAt(i);
-              if (item) {
-                  item.y = item.y - (item.height + 5);
-              }
-          }
-          const tipsItem = this._tipsList.shift();
-          this._sprite.addChild(tipsItem);
-          tipsItem.execTween();
-      }
-  }
-  let mdr;
-  function showTips(str) {
-      if (!mdr) {
-          mdr = new TipsMdr();
-      }
-      mdr.addTips(str);
-  }
-
   var Handler$2 = Laya.Handler;
   var Event$1 = Laya.Event;
   var SoundManager = Laya.SoundManager;
@@ -1412,7 +1417,7 @@
               }
           }
           else {
-              showTips("无可消除的卡牌，请洗牌");
+              this.emit("misc_show_tips", "无可消除的卡牌，请洗牌!");
           }
           this._proxy.model.updateScore(-5);
       }
@@ -1420,7 +1425,7 @@
           const list = this._proxy.model.getRefreshCardDataList();
           this._list.array = list.reduce((a, b) => a.concat(b));
           this._list.refresh();
-          showTips("洗牌成功！");
+          this.emit("misc_show_tips", "洗牌成功!");
           this._proxy.model.updateScore(-10);
       }
       onClickRule() {

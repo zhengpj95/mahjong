@@ -1304,11 +1304,12 @@
           eventMgr.on(event, this.exeCmd, this);
           this._cmdMap[event] = cls;
       };
-      BaseModule.prototype.exeCmd = function (event, args) {
-          var cls = this._cmdMap[event];
+      BaseModule.prototype.exeCmd = function (data) {
+          var _a, _b;
+          var cls = this._cmdMap[(_a = data === null || data === undefined ? undefined : data.type) !== null && _a !== undefined ? _a : ""];
           if (cls) {
               var cmd = new cls();
-              cmd.exec(args);
+              cmd.exec((_b = data === null || data === undefined ? undefined : data.data) !== null && _b !== undefined ? _b : "");
           }
       };
       BaseModule.prototype.regProxy = function (type, proxy) {

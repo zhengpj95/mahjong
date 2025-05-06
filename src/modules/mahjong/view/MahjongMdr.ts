@@ -1,12 +1,11 @@
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent, MahjongScoreType } from "@def/mahjong";
-import { showTips } from "../../misc/view/TipsMdr";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { BarProgressComp } from "@script/index";
 import { ModuleType, ProxyType } from "@def/module-type";
 import { ui } from "@ui/layaMaxUI";
-import { MiscViewType } from "@def/misc";
+import { MiscEvent, MiscViewType } from "@def/misc";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -249,7 +248,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
         }
       }
     } else {
-      showTips("无可消除的卡牌，请洗牌");
+      this.emit(MiscEvent.SHOW_TIPS, "无可消除的卡牌，请洗牌!");
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
   }
@@ -260,7 +259,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     const list = this._proxy.model.getRefreshCardDataList();
     this._list.array = list.reduce((a, b) => a.concat(b));
     this._list.refresh();
-    showTips("洗牌成功！");
+    this.emit(MiscEvent.SHOW_TIPS, "洗牌成功!");
     this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
   }
 
