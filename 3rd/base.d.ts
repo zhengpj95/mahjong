@@ -35,7 +35,8 @@ declare module base {
   
   type EventFunc = (...args: any[]) => any;
   class EventManager {
-      on(event: string, method: EventFunc, caller: any, args?: any): void;
+      on(event: string, method: EventFunc, caller: any, args?: any[]): void;
+      once(event: string, method: EventFunc, caller: any, args?: any[]): void;
       off(event: string, method: EventFunc, caller: any): void;
       emit(event: string, data?: any): void;
       offAllByKey(event: string): void;

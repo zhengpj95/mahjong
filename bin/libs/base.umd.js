@@ -686,8 +686,20 @@
                   return;
               }
           }
-          var callBack = CallBack.alloc(caller, method, args);
+          var callBack = CallBack.alloc(caller, method, (args !== null && args !== undefined ? args : []), false);
           this._messages[event].push(callBack);
+      };
+      EventManager.prototype.once = function (event, method, caller, args) {
+          var _this = this;
+          var wrapper = function () {
+              var args = [];
+              for (var _i = 0; _i < arguments.length; _i++) {
+                  args[_i] = arguments[_i];
+              }
+              _this.off(event, wrapper, caller);
+              method.apply(caller, args);
+          };
+          this.on(event, wrapper, caller, args);
       };
       EventManager.prototype.off = function (event, method, caller) {
           var list = this._messages[event];
