@@ -658,7 +658,7 @@
           enumerable: false,
           configurable: true
       });
-      GEvent.prototype.recover = function () {
+      GEvent.prototype.free = function () {
           poolMgr.free(this);
       };
       GEvent.prototype.onAlloc = function () {
@@ -716,7 +716,7 @@
               }
               var nt = GEvent.alloc(event, data);
               callBack.exec(nt);
-              nt.recover();
+              nt.free();
           }
           if (list.length === 0) {
               delete this._messages[event];
