@@ -1,10 +1,9 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":6,
-    "selecteID":8,
+    "selectedBox":2,
     "searchKey":"View",
-    "props":{"width":640,"runtime":"modules/misc/RuleMdr.ts","height":1136},
+    "props":{"width":640,"height":1136},
     "nodeParent":-1,
     "maxID":13,
     "label":"View",

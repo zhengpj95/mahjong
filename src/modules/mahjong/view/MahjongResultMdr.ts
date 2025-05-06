@@ -1,39 +1,47 @@
 import { ui } from "@ui/layaMaxUI";
-import { addPopupMask, LayerIndex, removePopupMask, setLayerIndex } from "@base/LayerManager";
-import { IMahjongResultParam, MahjongEvent } from "@def/mahjong";
+import { addPopupMask, layerMgr, removePopupMask } from "@base/LayerManager";
+import { IMahjongResultParam, MahjongEvent, MahjongViewType } from "@def/mahjong";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { ModuleType, ProxyType } from "@def/module-type";
 import Label = Laya.Label;
 import MahjongResultUI = ui.modules.mahjong.MahjongResultUI;
-import Scene = Laya.Scene;
 import eventMgr = base.eventMgr;
+import BaseMediator = base.BaseMediator;
+import facade = base.facade;
 
 /**
  * 结算弹窗
  * @date 2025/1/19
  */
-export default class MahjongResultMdr extends MahjongResultUI {
+export default class MahjongResultMdr extends BaseMediator<MahjongResultUI> {
   private _lab: Label;
   private _proxy: MahjongProxy;
   private _param?: IMahjongResultParam;
 
-  createChildren() {
-    super.createChildren();
-    setLayerIndex(this, LayerIndex.MODAL);
+  constructor() {
+    super("modules/mahjong/MahjongResult.scene", layerMgr.modal);
     addPopupMask();
   }
 
-  onOpened(param: any) {
-    super.onOpened(param);
+  protected addEvents(): void {
+  }
+
+  protected initUI(): void {
+  }
+
+  protected onClose(): void {
+  }
+
+  protected onOpen(): void {
     this._proxy = base.facade.getProxy(ModuleType.MAHJONG, ProxyType.MAHJONG);
-    this._param = param;
+    this._param = this.params;
 
-    this._lab = ComUtils.getNodeByNameList<Label>(this, ["boxHtml", "lab"]);
-    this.btnHome.on(Laya.Event.CLICK, this, this.onClickHome);
-    this.btnNext.on(Laya.Event.CLICK, this, this.onClickNext);
+    this._lab = ComUtils.getNodeByNameList<Label>(this.ui, ["boxHtml", "lab"]);
+    this.ui.btnHome.on(Laya.Event.CLICK, this, this.onClickHome);
+    this.ui.btnNext.on(Laya.Event.CLICK, this, this.onClickNext);
 
-    const btnNextLab = <Label>this.btnNext.getChildByName("lab");
+    const btnNextLab = <Label>this.ui.btnNext.getChildByName("lab");
     if (!this._param || !this._param.type) {
       this._lab.text = `得分: ` + this._proxy.model.levelScore;
       btnNextLab.text = `下一关`;
@@ -44,15 +52,15 @@ export default class MahjongResultMdr extends MahjongResultUI {
     }
   }
 
-  onClosed(type?: string) {
-    super.onClosed(type);
-    this.btnHome.off(Laya.Event.CLICK, this, this.onClickHome);
-    this.btnNext.off(Laya.Event.CLICK, this, this.onClickNext);
+  protected removeEvents(): void {
+    this.ui.btnHome.off(Laya.Event.CLICK, this, this.onClickHome);
+    this.ui.btnNext.off(Laya.Event.CLICK, this, this.onClickNext);
   }
 
   private onClickHome(): void {
     console.warn("MahjongResultMdr.onClickHome...");
-    Scene.open("modules/mahjong/MahjongHome.scene");
+    facade.openView(ModuleType.MAHJONG, MahjongViewType.HOME);
+    facade.closeView(ModuleType.MAHJONG, MahjongViewType.MAIN);
     this.close();
   }
 
@@ -63,8 +71,8 @@ export default class MahjongResultMdr extends MahjongResultUI {
     this.close();
   }
 
-  public close(type?: string) {
-    super.close(type);
+  public close(): void {
+    super.close();
     removePopupMask();
   }
 }

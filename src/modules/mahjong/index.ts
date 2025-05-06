@@ -1,6 +1,10 @@
 import BaseModule = base.BaseModule;
 import { ModuleType, ProxyType } from "@def/module-type";
 import { MahjongProxy } from "./model/MahjongProxy";
+import { MahjongViewType } from "@def/mahjong";
+import MahjongHomeMdr from "./view/MahjongHomeMdr";
+import MahjongMdr from "./view/MahjongMdr";
+import MahjongResultMdr from "./view/MahjongResultMdr";
 
 /**
  * @author zpj
@@ -15,6 +19,9 @@ export class MahjongModule extends BaseModule {
   }
 
   protected initMdr(): void {
+    this.regMdr(MahjongViewType.HOME, MahjongHomeMdr);
+    this.regMdr(MahjongViewType.MAIN, MahjongMdr);
+    this.regMdr(MahjongViewType.RESULT, MahjongResultMdr);
   }
 
   protected initProxy(): void {

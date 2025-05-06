@@ -1,13 +1,14 @@
-import { CardType, IMahjongResultParam, MahjongEvent } from "@def/mahjong";
+import { CardType, IMahjongResultParam, MahjongEvent, MahjongViewType } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar";
 import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "../MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
-import Scene = Laya.Scene;
+import { ModuleType } from "@def/module-type";
 import ConfigName = config.ConfigName;
 import LevelConfig = config.LevelConfig;
 import poolMgr = base.poolMgr;
 import eventMgr = base.eventMgr;
+import facade = base.facade;
 
 export const MAHJONG_LEVEL = "mahjong_level";
 
@@ -316,6 +317,6 @@ export class MahjongModel {
   /**展示结算弹窗*/
   public showResult(param?: IMahjongResultParam): void {
     eventMgr.emit(MahjongEvent.SHOW_RESULT);
-    Scene.open("modules/mahjong/MahjongResult.scene", false, param);
+    facade.openView(ModuleType.MAHJONG, MahjongViewType.RESULT, param);
   }
 }

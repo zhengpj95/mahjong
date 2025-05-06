@@ -1,4 +1,3 @@
-import { ui } from "@ui/layaMaxUI";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent, MahjongScoreType } from "@def/mahjong";
@@ -6,6 +5,8 @@ import { showTips } from "../../misc/TipsMdr";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { BarProgressComp } from "@script/index";
 import { ModuleType, ProxyType } from "@def/module-type";
+import { ui } from "@ui/layaMaxUI";
+import { MiscViewType } from "@def/misc";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -13,9 +14,10 @@ import Image = Laya.Image;
 import Event = Laya.Event;
 import SoundManager = Laya.SoundManager;
 import Label = Laya.Label;
+import BaseMediator = base.BaseMediator;
+import MahjongUI = ui.modules.mahjong.MahjongUI;
 import CallBack = base.CallBack;
-import Scene = Laya.Scene;
-import eventMgr = base.eventMgr;
+import facade = base.facade;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -40,7 +42,7 @@ const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯�
 /**
  * @date 2024/12/22
  */
-export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
+export default class MahjongMdr extends BaseMediator<MahjongUI> {
   private _proxy: MahjongProxy;
   private _list: List;
   private _preIdx = -1;
@@ -51,40 +53,48 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private _btnRule: Image;
 
   constructor() {
-    super();
-    this._proxy = base.facade.getProxy(ModuleType.MAHJONG, ProxyType.MAHJONG);
+    super("modules/mahjong/Mahjong.scene", Laya.Scene.root);
   }
 
-  public createChildren(): void {
-    super.createChildren();
-    this._list = <List>this.getChildByName("listItem");
+  protected addEvents(): void {
+    this.on(MahjongEvent.UPDATE_INFO, this.onRefreshNext, this);
+    this.on(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
+    this.on(MahjongEvent.SHOW_RESULT, this.showResultToClear, this);
+    this.on(MahjongEvent.UPDATE_SCORE, this.updateScore, this);
+  }
+
+  protected initUI(): void {
+    this._proxy = base.facade.getProxy(ModuleType.MAHJONG, ProxyType.MAHJONG);
+
+    this._list = <List>this.ui.getChildByName("listItem");
     this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
 
-    this._btnTips = <Image>this.getChildByName("btnTips");
-    this._btnRefresh = <Image>this.getChildByName("btnRefresh");
+    this._btnTips = <Image>this.ui.getChildByName("btnTips");
+    this._btnRefresh = <Image>this.ui.getChildByName("btnRefresh");
     this._btnTips.on(Laya.Event.CLICK, this, this.onBtnTips);
     this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
 
-    this._btnRule = <Image>this.getChildByName("btnRule");
+    this._btnRule = <Image>this.ui.getChildByName("btnRule");
     this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
 
-    eventMgr.on(MahjongEvent.UPDATE_INFO, this.onRefreshNext, this);
-    eventMgr.on(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
-    eventMgr.on(MahjongEvent.SHOW_RESULT, this.showResultToClear, this);
-    eventMgr.on(MahjongEvent.UPDATE_SCORE, this.updateScore, this);
   }
 
-  public onOpened(param: any): void {
-    super.onOpened(param);
+  protected onClose(): void {
+    this._preIdx = -1;
+    this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
+    this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
+  }
+
+  protected onOpen(): void {
     this._proxy.model.clearData();
     this.onRefreshNext();
   }
 
-  public onClosed(type?: string): void {
-    super.onClosed(type);
-    this._preIdx = -1;
-    this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
-    this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
+  protected removeEvents(): void {
+    this.off(MahjongEvent.UPDATE_INFO, this.onRefreshNext, this);
+    this.off(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
+    this.off(MahjongEvent.SHOW_RESULT, this.showResultToClear, this);
+    this.off(MahjongEvent.UPDATE_SCORE, this.updateScore, this);
   }
 
   private onRefreshNext(data?: boolean): void {
@@ -101,7 +111,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   private updateBar(): void {
     const now = Date.now() / 1000 >> 0;
     this._endTime = now + this._proxy.model.getChallengeTime();
-    const bar = <BarProgressComp>this.getChildByName("bar");
+    const bar = <BarProgressComp>this.ui.getChildByName("bar");
     bar.value = 1;
     base.tweenMgr.remove(bar);
     base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
@@ -109,7 +119,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
 
   // 展示结算弹窗时候，清除操作
   private showResultToClear(): void {
-    const bar = <Box>this.getChildByName("bar");
+    const bar = <Box>this.ui.getChildByName("bar");
     base.tweenMgr.remove(bar);
   }
 
@@ -179,7 +189,7 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private updateLevel(): void {
-    const lab = <Label>this.getChildByName("labLevel");
+    const lab = <Label>this.ui.getChildByName("labLevel");
     lab.text = "关卡：" + this._proxy.model.getNextLevel();
   }
 
@@ -198,14 +208,14 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private updateScore(): void {
-    const lab = ComUtils.getNodeByNameList<Label>(this, ["boxScore", "lab"]);
+    const lab = ComUtils.getNodeByNameList<Label>(this.ui, ["boxScore", "lab"]);
     lab.text = this._proxy.model.levelScore + "";
     lab.color = this._proxy.model.levelScore > 0 ? "#42e422" : "#ff4646";
   }
 
   private resetScore(): void {
     this._lastScoreTime = 0;
-    const lab = ComUtils.getNodeByNameList<Label>(this, ["boxScore", "lab"]);
+    const lab = ComUtils.getNodeByNameList<Label>(this.ui, ["boxScore", "lab"]);
     lab.text = "0";
   }
 
@@ -255,6 +265,6 @@ export default class MahjongMdr extends ui.modules.mahjong.MahjongUI {
   }
 
   private onClickRule(): void {
-    Scene.open("modules/common/Rule.scene", false, ruleDesc);
+    facade.openView(ModuleType.MISC, MiscViewType.RULE, ruleDesc);
   }
 }

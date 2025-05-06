@@ -449,6 +449,12 @@
   }());
   var timerMgr = new TimerManager();
 
+  function checkInStage(target) {
+      if (!target) {
+          return false;
+      }
+      return target instanceof Laya.Node && target.displayedInStage;
+  }
   var EaseNone = function (p) { return p; };
 
   var TweenImpl = (function () {
@@ -511,7 +517,7 @@
           }
       };
       TweenImpl.prototype.update = function (currentTime) {
-          if (!this.target)
+          if (!this.target || !checkInStage(this.target))
               return true;
           if (this.startTime === null)
               return false;
@@ -1231,6 +1237,9 @@
           }
       };
       BaseMediator.prototype.close = function () {
+          this.doClose();
+      };
+      BaseMediator.prototype.doClose = function () {
           if (!this.isOpened) {
               return;
           }
@@ -1334,7 +1343,6 @@
       BaseModule.prototype.removeMdrIns = function (viewType) {
           var mdrIns = this.retMdrIns(viewType);
           if (mdrIns) {
-              console.log("\u5173\u95ED\u754C\u9762 m:".concat(this.name, ",v:").concat(viewType));
               mdrIns.close();
               this._mdrInsMap[viewType] = undefined;
               delete this._mdrInsMap[viewType];

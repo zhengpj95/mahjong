@@ -3,7 +3,10 @@ import { initLayerMgr } from "@base/LayerManager";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { initModules } from "./modules/index";
 import { initEnhancedConsole } from "@base/logger";
+import { ModuleType } from "@def/module-type";
+import { MahjongViewType } from "@def/mahjong";
 import baseInit = base.baseInit;
+import facade = base.facade;
 
 class Main {
   constructor() {
@@ -43,7 +46,8 @@ class Main {
 
   onConfigLoaded(): void {
     //加载IDE指定的场景
-    GameConfig.startScene && Laya.Scene.open(GameConfig.startScene);
+    facade.openView(ModuleType.MAHJONG, MahjongViewType.HOME);
+    // GameConfig.startScene && Laya.Scene.open(GameConfig.startScene);
   }
 }
 

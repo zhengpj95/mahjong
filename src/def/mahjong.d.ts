@@ -2,6 +2,12 @@
  * @date 2024/12/23
  */
 
+export const enum MahjongViewType {
+  HOME = 1,
+  MAIN = 2,
+  RESULT = 3
+}
+
 export const enum CardType {
   TONG = 1, // 9*4
   TIAO = 2, // 9*4

@@ -147,6 +147,7 @@ declare module base {
       protected constructor(url: string, parent: any);
       getViewType(): number;
       getName(): string;
+      close(): void;
       protected initView(handler: Laya.Handler): void;
       protected abstract initUI(): void;
       protected abstract addEvents(): void;
