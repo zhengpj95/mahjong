@@ -1103,6 +1103,34 @@
           }
           return p;
       };
+      Facade.prototype.openView = function (module, viewType, params) {
+          var m = this.retModule(module);
+          if (!m) {
+              console.error("facade.openView error, not module:".concat(module));
+              return;
+          }
+          var mdr = m.retMdr(viewType);
+          if (!mdr) {
+              console.error("facade.openView error, not view:".concat(viewType));
+              return;
+          }
+          var mdrIns = new mdr();
+          mdrIns.setModule(m);
+          mdrIns.setViewType(viewType);
+          mdrIns.setName("".concat(mdr.name, " m:").concat(module, ",v:").concat(viewType));
+          mdrIns.open(params);
+      };
+      Facade.prototype.closeView = function (module, viewType) {
+          var m = this.retModule(module);
+          if (!m) {
+              console.error("facade.closeView error, not module:".concat(module));
+              return;
+          }
+          var mdrIns = m.retMdrIns(viewType);
+          if (mdrIns) {
+              mdrIns.close();
+          }
+      };
       return Facade;
   }());
   var facade = new Facade();
@@ -1194,10 +1222,12 @@
           if (!this.isOpened) {
               return;
           }
+          console.log("\u5173\u95ED\u754C\u9762 m:".concat(this._moduleName, ",v:").concat(this._viewType));
           this.isOpened = false;
           this.removeEvents();
           this.onClose();
           this.destroyUI();
+          this.removeMdr();
       };
       BaseMediator.prototype.initView = function (handler) {
       };
@@ -1214,6 +1244,8 @@
           this.initUI();
           this.addEvents();
           this.isOpened = true;
+          console.log("\u6253\u5F00\u754C\u9762 m:".concat(this._moduleName, ",v:").concat(this._viewType));
+          this._module.regMdrIns(this);
           this.onOpen();
       };
       BaseMediator.prototype.destroyUI = function () {
@@ -1224,6 +1256,12 @@
           }
           this.parent = undefined;
           this.uiUrl = undefined;
+      };
+      BaseMediator.prototype.removeMdr = function () {
+          this._module.removeMdrIns(this._viewType);
+          this._viewType = undefined;
+          this._moduleName = undefined;
+          this._module = undefined;
       };
       return BaseMediator;
   }(BaseEmitter));

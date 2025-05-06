@@ -180,6 +180,8 @@ declare module base {
       push<T extends BaseModuleCls>(cls: T): void;
       instantiate(): void;
       getProxy<T extends BaseProxy>(module: ModuleType, proxy: ProxyType): T | undefined;
+      openView(module: ModuleType, viewType: number, params?: any): void;
+      closeView(module: ModuleType, viewType: number): void;
   }
   const facade: Facade;
   
