@@ -1,7 +1,7 @@
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent, MahjongScoreType } from "@def/mahjong";
-import { showTips } from "../../misc/TipsMdr";
+import { showTips } from "../../misc/view/TipsMdr";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { BarProgressComp } from "@script/index";
 import { ModuleType, ProxyType } from "@def/module-type";

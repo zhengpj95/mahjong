@@ -307,7 +307,7 @@
       initUI() {
       }
       onClose() {
-          console.log(`11111 onClose`);
+          console.log(`11111 RuleMdr onClose`);
           removePopupMask();
       }
       onOpen() {

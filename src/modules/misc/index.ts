@@ -1,7 +1,7 @@
 import BaseModule = base.BaseModule;
 import { ModuleType } from "@def/module-type";
 import { MiscViewType } from "@def/misc";
-import RuleMdr from "./RuleMdr";
+import RuleMdr from "./view/RuleMdr";
 
 /**
  * @author zpj
