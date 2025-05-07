@@ -316,8 +316,6 @@
           this._btnClose = this.ui.getChildByName("boxInfo").getChildByName("btnClose");
           this._btnClose.once(Laya.Event.CLICK, this, this.close);
       }
-      removeEvents() {
-      }
   }
 
   var Box = Laya.Box;
@@ -1149,12 +1147,21 @@
       }
       addEvents() {
           this._btnStart.on(Laya.Event.CLICK, this, this.onClickBtnStart);
+          this.on("test_on", this.onOn);
+          this.once("test_once", this.Once);
+      }
+      onOn(d) {
+          console.log(`11111 onOn `, d);
+      }
+      Once(d) {
+          console.log(`11111 Once `, d);
       }
       initUI() {
           this._btnStart = this.ui.getChildByName("btnStart");
       }
       onClose() {
           console.warn(`11111 MahjongHomeMdr.onClose...`, this.params);
+          this.removeEvents();
       }
       onOpen() {
           console.warn(`11111 MahjongHomeMdr.onOpen...`, this.params);
@@ -1269,6 +1276,7 @@
           this._preIdx = -1;
           this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
           this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
+          this.removeEvents();
       }
       onOpen() {
           this._proxy.model.clearData();
@@ -1446,6 +1454,7 @@
       initUI() {
       }
       onClose() {
+          this.removeEvents();
       }
       onOpen() {
           this._proxy = base.facade.getProxy(2, 2);

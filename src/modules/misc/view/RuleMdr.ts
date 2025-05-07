@@ -34,7 +34,4 @@ export default class RuleMdr extends BaseMediator<RuleUI> {
     this._btnClose = <Image>this.ui.getChildByName("boxInfo").getChildByName("btnClose");
     this._btnClose.once(Laya.Event.CLICK, this, this.close);
   }
-
-  protected removeEvents(): void {
-  }
 }

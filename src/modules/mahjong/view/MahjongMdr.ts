@@ -82,6 +82,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     this._preIdx = -1;
     this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
     this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
+    this.removeEvents();
   }
 
   protected onOpen(): void {
@@ -89,7 +90,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     this.onRefreshNext();
   }
 
-  protected removeEvents(): void {
+  private removeEvents(): void {
     this.off(MahjongEvent.UPDATE_INFO, this.onRefreshNext, this);
     this.off(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
     this.off(MahjongEvent.SHOW_RESULT, this.showResultToClear, this);

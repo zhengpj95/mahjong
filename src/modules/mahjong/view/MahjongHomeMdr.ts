@@ -27,13 +27,14 @@ export default class MahjongHomeMdr extends BaseMediator<MahjongHomeUI> {
 
   protected onClose(): void {
     console.warn(`11111 MahjongHomeMdr.onClose...`, this.params);
+    this.removeEvents();
   }
 
   protected onOpen(): void {
     console.warn(`11111 MahjongHomeMdr.onOpen...`, this.params);
   }
 
-  protected removeEvents(): void {
+  private removeEvents(): void {
     this._btnStart.offAll(Laya.Event.CLICK);
   }
 

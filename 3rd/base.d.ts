@@ -122,21 +122,23 @@ declare module base {
   }
   const resourceMgr: ResourceManager;
   
-  type VoidFunc = (...args: any) => void;
+  type VoidMethod = (...args: any) => void;
   type LayaEvent = {
       target: Laya.EventDispatcher;
       event: string;
-      listener: (...args: any[]) => void;
+      method: VoidMethod;
       thisObject: any;
       args?: any[] | undefined;
   };
   class BaseEmitter {
-      emit(event: string, args?: any): void;
-      mulOn(events: string[], method: VoidFunc, caller?: any): void;
-      on(event: string, method: VoidFunc, caller?: any): void;
-      off(event: string, method: (...args: any) => void, caller?: any): void;
-      onLaya(target: LayaEvent["target"], event: LayaEvent["event"], listener: LayaEvent["listener"], thisObject?: LayaEvent["thisObject"], args?: any[] | undefined): void;
-      offLaya(target: LayaEvent["target"], event: LayaEvent["event"], listener: LayaEvent["listener"], thisObject?: LayaEvent["thisObject"]): void;
+      protected emit(event: string, args?: any): void;
+      protected mulOn(events: string[], method: VoidMethod, caller?: any): void;
+      protected on(event: string, method: VoidMethod, caller?: any, args?: any[]): void;
+      protected once(event: string, method: VoidMethod, caller?: any, args?: any[]): void;
+      protected off(event: string, method: VoidMethod, caller?: any): void;
+      protected onLaya(target: LayaEvent["target"], event: LayaEvent["event"], method: LayaEvent["method"], thisObject?: LayaEvent["thisObject"], args?: any[] | undefined): void;
+      protected offLaya(target: LayaEvent["target"], event: LayaEvent["event"], listener: LayaEvent["method"], thisObject?: LayaEvent["thisObject"]): void;
+      protected offAll(): void;
   }
   
   abstract class BaseProxy extends BaseEmitter {
@@ -163,7 +165,6 @@ declare module base {
       protected abstract addEvents(): void;
       protected abstract onOpen(): void;
       protected abstract onClose(): void;
-      protected abstract removeEvents(): void;
   }
   
   type MdrCls = new () => BaseMediator;

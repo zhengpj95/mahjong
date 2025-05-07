@@ -31,6 +31,7 @@ export default class MahjongResultMdr extends BaseMediator<MahjongResultUI> {
   }
 
   protected onClose(): void {
+    this.removeEvents();
   }
 
   protected onOpen(): void {
@@ -52,7 +53,7 @@ export default class MahjongResultMdr extends BaseMediator<MahjongResultUI> {
     }
   }
 
-  protected removeEvents(): void {
+  private removeEvents(): void {
     this.ui.btnHome.off(Laya.Event.CLICK, this, this.onClickHome);
     this.ui.btnNext.off(Laya.Event.CLICK, this, this.onClickNext);
   }
