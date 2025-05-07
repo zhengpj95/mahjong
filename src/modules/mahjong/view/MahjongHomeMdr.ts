@@ -2,6 +2,7 @@ import Image = Laya.Image;
 import BaseMediator = base.BaseMediator;
 import MahjongHomeUI = ui.modules.mahjong.MahjongHomeUI;
 import facade = base.facade;
+import LayerIndex = base.LayerIndex;
 import { ui } from "@ui/layaMaxUI";
 import { MahjongViewType } from "@def/mahjong";
 import { ModuleType } from "@def/module-type";
@@ -14,7 +15,7 @@ export default class MahjongHomeMdr extends BaseMediator<MahjongHomeUI> {
   private _btnStart: Image;
 
   constructor() {
-    super("modules/mahjong/MahjongHome.scene", Laya.Scene.root);
+    super(LayerIndex.MAIN, "modules/mahjong/MahjongHome.scene");
   }
 
   protected addEvents(): void {

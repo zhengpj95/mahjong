@@ -1,9 +1,10 @@
 import { ui } from "@ui/layaMaxUI";
-import { addPopupMask, layerMgr, removePopupMask } from "@base/LayerManager";
+import { addPopupMask, removePopupMask } from "@base/LayerManager";
 import Image = Laya.Image;
 import Label = Laya.Label;
 import RuleUI = ui.modules.common.RuleUI;
 import BaseMediator = base.BaseMediator;
+import LayerIndex = base.LayerIndex;
 
 /**
  * @author zpj
@@ -13,7 +14,7 @@ export default class RuleMdr extends BaseMediator<RuleUI> {
   private _btnClose: Image;
 
   constructor() {
-    super("modules/common/Rule.scene", layerMgr.modal);
+    super(LayerIndex.MODAL, "modules/common/Rule.scene");
     addPopupMask();
   }
 

@@ -7,7 +7,8 @@ import Handler = Laya.Handler;
 import Sprite = Laya.Sprite;
 import poolMgr = base.poolMgr;
 import PoolObject = base.PoolObject;
-import { layerMgr } from "@base/LayerManager";
+import layerMgr = base.layerMgr;
+import LayerIndex = base.LayerIndex;
 
 class TipsItem extends Box implements PoolObject {
   private _img: Image;
@@ -78,7 +79,7 @@ export class TipsMdr extends Box {
       this.addChild(this._sprite);
     }
     this.size(Laya.stage.width, Laya.stage.height);
-    layerMgr.tips.addChild(this);
+    layerMgr.getLayer(LayerIndex.TIPS).addChild(this);
   }
 
   public addTips(str: string | string[]): void {

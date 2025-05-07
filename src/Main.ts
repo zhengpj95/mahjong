@@ -1,11 +1,9 @@
 import GameConfig from "./GameConfig";
-import { initLayerMgr } from "@base/LayerManager";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { initModules } from "./modules/index";
 import { initEnhancedConsole } from "@base/logger";
 import { ModuleType } from "@def/module-type";
 import { MahjongViewType } from "@def/mahjong";
-import baseInit = base.baseInit;
 import facade = base.facade;
 
 class Main {
@@ -32,9 +30,8 @@ class Main {
     //激活资源版本控制，version.json由IDE发布功能自动生成，如果没有也不影响后续流程
     Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
 
-    initLayerMgr();
     initLoop();
-    baseInit();
+    base.baseInit();
     initModules();
     GameCfg.init();
   }

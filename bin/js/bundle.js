@@ -158,82 +158,6 @@
   GameConfig.exportSceneToJson = true;
   GameConfig.init();
 
-  var Sprite = Laya.Sprite;
-  var Scene = Laya.Scene;
-  var LayerIndex;
-  (function (LayerIndex) {
-      LayerIndex[LayerIndex["ROOT"] = 1] = "ROOT";
-      LayerIndex[LayerIndex["MODAL"] = 2] = "MODAL";
-      LayerIndex[LayerIndex["TIPS"] = 3] = "TIPS";
-  })(LayerIndex || (LayerIndex = {}));
-  function setLayerIndex(scene, idx = LayerIndex.ROOT) {
-      if (scene) {
-          scene["_layerIndex_"] = idx;
-      }
-  }
-  class LayerManager {
-      init() {
-          Scene.root;
-          this.modal;
-          this.tips;
-      }
-      get modal() {
-          if (!this._modal) {
-              this._modal = new Sprite();
-              Scene["_modal_"] = Laya.stage.addChildAt(this._modal, 1);
-              const modal = Scene["_modal_"];
-              modal.name = "modal";
-              modal.mouseThrough = true;
-              Laya.stage.on("resize", null, () => {
-                  modal.size(Laya.stage.width, Laya.stage.height);
-                  modal.event(Laya.Event.RESIZE);
-              });
-              modal.size(Laya.stage.width, Laya.stage.height);
-              modal.event(Laya.Event.RESIZE);
-          }
-          return this._modal;
-      }
-      get tips() {
-          if (!this._tips) {
-              this._tips = new Sprite();
-              Scene["_tips_"] = Laya.stage.addChildAt(this._tips, 2);
-              const tips = Scene["_tips_"];
-              tips.name = "tips";
-              tips.mouseThrough = true;
-              Laya.stage.on("resize", null, () => {
-                  tips.size(Laya.stage.width, Laya.stage.height);
-                  tips.event(Laya.Event.RESIZE);
-              });
-              tips.size(Laya.stage.width, Laya.stage.height);
-              tips.event(Laya.Event.RESIZE);
-          }
-          return this._tips;
-      }
-  }
-  let sprite;
-  function createPopupMask() {
-      if (!sprite) {
-          sprite = new Sprite();
-          sprite.graphics.drawRect(0, 0, Laya.stage.width, Laya.stage.height, "#000000CC");
-      }
-      sprite.name = "popup_mask";
-      return sprite;
-  }
-  function addPopupMask() {
-      const mask = createPopupMask();
-      mask.removeSelf();
-      layerMgr.modal.addChildAt(mask, 0);
-  }
-  function removePopupMask() {
-      const mask = createPopupMask();
-      mask.removeSelf();
-  }
-  let layerMgr;
-  function initLayerMgr() {
-      layerMgr = new LayerManager();
-      layerMgr.init();
-  }
-
   class DebugUtils {
       static debug(key, cls) {
           if (!key || !cls) {
@@ -296,10 +220,31 @@
   GameCfg.cfgListMap = {};
   DebugUtils.debug("GameCfg", GameCfg);
 
+  var Sprite = Laya.Sprite;
+  var layerMgr = base.layerMgr;
+  let sprite;
+  function createPopupMask() {
+      if (!sprite) {
+          sprite = new Sprite();
+          sprite.graphics.drawRect(0, 0, Laya.stage.width, Laya.stage.height, "#000000CC");
+      }
+      sprite.name = "popup_mask";
+      return sprite;
+  }
+  function addPopupMask() {
+      const mask = createPopupMask();
+      mask.removeSelf();
+      layerMgr.getLayer(2).addChildAt(mask, 0);
+  }
+  function removePopupMask() {
+      const mask = createPopupMask();
+      mask.removeSelf();
+  }
+
   var BaseMediator = base.BaseMediator;
   class RuleMdr extends BaseMediator {
       constructor() {
-          super("modules/common/Rule.scene", layerMgr.modal);
+          super(2, "modules/common/Rule.scene");
           addPopupMask();
       }
       addEvents() {
@@ -326,6 +271,7 @@
   var Handler$1 = Laya.Handler;
   var Sprite$1 = Laya.Sprite;
   var poolMgr = base.poolMgr;
+  var layerMgr$1 = base.layerMgr;
   class TipsItem extends Box {
       onAlloc() {
           this.size(600, 35);
@@ -379,7 +325,7 @@
               this.addChild(this._sprite);
           }
           this.size(Laya.stage.width, Laya.stage.height);
-          layerMgr.tips.addChild(this);
+          layerMgr$1.getLayer(3).addChild(this);
       }
       addTips(str) {
           if (Array.isArray(str)) {
@@ -1143,7 +1089,7 @@
   var facade$1 = base.facade;
   class MahjongHomeMdr extends BaseMediator$1 {
       constructor() {
-          super("modules/mahjong/MahjongHome.scene", Laya.Scene.root);
+          super(1, "modules/mahjong/MahjongHome.scene");
       }
       addEvents() {
           this._btnStart.on(Laya.Event.CLICK, this, this.onClickBtnStart);
@@ -1242,7 +1188,7 @@
 5.用 洗牌（扣10分）👉 重置剩余牌位置`;
   class MahjongMdr extends BaseMediator$2 {
       constructor() {
-          super("modules/mahjong/Mahjong.scene", Laya.Scene.root);
+          super(1, "modules/mahjong/Mahjong.scene");
           this._preIdx = -1;
           this._lastScoreTime = 0;
           this._endTime = 0;
@@ -1438,7 +1384,7 @@
   var facade$3 = base.facade;
   class MahjongResultMdr extends BaseMediator$3 {
       constructor() {
-          super("modules/mahjong/MahjongResult.scene", layerMgr.modal);
+          super(2, "modules/mahjong/MahjongResult.scene");
           addPopupMask();
       }
       addEvents() {
@@ -1617,7 +1563,6 @@
           Laya.alertGlobalError(true);
           initEnhancedConsole();
           Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
-          initLayerMgr();
           initLoop();
           baseInit();
           initModules();

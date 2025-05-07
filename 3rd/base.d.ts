@@ -122,6 +122,26 @@ declare module base {
   }
   const resourceMgr: ResourceManager;
   
+  const enum LayerIndex {
+      NONE = -1,
+      MAP = 0,
+      MAIN = 1,
+      MODAL = 2,
+      TIPS = 3
+  }
+  
+  class BaseLayer extends Laya.Sprite {
+      idx: number;
+      constructor(idx?: number);
+      onResize(): void;
+  }
+  class LayerManager {
+      getLayer(idx: LayerIndex): BaseLayer;
+      onResize(): void;
+  }
+  const layerMgr: LayerManager;
+  function initLayer(): void;
+  
   type VoidMethod = (...args: any) => void;
   type LayaEvent = {
       target: Laya.EventDispatcher;
@@ -156,7 +176,7 @@ declare module base {
   abstract class BaseMediator<T extends Laya.Sprite = Laya.Sprite> extends BaseEmitter {
       protected ui: T | undefined;
       protected params?: any;
-      protected constructor(url: string, parent: any);
+      protected constructor(parent: LayerIndex | Laya.Sprite, url?: string);
       getViewType(): number;
       getName(): string;
       close(): void;
@@ -201,6 +221,6 @@ declare module base {
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, EventData, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
+  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, EventData, LayerIndex, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, initLayer, layerMgr, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
   
 }

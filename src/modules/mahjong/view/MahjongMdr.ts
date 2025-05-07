@@ -17,6 +17,7 @@ import BaseMediator = base.BaseMediator;
 import MahjongUI = ui.modules.mahjong.MahjongUI;
 import CallBack = base.CallBack;
 import facade = base.facade;
+import LayerIndex = base.LayerIndex;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -52,7 +53,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
   private _btnRule: Image;
 
   constructor() {
-    super("modules/mahjong/Mahjong.scene", Laya.Scene.root);
+    super(LayerIndex.MAIN, "modules/mahjong/Mahjong.scene");
   }
 
   protected addEvents(): void {
