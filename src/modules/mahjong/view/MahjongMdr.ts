@@ -97,9 +97,9 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     this.off(MahjongEvent.UPDATE_SCORE, this.updateScore, this);
   }
 
-  private onRefreshNext(data?: boolean): void {
+  private onRefreshNext(): void {
     console.warn(`11111 onRefreshNext cLv:${this._proxy.model.level}, nLv:${this._proxy.model.getNextLevel()}`);
-    this._proxy.model.showNext(data);
+    this._proxy.model.showNext();
 
     this.resetScore();
     this.updateLevel();

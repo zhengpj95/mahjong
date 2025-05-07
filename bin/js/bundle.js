@@ -707,7 +707,7 @@
           this.col = cfg && cfg.layout ? cfg.layout[1] : 10;
           this.data = [];
       }
-      clearData(isReset = false) {
+      clearData() {
           this.levelScore = 0;
           this.row = 0;
           this.col = 0;
@@ -914,7 +914,7 @@
           this.clearData();
           this.updateData();
       }
-      showNext(isAgain) {
+      showNext() {
           this.clearData();
           this.updateData();
       }
@@ -1147,14 +1147,6 @@
       }
       addEvents() {
           this._btnStart.on(Laya.Event.CLICK, this, this.onClickBtnStart);
-          this.on("test_on", this.onOn);
-          this.once("test_once", this.Once);
-      }
-      onOn(d) {
-          console.log(`11111 onOn `, d);
-      }
-      Once(d) {
-          console.log(`11111 Once `, d);
       }
       initUI() {
           this._btnStart = this.ui.getChildByName("btnStart");
@@ -1288,9 +1280,9 @@
           this.off("mahjong_show_result", this.showResultToClear, this);
           this.off("mahjong_update_score", this.updateScore, this);
       }
-      onRefreshNext(data) {
+      onRefreshNext() {
           console.warn(`11111 onRefreshNext cLv:${this._proxy.model.level}, nLv:${this._proxy.model.getNextLevel()}`);
-          this._proxy.model.showNext(data);
+          this._proxy.model.showNext();
           this.resetScore();
           this.updateLevel();
           const list = this._proxy.model.getMahjongData();

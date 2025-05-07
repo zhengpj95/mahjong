@@ -28,18 +28,6 @@ export class MahjongModel {
   private _astarMgr: AStarMgr;
   private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
 
-  // constructor() {
-  //   // this.init();
-  // }
-  //
-  // public init(): void {
-  //   globalAdapter.storage.getItem(MAHJONG_LEVEL, (data: number) => {
-  //     console.warn(`11111 before getItem: ${this.level}`);
-  //     this.level = data || 0;
-  //     console.warn(`11111 after getItem: ${this.level} ${data}`);
-  //   });
-  // }
-
   private getLevelCfg(): LevelConfig {
     const lv = this.getNextLevel();
     const list = GameCfg.getCfgListByName<LevelConfig>(ConfigName.LEVEl) || [];
@@ -62,10 +50,7 @@ export class MahjongModel {
   }
 
   // 清除当前关卡数据
-  public clearData(isReset = false): void {
-    // if (isReset) {
-    //   this.level = 0;
-    // }
+  public clearData(): void {
     this.levelScore = 0;
     this.row = 0;
     this.col = 0;
@@ -290,10 +275,7 @@ export class MahjongModel {
   }
 
   /**下一关*/
-  public showNext(isAgain?: boolean): void {
-    // if (!isAgain) {
-    //   this.level += 1;
-    // }
+  public showNext(): void {
     this.clearData();
     this.updateData();
   }
@@ -301,18 +283,6 @@ export class MahjongModel {
   public getNextLevel(): number {
     return this.level + 1;
   }
-
-  // /**挑战成功*/
-  // public challengeSuccess(): void {
-  //   let lev = this.level;
-  //   globalAdapter.storage.setItem(MAHJONG_LEVEL, lev, (success?: boolean) => {
-  //     if (success) {
-  //       console.log(`11111 setItem success: `, lev);
-  //     } else {
-  //       console.log(`11111 setItem fail: `, lev);
-  //     }
-  //   });
-  // }
 
   /**展示结算弹窗*/
   public showResult(param?: IMahjongResultParam): void {
