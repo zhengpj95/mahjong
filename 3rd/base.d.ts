@@ -24,8 +24,8 @@ declare module base {
   }
   const poolMgr: PoolManager;
   
-  class GEvent<T = any> implements PoolObject {
-      static alloc<T>(type: string, data: T): GEvent<T>;
+  class EventData<T = any> implements PoolObject {
+      static alloc<T>(type: string, data: T): EventData<T>;
       get type(): string;
       get data(): T;
       free(): void;
@@ -123,10 +123,20 @@ declare module base {
   const resourceMgr: ResourceManager;
   
   type VoidFunc = (...args: any) => void;
+  type LayaEvent = {
+      target: Laya.EventDispatcher;
+      event: string;
+      listener: (...args: any[]) => void;
+      thisObject: any;
+      args?: any[] | undefined;
+  };
   class BaseEmitter {
       emit(event: string, args?: any): void;
-      on(event: string, method: VoidFunc, caller: any): void;
-      off(event: string, method: (...args: any) => void, caller: any): void;
+      mulOn(events: string[], method: VoidFunc, caller?: any): void;
+      on(event: string, method: VoidFunc, caller?: any): void;
+      off(event: string, method: (...args: any) => void, caller?: any): void;
+      onLaya(target: LayaEvent["target"], event: LayaEvent["event"], listener: LayaEvent["listener"], thisObject?: LayaEvent["thisObject"], args?: any[] | undefined): void;
+      offLaya(target: LayaEvent["target"], event: LayaEvent["event"], listener: LayaEvent["listener"], thisObject?: LayaEvent["thisObject"]): void;
   }
   
   abstract class BaseProxy extends BaseEmitter {
@@ -190,6 +200,6 @@ declare module base {
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, GEvent, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
+  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, EventData, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
   
 }

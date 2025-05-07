@@ -639,42 +639,42 @@
       tweenMgr.update();
   }
 
-  var GEvent = (function () {
-      function GEvent() {
+  var EventData = (function () {
+      function EventData() {
           this._type = "";
           this._data = undefined;
       }
-      GEvent.alloc = function (type, data) {
-          var nt = poolMgr.alloc(GEvent);
-          nt._type = type;
-          nt._data = data;
-          return nt;
+      EventData.alloc = function (type, data) {
+          var eData = poolMgr.alloc(EventData);
+          eData._type = type;
+          eData._data = data;
+          return eData;
       };
-      Object.defineProperty(GEvent.prototype, "type", {
+      Object.defineProperty(EventData.prototype, "type", {
           get: function () {
               return this._type;
           },
           enumerable: false,
           configurable: true
       });
-      Object.defineProperty(GEvent.prototype, "data", {
+      Object.defineProperty(EventData.prototype, "data", {
           get: function () {
               return this._data;
           },
           enumerable: false,
           configurable: true
       });
-      GEvent.prototype.free = function () {
+      EventData.prototype.free = function () {
           poolMgr.free(this);
       };
-      GEvent.prototype.onAlloc = function () {
+      EventData.prototype.onAlloc = function () {
           this.onFree();
       };
-      GEvent.prototype.onFree = function () {
+      EventData.prototype.onFree = function () {
           this._type = "";
           this._data = undefined;
       };
-      return GEvent;
+      return EventData;
   }());
 
   var EventManager = (function () {
@@ -732,7 +732,7 @@
                   i--;
                   continue;
               }
-              var nt = GEvent.alloc(event, data);
+              var nt = EventData.alloc(event, data);
               callBack.exec(nt);
               nt.free();
           }
@@ -1159,11 +1159,31 @@
       BaseEmitter.prototype.emit = function (event, args) {
           eventMgr.emit(event, args);
       };
+      BaseEmitter.prototype.mulOn = function (events, method, caller) {
+          if (events === null || events === undefined ? undefined : events.length) {
+              for (var _i = 0, events_1 = events; _i < events_1.length; _i++) {
+                  var k = events_1[_i];
+                  this.on(k, method, caller);
+              }
+          }
+      };
       BaseEmitter.prototype.on = function (event, method, caller) {
-          eventMgr.on(event, method, caller);
+          eventMgr.on(event, method, caller || this);
       };
       BaseEmitter.prototype.off = function (event, method, caller) {
-          eventMgr.off(event, method, caller);
+          eventMgr.off(event, method, caller || this);
+      };
+      BaseEmitter.prototype.onLaya = function (target, event, listener, thisObject, args) {
+          if (!target || !event || !listener) {
+              return;
+          }
+          target.on(event, thisObject || this, listener, args);
+      };
+      BaseEmitter.prototype.offLaya = function (target, event, listener, thisObject) {
+          if (!target || !event || !listener) {
+              return;
+          }
+          target.off(event, thisObject || this, listener);
       };
       return BaseEmitter;
   }());
@@ -1373,7 +1393,7 @@
   exports.BaseProxy = BaseProxy;
   exports.CallBack = CallBack;
   exports.Ease = Ease;
-  exports.GEvent = GEvent;
+  exports.EventData = EventData;
   exports.baseInit = baseInit;
   exports.baseLoop = baseLoop;
   exports.eventMgr = eventMgr;
