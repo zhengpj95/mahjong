@@ -1,5 +1,4 @@
 import { ui } from "@ui/layaMaxUI";
-import { addPopupMask, removePopupMask } from "@base/LayerManager";
 import Image = Laya.Image;
 import Label = Laya.Label;
 import RuleUI = ui.modules.common.RuleUI;
@@ -15,7 +14,6 @@ export default class RuleMdr extends BaseMediator<RuleUI> {
 
   constructor() {
     super(LayerIndex.MODAL, "modules/common/Rule.scene");
-    addPopupMask();
   }
 
   protected addEvents(): void {
@@ -26,7 +24,6 @@ export default class RuleMdr extends BaseMediator<RuleUI> {
 
   protected onClose(): void {
     console.log(`11111 RuleMdr onClose`);
-    removePopupMask();
   }
 
   protected onOpen(): void {

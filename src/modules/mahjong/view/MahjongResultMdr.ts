@@ -1,5 +1,4 @@
 import { ui } from "@ui/layaMaxUI";
-import { addPopupMask, removePopupMask } from "@base/LayerManager";
 import { IMahjongResultParam, MahjongEvent, MahjongViewType } from "@def/mahjong";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
@@ -22,7 +21,6 @@ export default class MahjongResultMdr extends BaseMediator<MahjongResultUI> {
 
   constructor() {
     super(LayerIndex.MODAL, "modules/mahjong/MahjongResult.scene");
-    addPopupMask();
   }
 
   protected addEvents(): void {
@@ -75,6 +73,5 @@ export default class MahjongResultMdr extends BaseMediator<MahjongResultUI> {
 
   public close(): void {
     super.close();
-    removePopupMask();
   }
 }

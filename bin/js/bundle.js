@@ -220,32 +220,10 @@
   GameCfg.cfgListMap = {};
   DebugUtils.debug("GameCfg", GameCfg);
 
-  var Sprite = Laya.Sprite;
-  var layerMgr = base.layerMgr;
-  let sprite;
-  function createPopupMask() {
-      if (!sprite) {
-          sprite = new Sprite();
-          sprite.graphics.drawRect(0, 0, Laya.stage.width, Laya.stage.height, "#000000CC");
-      }
-      sprite.name = "popup_mask";
-      return sprite;
-  }
-  function addPopupMask() {
-      const mask = createPopupMask();
-      mask.removeSelf();
-      layerMgr.getLayer(2).addChildAt(mask, 0);
-  }
-  function removePopupMask() {
-      const mask = createPopupMask();
-      mask.removeSelf();
-  }
-
   var BaseMediator = base.BaseMediator;
   class RuleMdr extends BaseMediator {
       constructor() {
           super(2, "modules/common/Rule.scene");
-          addPopupMask();
       }
       addEvents() {
       }
@@ -253,7 +231,6 @@
       }
       onClose() {
           console.log(`11111 RuleMdr onClose`);
-          removePopupMask();
       }
       onOpen() {
           const labDesc = this.ui.getChildByName("boxInfo").getChildByName("labDesc");
@@ -269,9 +246,9 @@
   var Timer = Laya.Timer;
   var Tween = Laya.Tween;
   var Handler$1 = Laya.Handler;
-  var Sprite$1 = Laya.Sprite;
+  var Sprite = Laya.Sprite;
   var poolMgr = base.poolMgr;
-  var layerMgr$1 = base.layerMgr;
+  var layerMgr = base.layerMgr;
   class TipsItem extends Box {
       onAlloc() {
           this.size(600, 35);
@@ -320,12 +297,12 @@
           this._tipsList = [];
           this._showMaxNum = 5;
           if (!this._sprite) {
-              this._sprite = new Sprite$1();
+              this._sprite = new Sprite();
               this._sprite.size(Laya.stage.width, Laya.stage.height);
               this.addChild(this._sprite);
           }
           this.size(Laya.stage.width, Laya.stage.height);
-          layerMgr$1.getLayer(3).addChild(this);
+          layerMgr.getLayer(3).addChild(this);
       }
       addTips(str) {
           if (Array.isArray(str)) {
@@ -1385,7 +1362,6 @@
   class MahjongResultMdr extends BaseMediator$3 {
       constructor() {
           super(2, "modules/mahjong/MahjongResult.scene");
-          addPopupMask();
       }
       addEvents() {
       }
@@ -1429,7 +1405,6 @@
       }
       close() {
           super.close();
-          removePopupMask();
       }
   }
 
@@ -1539,7 +1514,6 @@
       }
   }
 
-  var baseInit = base.baseInit;
   var facade$4 = base.facade;
   class Main {
       constructor() {
@@ -1564,7 +1538,7 @@
           initEnhancedConsole();
           Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
           initLoop();
-          baseInit();
+          base.baseInit();
           initModules();
           GameCfg.init();
       }
