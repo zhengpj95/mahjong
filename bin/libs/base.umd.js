@@ -548,6 +548,35 @@
       tweenMgr.update();
   }
 
+  var View = Laya.View;
+  function createEmptyTexture(width, height) {
+      const pixelData = new Uint8Array(width * height * 4);
+      pixelData.fill(0);
+      for (let i = 3; i < pixelData.length; i += 4) {
+          pixelData[i] = 255 * 0.8;
+      }
+      const tex2D = new Laya.Texture2D(width, height, Laya.TextureFormat.R8G8B8A8, false, false);
+      tex2D.setPixels(pixelData);
+      return Laya.Texture.create(tex2D, 0, 0, width, height, 0, 0);
+  }
+  function createPopupSprite(w, h) {
+      const sp = new Laya.Sprite();
+      sp.texture = createEmptyTexture(w, h);
+      return sp;
+  }
+  const MdrKey$1 = "_mediator_";
+  function findMediatorTemp(comp) {
+      if (!comp)
+          return undefined;
+      let mdr = comp[MdrKey$1];
+      while (comp && !mdr) {
+          comp = comp.parent;
+          if (comp[MdrKey$1]) {
+              mdr = comp[MdrKey$1];
+          }
+      }
+      return mdr;
+  }
   class BaseLayer extends Laya.Sprite {
       constructor(idx = -1) {
           super();
@@ -573,6 +602,65 @@
   class ModalLayer extends BaseLayer {
       constructor() {
           super(2);
+      }
+      addChild(node) {
+          const res = super.addChild(node);
+          if (res === this._popupSp) {
+              return res;
+          }
+          if (node instanceof View) {
+              node.mouseThrough = true;
+          }
+          this.updateModel();
+          return res;
+      }
+      removeChild(node) {
+          const res = super.removeChild(node);
+          if (res === this._popupSp) {
+              return res;
+          }
+          this.updateModel();
+          return res;
+      }
+      updateModel() {
+          if (!this.numChildren) {
+              return;
+          }
+          if (this._popupSp) {
+              const idx = this.getChildIndex(this._popupSp);
+              if (!idx && this.numChildren === 1) {
+                  this.remModel();
+                  return;
+              }
+              if (idx > -1) {
+                  this.setChildIndex(this._popupSp, this.numChildren - 2);
+                  return;
+              }
+          }
+          this.addModel();
+      }
+      addModel() {
+          if (!this._popupSp) {
+              this._popupSp = createPopupSprite(Laya.stage.width, Laya.stage.height);
+              this._popupSp.name = `popup_sprite`;
+          }
+          this._popupSp.mouseEnabled = true;
+          this.addChildAt(this._popupSp, this.numChildren - 1);
+          this._popupSp.on(Laya.Event.CLICK, this, this.onClickPopup);
+      }
+      onClickPopup() {
+          var _a, _b;
+          const parent = (_a = this._popupSp) === null || _a === undefined ? undefined : _a.parent;
+          if (parent) {
+              const mdr = findMediatorTemp(parent.getChildAt(parent.numChildren - 1));
+              (_b = mdr === null || mdr === undefined ? undefined : mdr.close) === null || _b === undefined ? undefined : _b.call(mdr);
+          }
+      }
+      remModel() {
+          if (!this._popupSp || !this.contains(this._popupSp)) {
+              return;
+          }
+          this.removeChildAt(0);
       }
   }
   class TipsLayer extends BaseLayer {
@@ -1375,7 +1463,6 @@
   exports.eventMgr = eventMgr;
   exports.facade = facade;
   exports.findMediator = findMediator;
-  exports.initLayer = initLayer;
   exports.layerMgr = layerMgr;
   exports.poolMgr = poolMgr;
   exports.resourceMgr = resourceMgr;

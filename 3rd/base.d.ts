@@ -140,7 +140,6 @@ declare module base {
       onResize(): void;
   }
   const layerMgr: LayerManager;
-  function initLayer(): void;
   
   type VoidMethod = (...args: any) => void;
   type LayaEvent = {
@@ -221,6 +220,6 @@ declare module base {
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, EventData, LayerIndex, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, initLayer, layerMgr, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
+  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, EventData, LayerIndex, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
   
 }
