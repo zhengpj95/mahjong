@@ -548,7 +548,6 @@
       tweenMgr.update();
   }
 
-  var View = Laya.View;
   function createEmptyTexture(width, height) {
       const pixelData = new Uint8Array(width * height * 4);
       pixelData.fill(0);
@@ -608,7 +607,7 @@
           if (res === this._popupSp) {
               return res;
           }
-          if (node instanceof View) {
+          if (node instanceof Laya.View) {
               node.mouseThrough = true;
           }
           this.updateModel();
