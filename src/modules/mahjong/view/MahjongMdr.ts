@@ -18,6 +18,7 @@ import MahjongUI = ui.modules.mahjong.MahjongUI;
 import CallBack = base.CallBack;
 import facade = base.facade;
 import LayerIndex = base.LayerIndex;
+import Point = Laya.Point;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -253,6 +254,14 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       this.emit(MiscEvent.SHOW_TIPS, "无可消除的卡牌，请洗牌!");
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
+
+    // const path: { x: number, y: number }[] = [];
+    // for (let card of cardList) {
+    //   path.push({ x: card.col, y: card.row });
+    // }
+    // console.log(path);
+    // this.animateDrawLine(path);
+    // this.createGlowEffect(path);
   }
 
   // 洗牌
@@ -267,5 +276,102 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
 
   private onClickRule(): void {
     facade.openView(ModuleType.MISC, MiscViewType.RULE, ruleDesc);
+  }
+
+  private animateDrawLine(path: { x: number, y: number }[], color: string = "#42e422") {
+    const tileWidth = 52;
+    const tileHeight = 70;
+    const offsetX = tileWidth / 2;
+    const offsetY = tileHeight / 2;
+    const lineLayer = new Laya.Sprite();
+    lineLayer.width = Laya.stage.width;
+    lineLayer.height = Laya.stage.height;
+    this.ui.addChild(lineLayer);
+
+    lineLayer.graphics.clear();
+
+    let i = 0;
+    const gPoint = Point.create();
+    gPoint.x = this._list.x;
+    gPoint.y = this._list.y;
+
+    function drawNextSegment() {
+      if (i >= path.length - 1) {
+        // 所有段绘制完成后清除
+        Laya.timer.once(300, null, () => {
+          lineLayer.removeSelf();
+        });
+        return;
+      }
+
+      const from = path[i];
+      const to = path[i + 1];
+
+      const fromX = gPoint.x + from.x * tileWidth + offsetX + 4 + from.x * 3;
+      const fromY = gPoint.y + from.y * tileHeight + offsetY + 4 + from.y * 3;
+      const toX = gPoint.x + to.x * tileWidth + offsetX + 4 + to.x * 3;
+      const toY = gPoint.y + to.y * tileHeight + offsetY + 4 + to.y * 3;
+
+      console.log(fromX, fromY, toX, toY);
+
+      // 模拟绘制动画（线条从 from 到 to）
+      const progress = { x: fromX, y: fromY };
+
+      const tempLine = new Laya.Sprite();
+      lineLayer.addChild(tempLine);
+
+      Laya.Tween.to(progress, { x: toX, y: toY }, 100, null, Laya.Handler.create(null, () => {
+        i++;
+        drawNextSegment();
+      }), 0, true); // true 表示使用帧率模式
+
+      // 每帧重绘当前段的动态线条
+      tempLine.frameLoop(1, null, () => {
+        tempLine.graphics.clear();
+        tempLine.graphics.drawLine(fromX, fromY, progress.x, progress.y, color, 5);
+      });
+    }
+
+    drawNextSegment();
+  }
+
+  private createGlowEffect(path: { x: number, y: number }[]) {
+    const glow = new Laya.Sprite();
+    glow.graphics.drawCircle(0, 0, 10, "#FFFF00"); // 黄色发光球
+    glow.alpha = 0.8;
+    glow.width = Laya.stage.width;
+    glow.height = Laya.stage.height;
+    this.ui.addChild(glow);
+
+    const tileWidth = 52;
+    const tileHeight = 70;
+    const offsetX = tileWidth / 2;
+    const offsetY = tileHeight / 2;
+    const gPoint = Point.create();
+    gPoint.x = this._list.x;
+    gPoint.y = this._list.y;
+
+    const points: Laya.Point[] = path.map(p => new Laya.Point(
+      gPoint.x + p.x * tileWidth + offsetX + 4 + p.x * 3,
+      gPoint.y + p.y * tileHeight + offsetY + 4 + p.y * 3)
+    );
+    let index = 0;
+
+    function moveNext() {
+      if (index >= points.length - 1) {
+        glow.removeSelf();
+        return;
+      }
+
+      const from = points[index];
+      const to = points[index + 1];
+      glow.pos(from.x, from.y);
+      Laya.Tween.to(glow, { x: to.x, y: to.y }, 100, null, Laya.Handler.create(null, () => {
+        index++;
+        moveNext();
+      }));
+    }
+
+    moveNext();
   }
 }
