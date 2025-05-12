@@ -1343,6 +1343,9 @@
       }
       onUILoaded(view) {
           this.ui = view;
+          if (!this.ui) {
+              console.error(`BaseMediator.onUILoaded error: no ui!`);
+          }
           this.ui.name = this[MdrName];
           Object.defineProperty(this.ui, MdrKey, {
               value: this,
