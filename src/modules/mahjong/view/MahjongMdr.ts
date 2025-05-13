@@ -19,6 +19,7 @@ import CallBack = base.CallBack;
 import facade = base.facade;
 import LayerIndex = base.LayerIndex;
 import Point = Laya.Point;
+import Sprite = Laya.Sprite;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -162,13 +163,18 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
       const curItem = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
       const preItem = <BoxCard>this._list.getCell(this._preIdx).getChildByName("boxCard");
-      if (curItemData && curItemData.checkSame(preItemData)
-        && this._proxy.model.canConnect(preItemData, curItemData)) {
+      const paths = this._proxy.model.findPath(preItemData, curItemData);
+      if (curItemData && curItemData.checkSame(preItemData) && !!paths.length) {
         ComUtils.setScale(curItem, BIG_SCALE);
         this.clearCardItem(curItem, index);
         this.setSelect(curItem, true);
         this.clearCardItem(preItem, this._preIdx);
         this.addScore();
+        const p = paths.map(item => {
+          return { x: item[1] - 1, y: item[0] - 1 };
+        });
+        this.animateDrawLine(p);
+        this.createGlowEffect(p);
       } else {
         ComUtils.setScale(curItem, INIT_SCALE);
         ComUtils.setScale(preItem, INIT_SCALE);
@@ -254,14 +260,6 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       this.emit(MiscEvent.SHOW_TIPS, "无可消除的卡牌，请洗牌!");
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
-
-    // const path: { x: number, y: number }[] = [];
-    // for (let card of cardList) {
-    //   path.push({ x: card.col, y: card.row });
-    // }
-    // console.log(path);
-    // this.animateDrawLine(path);
-    // this.createGlowEffect(path);
   }
 
   // 洗牌
@@ -278,28 +276,34 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     facade.openView(ModuleType.MISC, MiscViewType.RULE, ruleDesc);
   }
 
-  private animateDrawLine(path: { x: number, y: number }[], color: string = "#42e422") {
+  private _lineSprite: Sprite;
+  private _glowSprite: Sprite;
+
+  private animateDrawLine(path: { x: number, y: number }[], color: string = "#42e422"): void {
     const tileWidth = 52;
     const tileHeight = 70;
     const offsetX = tileWidth / 2;
     const offsetY = tileHeight / 2;
-    const lineLayer = new Laya.Sprite();
-    lineLayer.width = Laya.stage.width;
-    lineLayer.height = Laya.stage.height;
-    this.ui.addChild(lineLayer);
-
-    lineLayer.graphics.clear();
+    if (!this._lineSprite) {
+      this._lineSprite = new Laya.Sprite();
+      this._lineSprite.width = Laya.stage.width;
+      this._lineSprite.height = Laya.stage.height;
+    }
+    this.ui.addChild(this._lineSprite);
 
     let i = 0;
+    const lineLayer = this._lineSprite;
     const gPoint = Point.create();
     gPoint.x = this._list.x;
     gPoint.y = this._list.y;
+    const time = path.length >= 10 ? 15 : path.length >= 5 ? 30 : 120;
 
-    function drawNextSegment() {
+    function drawNextSegment(): void {
       if (i >= path.length - 1) {
         // 所有段绘制完成后清除
-        Laya.timer.once(300, null, () => {
+        Laya.timer.once(100, null, () => {
           lineLayer.removeSelf();
+          lineLayer.removeChildren();
         });
         return;
       }
@@ -312,15 +316,13 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       const toX = gPoint.x + to.x * tileWidth + offsetX + 4 + to.x * 3;
       const toY = gPoint.y + to.y * tileHeight + offsetY + 4 + to.y * 3;
 
-      console.log(fromX, fromY, toX, toY);
-
       // 模拟绘制动画（线条从 from 到 to）
       const progress = { x: fromX, y: fromY };
 
       const tempLine = new Laya.Sprite();
       lineLayer.addChild(tempLine);
 
-      Laya.Tween.to(progress, { x: toX, y: toY }, 100, null, Laya.Handler.create(null, () => {
+      Laya.Tween.to(progress, { x: toX, y: toY }, time, null, Laya.Handler.create(null, () => {
         i++;
         drawNextSegment();
       }), 0, true); // true 表示使用帧率模式
@@ -335,13 +337,16 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     drawNextSegment();
   }
 
-  private createGlowEffect(path: { x: number, y: number }[]) {
-    const glow = new Laya.Sprite();
-    glow.graphics.drawCircle(0, 0, 10, "#FFFF00"); // 黄色发光球
-    glow.alpha = 0.8;
-    glow.width = Laya.stage.width;
-    glow.height = Laya.stage.height;
-    this.ui.addChild(glow);
+
+  private createGlowEffect(path: { x: number, y: number }[]): void {
+    if (!this._glowSprite) {
+      this._glowSprite = new Laya.Sprite();
+      this._glowSprite.alpha = 1;
+      this._glowSprite.width = this._glowSprite.height = 1;
+      this._glowSprite.name = "glow";
+    }
+    this._glowSprite.graphics.drawCircle(0, 0, 10, "#FFFF00"); // 黄色发光球
+    this.ui.addChild(this._glowSprite);
 
     const tileWidth = 52;
     const tileHeight = 70;
@@ -356,8 +361,10 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       gPoint.y + p.y * tileHeight + offsetY + 4 + p.y * 3)
     );
     let index = 0;
+    const glow = this._glowSprite;
+    const time = path.length >= 10 ? 15 : path.length >= 5 ? 30 : 120;
 
-    function moveNext() {
+    function moveNext(): void {
       if (index >= points.length - 1) {
         glow.removeSelf();
         return;
@@ -366,7 +373,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       const from = points[index];
       const to = points[index + 1];
       glow.pos(from.x, from.y);
-      Laya.Tween.to(glow, { x: to.x, y: to.y }, 100, null, Laya.Handler.create(null, () => {
+      Laya.Tween.to(glow, { x: to.x, y: to.y }, time, null, Laya.Handler.create(null, () => {
         index++;
         moveNext();
       }));

@@ -1156,6 +1156,7 @@
   var BaseMediator$2 = base.BaseMediator;
   var CallBack$1 = base.CallBack;
   var facade$2 = base.facade;
+  var Point = Laya.Point;
   const INIT_SCALE = 0.4;
   const BIG_SCALE = 0.42;
   const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯）\n
@@ -1255,13 +1256,18 @@
               const preItemData = this._list.getItem(this._preIdx);
               const curItem = this._list.getCell(index).getChildByName("boxCard");
               const preItem = this._list.getCell(this._preIdx).getChildByName("boxCard");
-              if (curItemData && curItemData.checkSame(preItemData)
-                  && this._proxy.model.canConnect(preItemData, curItemData)) {
+              const paths = this._proxy.model.findPath(preItemData, curItemData);
+              if (curItemData && curItemData.checkSame(preItemData) && !!paths.length) {
                   ComUtils.setScale(curItem, BIG_SCALE);
                   this.clearCardItem(curItem, index);
                   this.setSelect(curItem, true);
                   this.clearCardItem(preItem, this._preIdx);
                   this.addScore();
+                  const p = paths.map(item => {
+                      return { x: item[1] - 1, y: item[0] - 1 };
+                  });
+                  this.animateDrawLine(p);
+                  this.createGlowEffect(p);
               }
               else {
                   ComUtils.setScale(curItem, INIT_SCALE);
@@ -1353,6 +1359,86 @@
       }
       onClickRule() {
           facade$2.openView(1, 1, ruleDesc);
+      }
+      animateDrawLine(path, color = "#42e422") {
+          const tileWidth = 52;
+          const tileHeight = 70;
+          const offsetX = tileWidth / 2;
+          const offsetY = tileHeight / 2;
+          if (!this._lineSprite) {
+              this._lineSprite = new Laya.Sprite();
+              this._lineSprite.width = Laya.stage.width;
+              this._lineSprite.height = Laya.stage.height;
+          }
+          this.ui.addChild(this._lineSprite);
+          let i = 0;
+          const lineLayer = this._lineSprite;
+          const gPoint = Point.create();
+          gPoint.x = this._list.x;
+          gPoint.y = this._list.y;
+          const time = path.length >= 10 ? 15 : path.length >= 5 ? 30 : 120;
+          function drawNextSegment() {
+              if (i >= path.length - 1) {
+                  Laya.timer.once(100, null, () => {
+                      lineLayer.removeSelf();
+                      lineLayer.removeChildren();
+                  });
+                  return;
+              }
+              const from = path[i];
+              const to = path[i + 1];
+              const fromX = gPoint.x + from.x * tileWidth + offsetX + 4 + from.x * 3;
+              const fromY = gPoint.y + from.y * tileHeight + offsetY + 4 + from.y * 3;
+              const toX = gPoint.x + to.x * tileWidth + offsetX + 4 + to.x * 3;
+              const toY = gPoint.y + to.y * tileHeight + offsetY + 4 + to.y * 3;
+              const progress = { x: fromX, y: fromY };
+              const tempLine = new Laya.Sprite();
+              lineLayer.addChild(tempLine);
+              Laya.Tween.to(progress, { x: toX, y: toY }, time, null, Laya.Handler.create(null, () => {
+                  i++;
+                  drawNextSegment();
+              }), 0, true);
+              tempLine.frameLoop(1, null, () => {
+                  tempLine.graphics.clear();
+                  tempLine.graphics.drawLine(fromX, fromY, progress.x, progress.y, color, 5);
+              });
+          }
+          drawNextSegment();
+      }
+      createGlowEffect(path) {
+          if (!this._glowSprite) {
+              this._glowSprite = new Laya.Sprite();
+              this._glowSprite.alpha = 1;
+              this._glowSprite.width = this._glowSprite.height = 1;
+              this._glowSprite.name = "glow";
+          }
+          this._glowSprite.graphics.drawCircle(0, 0, 10, "#FFFF00");
+          this.ui.addChild(this._glowSprite);
+          const tileWidth = 52;
+          const tileHeight = 70;
+          const offsetX = tileWidth / 2;
+          const offsetY = tileHeight / 2;
+          const gPoint = Point.create();
+          gPoint.x = this._list.x;
+          gPoint.y = this._list.y;
+          const points = path.map(p => new Laya.Point(gPoint.x + p.x * tileWidth + offsetX + 4 + p.x * 3, gPoint.y + p.y * tileHeight + offsetY + 4 + p.y * 3));
+          let index = 0;
+          const glow = this._glowSprite;
+          const time = path.length >= 10 ? 15 : path.length >= 5 ? 30 : 120;
+          function moveNext() {
+              if (index >= points.length - 1) {
+                  glow.removeSelf();
+                  return;
+              }
+              const from = points[index];
+              const to = points[index + 1];
+              glow.pos(from.x, from.y);
+              Laya.Tween.to(glow, { x: to.x, y: to.y }, time, null, Laya.Handler.create(null, () => {
+                  index++;
+                  moveNext();
+              }));
+          }
+          moveNext();
       }
   }
 
