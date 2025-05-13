@@ -1075,11 +1075,9 @@
           this._btnStart = this.ui.getChildByName("btnStart");
       }
       onClose() {
-          console.warn(`11111 MahjongHomeMdr.onClose...`, this.params);
           this.removeEvents();
       }
       onOpen() {
-          console.warn(`11111 MahjongHomeMdr.onOpen...`, this.params);
       }
       removeEvents() {
           this._btnStart.offAll(Laya.Event.CLICK);
@@ -1157,6 +1155,7 @@
   var CallBack$1 = base.CallBack;
   var facade$2 = base.facade;
   var Point = Laya.Point;
+  var Tween$1 = Laya.Tween;
   const INIT_SCALE = 0.4;
   const BIG_SCALE = 0.42;
   const ruleDesc = `1.点击两张相同牌，用≤3条直线连接（可拐弯）\n
@@ -1187,16 +1186,24 @@
           this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
           this._btnRule = this.ui.getChildByName("btnRule");
           this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
+          this._btnBack = this.ui.getChildByName("btnBack");
+          this.onLaya(this._btnBack, Event$1.CLICK, this.onClickBack);
+      }
+      onOpen() {
+          console.log(`11111 MahjongMdr onOpen`);
+          this._proxy.model.clearData();
+          this.onRefreshNext();
       }
       onClose() {
+          console.log(`11111 MahjongMdr onClose`);
           this._preIdx = -1;
           this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
           this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
           this.removeEvents();
-      }
-      onOpen() {
-          this._proxy.model.clearData();
-          this.onRefreshNext();
+          const bar = this.ui.getChildByName("bar");
+          base.tweenMgr.remove(bar);
+          Tween$1.clearAll(this);
+          Laya.timer.clearAll(this);
       }
       removeEvents() {
           this.off("mahjong_update_info", this.onRefreshNext, this);
@@ -1360,6 +1367,10 @@
       onClickRule() {
           facade$2.openView(1, 1, ruleDesc);
       }
+      onClickBack() {
+          this.close();
+          facade$2.openView(2, 1);
+      }
       animateDrawLine(path, color = "#42e422") {
           const tileWidth = 52;
           const tileHeight = 70;
@@ -1379,7 +1390,7 @@
           const time = path.length >= 10 ? 15 : path.length >= 5 ? 30 : 120;
           function drawNextSegment() {
               if (i >= path.length - 1) {
-                  Laya.timer.once(100, null, () => {
+                  Laya.timer.once(100, this, () => {
                       lineLayer.removeSelf();
                       lineLayer.removeChildren();
                   });
@@ -1394,7 +1405,7 @@
               const progress = { x: fromX, y: fromY };
               const tempLine = new Laya.Sprite();
               lineLayer.addChild(tempLine);
-              Laya.Tween.to(progress, { x: toX, y: toY }, time, null, Laya.Handler.create(null, () => {
+              Laya.Tween.to(progress, { x: toX, y: toY }, time, this, Laya.Handler.create(null, () => {
                   i++;
                   drawNextSegment();
               }), 0, true);
@@ -1433,7 +1444,7 @@
               const from = points[index];
               const to = points[index + 1];
               glow.pos(from.x, from.y);
-              Laya.Tween.to(glow, { x: to.x, y: to.y }, time, null, Laya.Handler.create(null, () => {
+              Laya.Tween.to(glow, { x: to.x, y: to.y }, time, this, Laya.Handler.create(null, () => {
                   index++;
                   moveNext();
               }));

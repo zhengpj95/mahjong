@@ -1,6 +1,6 @@
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
-import { MahjongEvent, MahjongScoreType } from "@def/mahjong";
+import { MahjongEvent, MahjongScoreType, MahjongViewType } from "@def/mahjong";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { BarProgressComp } from "@script/index";
 import { ModuleType, ProxyType } from "@def/module-type";
@@ -20,6 +20,7 @@ import facade = base.facade;
 import LayerIndex = base.LayerIndex;
 import Point = Laya.Point;
 import Sprite = Laya.Sprite;
+import Tween = Laya.Tween;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -53,6 +54,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
   private _lastScoreTime = 0;
   private _endTime = 0;
   private _btnRule: Image;
+  private _btnBack: Image;
 
   constructor() {
     super(LayerIndex.MAIN, "modules/mahjong/Mahjong.scene");
@@ -79,18 +81,27 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     this._btnRule = <Image>this.ui.getChildByName("btnRule");
     this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
 
+    this._btnBack = <Image>this.ui.getChildByName("btnBack");
+    this.onLaya(this._btnBack, Event.CLICK, this.onClickBack);
+  }
+
+  protected onOpen(): void {
+    console.log(`11111 MahjongMdr onOpen`);
+    this._proxy.model.clearData();
+    this.onRefreshNext();
   }
 
   protected onClose(): void {
+    console.log(`11111 MahjongMdr onClose`);
     this._preIdx = -1;
     this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
     this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
     this.removeEvents();
-  }
 
-  protected onOpen(): void {
-    this._proxy.model.clearData();
-    this.onRefreshNext();
+    const bar = <BarProgressComp>this.ui.getChildByName("bar");
+    base.tweenMgr.remove(bar);
+    Tween.clearAll(this);
+    Laya.timer.clearAll(this);
   }
 
   private removeEvents(): void {
@@ -276,6 +287,11 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     facade.openView(ModuleType.MISC, MiscViewType.RULE, ruleDesc);
   }
 
+  private onClickBack(): void {
+    this.close();
+    facade.openView(ModuleType.MAHJONG, MahjongViewType.HOME);
+  }
+
   private _lineSprite: Sprite;
   private _glowSprite: Sprite;
 
@@ -301,7 +317,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
     function drawNextSegment(): void {
       if (i >= path.length - 1) {
         // 所有段绘制完成后清除
-        Laya.timer.once(100, null, () => {
+        Laya.timer.once(100, this, () => {
           lineLayer.removeSelf();
           lineLayer.removeChildren();
         });
@@ -322,7 +338,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       const tempLine = new Laya.Sprite();
       lineLayer.addChild(tempLine);
 
-      Laya.Tween.to(progress, { x: toX, y: toY }, time, null, Laya.Handler.create(null, () => {
+      Laya.Tween.to(progress, { x: toX, y: toY }, time, this, Laya.Handler.create(null, () => {
         i++;
         drawNextSegment();
       }), 0, true); // true 表示使用帧率模式
@@ -373,7 +389,7 @@ export default class MahjongMdr extends BaseMediator<MahjongUI> {
       const from = points[index];
       const to = points[index + 1];
       glow.pos(from.x, from.y);
-      Laya.Tween.to(glow, { x: to.x, y: to.y }, time, null, Laya.Handler.create(null, () => {
+      Laya.Tween.to(glow, { x: to.x, y: to.y }, time, this, Laya.Handler.create(null, () => {
         index++;
         moveNext();
       }));

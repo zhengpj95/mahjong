@@ -10,6 +10,9 @@ D modules
 D modules/common
 P 7D862B48 img_bg1.png
 P 07B8FD00 img_blank.png
+P 202D98FA img_btn_back.png
+P 4B463CEB img_btn_back1.png
+P F9188C25 img_btn_bg.png
 P D99150C1 img_btn_close.png
 P 5447FD7D img_com_btn_green.png
 P 789E39B1 img_common_btn_yellow.png
