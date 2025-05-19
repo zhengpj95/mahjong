@@ -3,7 +3,6 @@ import { ModuleType } from "@def/module-type";
 import { MiscEvent, MiscViewType } from "@def/misc";
 import RuleMdr from "./view/RuleMdr";
 import { ShowTipsCmd } from "./cmd/ShowTipsCmd";
-import { TestMdr } from "./view/TestMdr";
 
 /**
  * @author zpj
@@ -20,7 +19,6 @@ export class MiscModule extends BaseModule {
 
   protected initMdr(): void {
     this.regMdr(MiscViewType.RULE, RuleMdr);
-    this.regMdr(MiscViewType.TEST, TestMdr);
   }
 
   protected initProxy(): void {

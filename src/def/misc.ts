@@ -4,7 +4,6 @@
  */
 export const enum MiscViewType {
   RULE = 1,
-  TEST = 2,
 }
 
 export const enum MiscEvent {
