@@ -166,7 +166,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
       return;
     }
 
-    SoundManager.playSound("audio/mixkit-flop.wav");
+    SoundManager.playSound("resources/audio/mixkit-flop.wav");
     if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
