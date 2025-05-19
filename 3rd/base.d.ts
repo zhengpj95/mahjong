@@ -175,7 +175,7 @@ declare module base {
   abstract class BaseMediator<T extends Laya.Sprite = Laya.Sprite> extends BaseEmitter {
       protected ui: T | undefined;
       protected params?: any;
-      protected constructor(parent: LayerIndex | Laya.Sprite, url?: string);
+      protected constructor(parent: LayerIndex | Laya.Sprite, url?: string, isEasyClose?: boolean);
       getViewType(): number;
       getName(): string;
       close(): void;

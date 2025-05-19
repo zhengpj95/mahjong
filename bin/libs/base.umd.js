@@ -607,8 +607,11 @@
           if (res === this._popupSp) {
               return res;
           }
-          if (node instanceof Laya.View) {
-              node.mouseThrough = true;
+          if (node instanceof Laya.Scene) {
+              const mdr = findMediatorTemp(node);
+              if (mdr === null || mdr === undefined ? undefined : mdr.isEasyClose) {
+                  node.mouseThrough = true;
+              }
           }
           this.updateModel();
           return res;
@@ -652,7 +655,9 @@
           const parent = (_a = this._popupSp) === null || _a === undefined ? undefined : _a.parent;
           if (parent) {
               const mdr = findMediatorTemp(parent.getChildAt(parent.numChildren - 1));
-              (_b = mdr === null || mdr === undefined ? undefined : mdr.close) === null || _b === undefined ? undefined : _b.call(mdr);
+              if (mdr === null || mdr === undefined ? undefined : mdr.isEasyClose) {
+                  (_b = mdr === null || mdr === undefined ? undefined : mdr.close) === null || _b === undefined ? undefined : _b.call(mdr);
+              }
           }
       }
       remModel() {
@@ -1281,10 +1286,11 @@
       return mdr;
   }
   class BaseMediator extends BaseEmitter {
-      constructor(parent, url) {
+      constructor(parent, url, isEasyClose) {
           super();
           this.ui = undefined;
           this.isOpened = false;
+          this.isEasyClose = false;
           this.uiUrl = url;
           if (typeof parent === "number") {
               this.parent = layerMgr.getLayer(parent);
@@ -1292,6 +1298,7 @@
           else {
               this.parent = parent;
           }
+          this.isEasyClose = isEasyClose !== null && isEasyClose !== undefined ? isEasyClose : false;
       }
       setModule(module) {
           this._module = module;
