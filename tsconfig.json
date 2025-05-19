@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es6",
+    "strict": true,
+    "strictNullChecks": false,
+    "noEmitHelpers": true,
+    "sourceMap": false,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "preserveConstEnums": true,
+    "baseUrl": "./",
+    "paths": {
+      "@base/*": [
+        "src/base/*"
+      ],
+      "@def/*": [
+        "src/def/*"
+      ],
+      "@script/*": [
+        "src/script/*"
+      ],
+      "@platform/*": [
+        "src/platform/*"
+      ],
+      "@configName": [
+        "src/3rd/config-name.ts"
+      ],
+      "~/packages/*": [
+        "./library/packages/*"
+      ]
+    }
+  },
+  "include": [
+    "./assets",
+    "./src",
+    "./engine"
+  ]
+}

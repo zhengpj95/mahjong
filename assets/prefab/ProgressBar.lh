@@ -1,0 +1,63 @@
+{
+  "_$ver": 1,
+  "_$id": "s5yzvzb2",
+  "_$type": "Box",
+  "name": "bar",
+  "width": 400,
+  "height": 30,
+  "_$comp": [
+    {
+      "_$type": "3c89ce1e-011a-406b-99ab-fa06df12da25",
+      "scriptPath": "../src/script/BarProgress.ts"
+    }
+  ],
+  "_$child": [
+    {
+      "_$id": "8f6xarwf",
+      "_$type": "Image",
+      "name": "img_progress_bg",
+      "width": 400,
+      "height": 30,
+      "left": 0,
+      "right": 0,
+      "top": 0,
+      "bottom": 0,
+      "skin": "res://599eca62-bb93-4307-a928-be388d2d558a",
+      "color": "#ffffff"
+    },
+    {
+      "_$id": "mcbeuxjc",
+      "_$type": "Image",
+      "name": "imgBar",
+      "x": 1,
+      "y": 1,
+      "width": 398,
+      "height": 28,
+      "left": 1,
+      "right": 1,
+      "top": 1,
+      "bottom": 1,
+      "skin": "res://3759518e-cea1-404c-9f91-092058abc004",
+      "color": "#ffffff"
+    },
+    {
+      "_$id": "m0fn1c0u",
+      "_$type": "Label",
+      "name": "lab",
+      "x": 195,
+      "y": 4,
+      "width": 11,
+      "height": 23,
+      "centerX": 0,
+      "centerY": 0,
+      "text": "",
+      "fontSize": 22,
+      "color": "rgba(242, 237, 226, 1)",
+      "fitContent": "yes",
+      "align": "center",
+      "valign": "middle",
+      "padding": "0,0,0,0",
+      "stroke": 3
+    }
+  ]
+}

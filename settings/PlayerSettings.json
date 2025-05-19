@@ -1,0 +1,18 @@
+{
+  "resolution": {
+    "designWidth": 640,
+    "designHeight": 1136,
+    "scaleMode": "showall",
+    "alignV": "middle",
+    "alignH": "center"
+  },
+  "modules": {
+    "laya.ui": true,
+    "laya.legacyParser": true,
+    "laya.d3": true
+  },
+  "splash": {
+    "backgroundColor": "rgba(149, 103, 103, 1)",
+    "fit": "center"
+  }
+}
