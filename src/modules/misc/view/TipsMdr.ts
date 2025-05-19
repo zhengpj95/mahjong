@@ -20,7 +20,7 @@ class TipsItem extends Box implements PoolObject {
     this.centerY = -100;
     if (!this._img) {
       this._img = new Image();
-      this._img.skin = `modules/common/img_blank.png`;
+      this._img.skin = `atlas/common/img_blank.png`;
       this._img.left = this._img.right = this._img.bottom = this._img.top = 0;
       this._img.sizeGrid = `3,8,6,5`;
       this.addChild(this._img);
