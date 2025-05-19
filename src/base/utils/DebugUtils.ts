@@ -7,7 +7,7 @@ export class DebugUtils {
       return;
     }
     if (window) {
-      window[key] = cls;
+      (window as any)[key] = cls;
     }
   }
 

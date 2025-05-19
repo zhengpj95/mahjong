@@ -51,7 +51,7 @@ function getTimestamp(): string {
 
 function wrapConsoleMethod(originalMethod: (...args: any[]) => void, color: string = "", name = ""): (...args: any[]) => void {
   return (...args: any[]) => {
-    const logLevel = name || originalMethod.name;
+    const logLevel = <LogLevel>(name || originalMethod.name);
     if (LOG_LEVEL_ORDER[logLevel] > LOG_LEVEL_ORDER[FILTER_LEVEL]) {
       return undefined;
     }

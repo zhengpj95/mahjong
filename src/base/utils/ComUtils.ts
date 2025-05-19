@@ -13,7 +13,7 @@ export default class ComUtils {
     if (!box) {
       return undefined;
     }
-    let timeLine = <TimeLine>box["_timeLine_"];
+    let timeLine = <TimeLine>(box as any)["_timeLine_"];
     if (timeLine) {
       timeLine.reset();
       if (!isTween) {
@@ -21,7 +21,7 @@ export default class ComUtils {
         return undefined;
       }
     } else {
-      box["_timeLine_"] = timeLine = new TimeLine();
+      (box as any)["_timeLine_"] = timeLine = new TimeLine();
     }
     timeLine.to(box, { rotation: 10 }, 100)
       .to(box, { rotation: -10 }, 100)
