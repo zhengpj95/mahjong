@@ -13,7 +13,7 @@ export default class RuleMdr extends BaseMediator<RuleUI> {
   private _btnClose: Image;
 
   constructor() {
-    super(LayerIndex.MODAL, "modules/common/Rule.scene");
+    super(LayerIndex.MODAL, "modules/common/Rule.scene",true);
   }
 
   protected addEvents(): void {
