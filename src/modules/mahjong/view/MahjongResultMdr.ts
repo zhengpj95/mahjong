@@ -8,6 +8,7 @@ import BaseMediator = base.BaseMediator;
 import facade = base.facade;
 import Sprite = Laya.Sprite;
 import Image = Laya.Image;
+import LayerIndex = base.LayerIndex;
 
 /**
  * 结算弹窗
@@ -21,7 +22,7 @@ export default class MahjongResultMdr extends BaseMediator<Sprite> {
   private _btnNext: Image;
 
   constructor() {
-    super(2, "scene/mahjong/MahjongResult.ls");
+    super(LayerIndex.MODAL, "scene/mahjong/MahjongResult.ls");
   }
 
   protected addEvents(): void {

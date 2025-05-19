@@ -2,6 +2,7 @@ import Image = Laya.Image;
 import BaseMediator = base.BaseMediator;
 import Sprite = Laya.Sprite;
 import facade = base.facade;
+import LayerIndex = base.LayerIndex;
 import { ModuleType } from "@def/module-type";
 import { MahjongViewType } from "@def/mahjong";
 
@@ -13,7 +14,7 @@ export default class MahjongHomeMdr extends BaseMediator<Sprite> {
   private _btnStart: Image;
 
   constructor() {
-    super(1, "scene/mahjong/MahjongHome.ls");
+    super(LayerIndex.MAIN, "scene/mahjong/MahjongHome.ls");
   }
 
   protected addEvents(): void {
@@ -37,6 +38,7 @@ export default class MahjongHomeMdr extends BaseMediator<Sprite> {
   }
 
   private onClickBtnStart(): void {
+    this.close();
     facade.openView(ModuleType.MAHJONG, MahjongViewType.MAIN);
   }
 }

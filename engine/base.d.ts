@@ -122,13 +122,14 @@ declare module base {
   }
   const resourceMgr: ResourceManager;
   
-  const enum LayerIndex {
-      NONE = -1,
-      MAP = 0,
-      MAIN = 1,
-      MODAL = 2,
-      TIPS = 3
-  }
+  const LayerIndex: {
+      readonly NONE: -1;
+      readonly MAP: 0;
+      readonly MAIN: 1;
+      readonly MODAL: 2;
+      readonly TIPS: 3;
+  };
+  type LayerIndex = (typeof LayerIndex)[keyof typeof LayerIndex];
   
   class BaseLayer extends Laya.Sprite {
       idx: number;
@@ -175,7 +176,7 @@ declare module base {
   abstract class BaseMediator<T extends Laya.Sprite = Laya.Sprite> extends BaseEmitter {
       protected ui: T | undefined;
       protected params?: any;
-      protected constructor(parent: LayerIndex | Laya.Sprite, url?: string, isEaseClose?: boolean);
+      protected constructor(parent: LayerIndex | Laya.Sprite, url?: string, isEasyClose?: boolean);
       getViewType(): number;
       getName(): string;
       close(): void;

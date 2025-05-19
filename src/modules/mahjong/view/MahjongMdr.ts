@@ -18,6 +18,7 @@ import facade = base.facade;
 import Point = Laya.Point;
 import Sprite = Laya.Sprite;
 import Tween = Laya.Tween;
+import LayerIndex = base.LayerIndex;
 
 type BoxRender = Box & {
   boxCard: Box & {
@@ -55,7 +56,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   private _btnBack: Image;
 
   constructor() {
-    super(1, "scene/mahjong/Mahjong.ls");
+    super(LayerIndex.MAIN, "scene/mahjong/Mahjong.ls");
   }
 
   protected addEvents(): void {
@@ -267,18 +268,21 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
       }
     } else {
       this.emit(MiscEvent.SHOW_TIPS, "无可消除的卡牌，请洗牌!");
+      this.onBtnRefresh(true); // 主动洗牌
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
   }
 
   // 洗牌
-  private onBtnRefresh(): void {
+  private onBtnRefresh(auto = false): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
     const list = this._proxy.model.getRefreshCardDataList();
     this._list.array = list.reduce((a, b) => a.concat(b));
     this._list.refresh();
     this.emit(MiscEvent.SHOW_TIPS, "洗牌成功!");
-    this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
+    if (!auto) {
+      this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
+    }
   }
 
   private onClickRule(): void {

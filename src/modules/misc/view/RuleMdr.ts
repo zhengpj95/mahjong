@@ -2,6 +2,7 @@ import Image = Laya.Image;
 import Label = Laya.Label;
 import BaseMediator = base.BaseMediator;
 import Sprite = Laya.Sprite;
+import LayerIndex = base.LayerIndex;
 
 /**
  * @author zpj
@@ -11,7 +12,7 @@ export default class RuleMdr extends BaseMediator<Sprite> {
   private _btnClose: Image;
 
   constructor() {
-    super(2, "scene/common/Rule.ls", true);
+    super(LayerIndex.MODAL, "scene/common/Rule.ls", true);
   }
 
   protected addEvents(): void {
