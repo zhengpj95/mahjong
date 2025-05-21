@@ -6,15 +6,16 @@
   "right": 0,
   "top": 0,
   "bottom": 0,
-  "name": "Scene2D",
+  "name": "2dUI",
   "width": 640,
   "height": 1136,
   "_$child": [
     {
       "_$id": "bpnyws0x",
+      "_$var": true,
       "_$type": "Sprite",
       "name": "groundSprite",
-      "y": 1106,
+      "y": 1165,
       "width": 640,
       "height": 30,
       "_gcmds": [
@@ -47,7 +48,6 @@
     {
       "_$id": "zrbo3tqo",
       "_$type": "Sprite",
-      "name": "groundSpriteLeft",
       "width": 5,
       "height": 1136,
       "_gcmds": [
@@ -80,7 +80,6 @@
     {
       "_$id": "xxcy3y6d",
       "_$type": "Sprite",
-      "name": "groundSpriteRight",
       "x": 635,
       "width": 5,
       "height": 1136,
@@ -113,6 +112,7 @@
     },
     {
       "_$id": "yd502mrr",
+      "_$var": true,
       "_$type": "Sprite",
       "name": "ballSprite",
       "x": 291,
@@ -169,7 +169,6 @@
     {
       "_$id": "1vx2afl0",
       "_$type": "Sprite",
-      "name": "ballSprite1",
       "x": 447,
       "y": 433,
       "width": 50,
@@ -223,6 +222,90 @@
           "padding": "0,0,0,0"
         }
       ]
+    },
+    {
+      "_$id": "vdk1ev3s",
+      "_$var": true,
+      "_$type": "Image",
+      "name": "imgBg",
+      "x": 239,
+      "y": 545,
+      "width": 130,
+      "height": 175,
+      "skin": "res://4e953fc8-c319-49ab-bd2f-994dd3b36881",
+      "useSourceSize": true,
+      "color": "#ffffff",
+      "_$child": [
+        {
+          "_$id": "yghjoqs9",
+          "_$var": true,
+          "_$type": "Label",
+          "name": "lab",
+          "y": 47,
+          "width": 120,
+          "height": 28,
+          "text": "13",
+          "font": "STSong",
+          "fontSize": 30,
+          "color": "rgba(148, 10, 10, 1)",
+          "valign": "top",
+          "padding": "0,0,0,0"
+        },
+        {
+          "_$id": "m0863rta",
+          "_$var": true,
+          "_$type": "Label",
+          "name": "lab1",
+          "width": 120,
+          "height": 28,
+          "text": "13",
+          "font": "STSong",
+          "fontSize": 30,
+          "color": "rgba(148, 10, 10, 1)",
+          "valign": "top",
+          "padding": "0,0,0,0"
+        }
+      ]
+    },
+    {
+      "_$id": "3krgjccb",
+      "_$var": true,
+      "_$type": "Image",
+      "name": "imgBg1",
+      "x": 144,
+      "y": 567,
+      "width": 130,
+      "height": 175,
+      "skin": "res://4e953fc8-c319-49ab-bd2f-994dd3b36881",
+      "useSourceSize": true,
+      "color": "#ffffff",
+      "_$child": [
+        {
+          "_$id": "v6y8lgjf",
+          "_$var": true,
+          "_$type": "Label",
+          "name": "lab",
+          "y": 47,
+          "width": 120,
+          "height": 28,
+          "text": "13",
+          "font": "STSong",
+          "fontSize": 30,
+          "color": "rgba(148, 10, 10, 1)",
+          "valign": "top",
+          "padding": "0,0,0,0"
+        }
+      ]
+    },
+    {
+      "_$id": "ef91tg01",
+      "_$prefab": "5b041417-76b6-4e13-8097-5ad27bb7a39f",
+      "_$var": true,
+      "name": "bar",
+      "active": true,
+      "x": 55,
+      "y": 750,
+      "visible": true
     }
   ]
 }
