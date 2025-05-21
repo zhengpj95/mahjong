@@ -6,13 +6,18 @@ import { MahjongViewType } from "@def/mahjong";
 import { GameCfg } from "@base/cfg/GameCfg";
 import facade = base.facade;
 
+function initDebug(): void {
+  // @ts-ignore 宏定义
+  window._DEBUG_ = DEBUG;
+}
 
 /**
  * @author zpj
  * @date 2025/5/16
  */
 export async function main() {
-  console.log("Hello LayaAir! Game start!");
+  console.log("Hello LayaAir! Game main!");
+  initDebug();
 
   protobuf.util.Long = Long;
   protobuf.configure();

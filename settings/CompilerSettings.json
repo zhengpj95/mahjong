@@ -1,4 +1,11 @@
 {
+  "defines": [
+    {
+      "name": "DEBUG",
+      "debugValue": "true",
+      "releaseValue": "false"
+    }
+  ],
   "entries": [],
   "mainScript": "res://64c5f659-6167-4ade-8db6-7c8bbd4eb0ae"
 }
