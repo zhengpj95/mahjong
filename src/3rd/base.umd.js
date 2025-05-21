@@ -1293,6 +1293,17 @@
       }
       return mdr;
   }
+  function buildNodeRecursive(node, parent) {
+      var _a;
+      if (!((_a = node === null || node === undefined ? undefined : node.name) === null || _a === undefined ? undefined : _a.startsWith("$"))) {
+          return;
+      }
+      parent[node.name] = node;
+      const children = node["_children"];
+      for (const child of children) {
+          buildNodeRecursive(child, node);
+      }
+  }
   class BaseMediator extends BaseEmitter {
       constructor(parent, url, isEasyClose) {
           super();
@@ -1333,12 +1344,9 @@
           this.params = params;
           if (!this.ui && this.uiUrl) {
               Laya.Scene.load(this.uiUrl, Laya.Handler.create(this, (scene) => {
-                  var _a;
                   const children = scene["_children"];
                   for (const child of children) {
-                      if ((_a = child.name) === null || _a === undefined ? undefined : _a.startsWith("$")) {
-                          scene[child.name] = child;
-                      }
+                      buildNodeRecursive(child, scene);
                   }
                   this.onUILoaded(scene);
               }));

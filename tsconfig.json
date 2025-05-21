@@ -30,6 +30,9 @@
       ],
       "~/packages/*": [
         "./library/packages/*"
+      ],
+      "@3rd-types/*": [
+        "src/3rd-types/*"
       ]
     }
   },

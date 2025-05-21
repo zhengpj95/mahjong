@@ -12,10 +12,9 @@
   "_$child": [
     {
       "_$id": "bpnyws0x",
-      "_$var": true,
       "_$type": "Sprite",
-      "name": "groundSprite",
-      "y": 1165,
+      "name": "$groundSprite",
+      "y": 1106,
       "width": 640,
       "height": 30,
       "_gcmds": [
@@ -48,6 +47,7 @@
     {
       "_$id": "zrbo3tqo",
       "_$type": "Sprite",
+      "name": "$groundSpriteLeft",
       "width": 5,
       "height": 1136,
       "_gcmds": [
@@ -112,9 +112,8 @@
     },
     {
       "_$id": "yd502mrr",
-      "_$var": true,
       "_$type": "Sprite",
-      "name": "ballSprite",
+      "name": "$ballSprite",
       "x": 291,
       "y": 342,
       "width": 100,
@@ -225,9 +224,8 @@
     },
     {
       "_$id": "vdk1ev3s",
-      "_$var": true,
       "_$type": "Image",
-      "name": "imgBg",
+      "name": "$imgBg",
       "x": 239,
       "y": 545,
       "width": 130,
@@ -238,7 +236,6 @@
       "_$child": [
         {
           "_$id": "yghjoqs9",
-          "_$var": true,
           "_$type": "Label",
           "name": "lab",
           "y": 47,
@@ -253,9 +250,8 @@
         },
         {
           "_$id": "m0863rta",
-          "_$var": true,
           "_$type": "Label",
-          "name": "lab1",
+          "name": "$lab1",
           "width": 120,
           "height": 28,
           "text": "13",
@@ -269,9 +265,8 @@
     },
     {
       "_$id": "3krgjccb",
-      "_$var": true,
       "_$type": "Image",
-      "name": "imgBg1",
+      "name": "$imgBg1",
       "x": 144,
       "y": 567,
       "width": 130,
@@ -282,9 +277,8 @@
       "_$child": [
         {
           "_$id": "v6y8lgjf",
-          "_$var": true,
           "_$type": "Label",
-          "name": "lab",
+          "name": "$lab",
           "y": 47,
           "width": 120,
           "height": 28,
@@ -301,9 +295,9 @@
       "_$id": "ef91tg01",
       "_$prefab": "5b041417-76b6-4e13-8097-5ad27bb7a39f",
       "_$var": true,
-      "name": "bar",
+      "name": "$bar",
       "active": true,
-      "x": 55,
+      "x": 68,
       "y": 750,
       "visible": true
     }

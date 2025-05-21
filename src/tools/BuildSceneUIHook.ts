@@ -34,7 +34,7 @@ class BuildSceneUIHook implements IEditorEnv.ISceneHook {
 
   private createNode(child: ChildStructure, obj: any): void {
     let prefab = "";
-    if (child._$var) {
+    if (child.name?.startsWith("$")) {
       if (child._$prefab) {
         prefab = child._$prefab;
       } else {
