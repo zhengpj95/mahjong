@@ -1333,6 +1333,13 @@
           this.params = params;
           if (!this.ui && this.uiUrl) {
               Laya.Scene.load(this.uiUrl, Laya.Handler.create(this, (scene) => {
+                  var _a;
+                  const children = scene["_children"];
+                  for (const child of children) {
+                      if ((_a = child.name) === null || _a === undefined ? undefined : _a.startsWith("$")) {
+                          scene[child.name] = child;
+                      }
+                  }
                   this.onUILoaded(scene);
               }));
           }
