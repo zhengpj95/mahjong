@@ -9,7 +9,8 @@
   "modules": {
     "laya.ui": true,
     "laya.legacyParser": true,
-    "laya.d3": true
+    "laya.d3": true,
+    "laya.physics2D": true
   },
   "splash": {
     "backgroundColor": "rgba(149, 103, 103, 1)",

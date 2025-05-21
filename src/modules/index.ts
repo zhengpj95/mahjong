@@ -1,5 +1,6 @@
 import { MiscModule } from "./misc/index";
 import { MahjongModule } from "./mahjong/index";
+import { HoodleModule } from "./hoodle/index";
 
 /**
  * @author zpj
@@ -8,6 +9,7 @@ import { MahjongModule } from "./mahjong/index";
 function regModules(): void {
   base.facade.push(MiscModule);
   base.facade.push(MahjongModule);
+  base.facade.push(HoodleModule);
 }
 
 // 实例化所有模块
