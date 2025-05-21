@@ -81,6 +81,9 @@ class BuildSceneUIHook implements IEditorEnv.ISceneHook {
     }
 
     const scenePath: string = (scene as any)["_sceneFilePath"];
+    if (!scenePath.endsWith(".ls")) {
+      return; // 不是场景文件，过滤
+    }
     const [fileDir, fileName] = getSceneUIName(scenePath);
     let str = `/** ${fileDir} */\n` + `export interface ${fileName} extends Laya.Scene { \n`;
     if (Object.keys(obj).length) {
