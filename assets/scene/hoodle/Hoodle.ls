@@ -47,7 +47,7 @@
     {
       "_$id": "zrbo3tqo",
       "_$type": "Sprite",
-      "name": "$groundSpriteLeft",
+      "name": "groundSpriteLeft",
       "width": 5,
       "height": 1136,
       "_gcmds": [
@@ -80,6 +80,7 @@
     {
       "_$id": "xxcy3y6d",
       "_$type": "Sprite",
+      "name": "groundSpriteRight",
       "x": 635,
       "width": 5,
       "height": 1136,
@@ -168,6 +169,7 @@
     {
       "_$id": "1vx2afl0",
       "_$type": "Sprite",
+      "name": "Node",
       "x": 447,
       "y": 433,
       "width": 50,
@@ -226,13 +228,23 @@
       "_$id": "vdk1ev3s",
       "_$type": "Image",
       "name": "$imgBg",
-      "x": 239,
+      "x": 352,
       "y": 545,
       "width": 130,
       "height": 175,
       "skin": "res://4e953fc8-c319-49ab-bd2f-994dd3b36881",
       "useSourceSize": true,
       "color": "#ffffff",
+      "_$comp": [
+        {
+          "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
+          "scriptPath": "../src/script/ClickScale.ts"
+        },
+        {
+          "_$type": "3c89ce1e-011a-406b-99ab-fa06df12da25",
+          "scriptPath": "../src/script/BarProgress.ts"
+        }
+      ],
       "_$child": [
         {
           "_$id": "yghjoqs9",
@@ -274,6 +286,12 @@
       "skin": "res://4e953fc8-c319-49ab-bd2f-994dd3b36881",
       "useSourceSize": true,
       "color": "#ffffff",
+      "_$comp": [
+        {
+          "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
+          "scriptPath": "../src/script/ClickScale.ts"
+        }
+      ],
       "_$child": [
         {
           "_$id": "v6y8lgjf",
@@ -299,7 +317,13 @@
       "active": true,
       "x": 68,
       "y": 750,
-      "visible": true
+      "visible": true,
+      "_$comp": [
+        {
+          "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
+          "scriptPath": "../src/script/ClickScale.ts"
+        }
+      ]
     }
   ]
 }

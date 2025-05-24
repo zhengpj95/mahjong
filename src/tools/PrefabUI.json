@@ -1,0 +1,10 @@
+{
+  "BarProgress": [
+    "value: number;",
+    "text: string;"
+  ],
+  "ClickScale": [
+    "scale: number;",
+    "txt: string;"
+  ]
+}
