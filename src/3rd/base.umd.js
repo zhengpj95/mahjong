@@ -283,7 +283,7 @@
                   if (vo.exeTime <= this._curTime) {
                       vo.callBack.exec(this._curTime - vo.lastExeTime);
                       vo.lastExeTime = this._curTime;
-                      vo.exeTime += vo.interval;
+                      vo.exeTime = this._curTime + vo.interval;
                       if (!vo.isRepeat) {
                           if (vo.repeatCount > 0) {
                               vo.repeatCount--;
