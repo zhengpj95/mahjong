@@ -2,7 +2,7 @@
   "name": "mahjong",
   "icon": "",
   "useCompressedEngine": false,
-  "startupScene": "",
+  "startupScene": "res://41f51542-55de-4390-817c-1d8168680af1",
   "android": {
     "targetArchitectures": {
       "ARMv7": true,
