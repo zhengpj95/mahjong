@@ -12,7 +12,29 @@ interface NodeInfo {
 }
 
 interface ViewInfo {
+  // @ts-ignore
+  fileName?: string;
+
   [key: string]: NodeInfo;
+}
+
+// 组件结构
+interface IComponentNode {
+  _$type: string;
+  scriptPath: string;
+
+  [key: string]: any;
+}
+
+// 节点结构
+interface IChildNode {
+  name: string;
+  _$type: string;
+  _$prefab?: string;
+  _$child?: IChildNode[];
+  _$comp?: IComponentNode[];
+
+  [key: string]: any;
 }
 
 /**
@@ -27,7 +49,7 @@ export class GenUIDts {
     const map = new Map<string, ViewInfo>();
     for (const file of files) {
       const content = await fs.readFile(file, { encoding: "utf-8" });
-      const child = JSON.parse(content)?.["_$child"];
+      const child = (JSON.parse(content) as IChildNode)?._$child;
       const basename = path.basename(file).replace(".ls", "");
 
       // @ts-ignore
@@ -40,23 +62,22 @@ export class GenUIDts {
         await this.genChild(c, obj, 0);
       }
 
-      // @ts-ignore
-      obj["fileName"] = file.replace(FsUtils.ProjectRoot, "");
+      obj.fileName = file.replace(FsUtils.ProjectRoot, "");
       map.set(`${basename}View`, obj);
     }
     const fileContent = this.createViewStr(map);
     await this.writeDtsFile(fileContent, basename);
   }
 
-  public static async genChild(child: any, parent: { [key: string]: NodeInfo }, deep = 0): Promise<void> {
-    const name: string = child?.["name"];
+  public static async genChild(child: IChildNode, parent: { [key: string]: NodeInfo }, deep = 0): Promise<void> {
+    const name: string = child?.name;
     if (!name?.startsWith("$")) return;
-    if (child["_$prefab"]) {
-      const prefabInfo = await this.genPrefabNode(child["_$prefab"], name);
-      if (child["_$comp"]) {
+    if (child?._$prefab) {
+      const prefabInfo = await this.genPrefabNode(child._$prefab, name);
+      if (child?._$comp) {
         const compList: string[] = [];
-        for (let c of child["_$comp"]) {
-          const compStr = await this.getComponentNode(c["scriptPath"]);
+        for (let c of child._$comp) {
+          const compStr = await this.getComponentNode(c.scriptPath);
           if (compStr?.length) {
             compList.push(...compStr);
           }
@@ -79,11 +100,11 @@ export class GenUIDts {
       obj = parent[name] = <NodeInfo>{};
     }
     obj.name = name;
-    obj.type = `Laya.${child["_$type"]}`;
-    if (child["_$comp"]) {
+    obj.type = `Laya.${child._$type}`;
+    if (child._$comp) {
       const compList: string[] = [];
-      for (let c of child["_$comp"]) {
-        const compStr = await this.getComponentNode(c["scriptPath"]);
+      for (let c of child._$comp) {
+        const compStr = await this.getComponentNode(c.scriptPath);
         if (compStr?.length) {
           compList.push(...compStr);
         }
@@ -92,9 +113,9 @@ export class GenUIDts {
         obj.comp = compList;
       }
     }
-    if (child["_$child"]?.length) {
-      for (let c of child["_$child"]) {
-        const cname: string = c["name"];
+    if (child?._$child?.length) {
+      for (let c of child._$child) {
+        const cname: string = c.name;
         if (!cname?.startsWith("$")) {
           continue;
         }
@@ -161,22 +182,23 @@ export class GenUIDts {
 
   public static async genPrefabNode(uuid: string, name: string): Promise<NodeInfo | undefined> {
     let prefabPath = await FsUtils.getPrefabByUUID(uuid);
-    if (!prefabPath) return;
+    if (!prefabPath) return undefined;
     const prefabContent = await fs.readFile(prefabPath, { encoding: "utf-8" });
-    const prefabJson = JSON.parse(prefabContent);
+    if (!prefabContent) return undefined;
+    const prefabJson: IChildNode = JSON.parse(prefabContent);
     const obj = <NodeInfo>{};
-    obj.type = `Laya.${prefabJson["_$type"]}`;
+    obj.type = `Laya.${prefabJson._$type}`;
     obj.name = name;
-    if (prefabJson["_$child"]?.length) {
+    if (prefabJson._$child?.length) {
       obj.node = {};
-      for (const c of prefabJson["_$child"]) {
+      for (const c of prefabJson._$child) {
         await this.genChild(c, obj.node, 1);
       }
     }
-    if (prefabJson["_$comp"]) {
+    if (prefabJson._$comp) {
       const compList: string[] = [];
-      for (const c of prefabJson["_$comp"]) {
-        const compStr = await this.getComponentNode(c["scriptPath"]);
+      for (const c of prefabJson._$comp) {
+        const compStr = await this.getComponentNode(c.scriptPath);
         if (compStr?.length) {
           compList.push(...compStr);
         }
