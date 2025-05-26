@@ -29,7 +29,12 @@ export class GenUIDts {
       const content = await fs.readFile(file, { encoding: "utf-8" });
       const child = JSON.parse(content)?.["_$child"];
       const basename = path.basename(file).replace(".ls", "");
-      console.log(`start to generate ls file: `, file, basename);
+
+      // @ts-ignore
+      if (DEBUG) {
+        console.log(`start to generate ls file: `, file, basename);
+      }
+
       const obj: ViewInfo = {};
       for (let c of child) {
         await this.genChild(c, obj, 0);
@@ -39,7 +44,6 @@ export class GenUIDts {
       obj["fileName"] = file.replace(FsUtils.ProjectRoot, "");
       map.set(`${basename}View`, obj);
     }
-    // console.log(map);
     const fileContent = this.createViewStr(map);
     await this.writeDtsFile(fileContent, basename);
   }
@@ -112,8 +116,8 @@ export class GenUIDts {
   }
 
   public static createNodeStr(node: NodeInfo, deep = 1): string {
+    console.log(deep, node);
     if (!node?.name) return "";
-    console.log(11111, node);
     let rst: string = "  ".repeat(deep) + `${node.name}: ${node.type}`;
     if (node?.node) {
       let rst1 = "";
@@ -130,7 +134,7 @@ export class GenUIDts {
     } else if (node?.comp?.length) {
       rst += ` & {\n`;
       node.comp.forEach(value => {
-        rst += "  ".repeat(deep) + value;
+        rst += "  ".repeat(deep + 1) + value + "\n";
       });
       rst += "  ".repeat(deep) + "};\n";
     } else {
@@ -145,9 +149,9 @@ export class GenUIDts {
     try {
       await fs.mkdir(rooPath, { recursive: true });
       await fs.writeFile(filePath, fileContent, { encoding: "utf-8" });
-      console.log(`✅ writeFile success: ${filePath}`);
+      console.log(`✅ write ui .d.ts success: ${filePath}`);
     } catch (err) {
-      console.log(`❌ writeFile error: ${filePath}`, err);
+      console.log(`❌ write ui .d.ts error: ${filePath}`, err);
     }
   }
 
@@ -176,5 +180,3 @@ export class GenUIDts {
     return JSON.parse(prefabUIContent)[compName] ?? [];
   }
 }
-
-let debug = false;
