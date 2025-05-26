@@ -15,7 +15,7 @@ export class FsUtils {
    * @param ext 要查找的扩展名
    * @returns 文件绝对路径数组
    */
-  static async getAllFilesByExt(dir: string, ext: string): Promise<string[]> {
+  public static async getAllFilesByExt(dir: string, ext: string): Promise<string[]> {
     let results: string[] = [];
 
     try {

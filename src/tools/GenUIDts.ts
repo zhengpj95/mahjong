@@ -12,9 +12,6 @@ interface NodeInfo {
 }
 
 interface ViewInfo {
-  // @ts-ignore
-  fileName?: string;
-
   [key: string]: NodeInfo;
 }
 
@@ -54,7 +51,7 @@ export class GenUIDts {
 
       // @ts-ignore
       if (DEBUG) {
-        console.log(`start to generate ls file: `, file, basename);
+        console.log(`▶️ start to generate ls file: `, file, basename);
       }
 
       const obj: ViewInfo = {};
@@ -62,8 +59,8 @@ export class GenUIDts {
         await this.parseChild(c, obj, 0);
       }
 
-      obj.fileName = file.replace(FsUtils.ProjectRoot, "");
-      map.set(`${basename}View`, obj);
+      let fileName = file.replace(FsUtils.ProjectRoot, "");
+      map.set(fileName, obj);
     }
     const fileContent = this.createViewStr(map);
     await this.writeDtsFile(fileContent, basename);
@@ -127,20 +124,20 @@ export class GenUIDts {
     }
   }
 
-  public static createViewStr(map: Map<string, any>): string {
+  public static createViewStr(map: Map<string, ViewInfo>): string {
     if (!map) return "";
     const entries = map.entries();
     const lines: string[] = [];
     for (let [key, view] of entries) {
-      lines.push(`/** ${(view["fileName"] as string).replace(/\\/g, "/")} */\n`);
-      lines.push(`export interface ${key} extends Laya.Scene {\n`);
+      const basename = path.basename(key).replace(".ls", "");
+      lines.push(`/** ${key.replace(/\\/g, "/")} */\n`);
+      lines.push(`export interface ${basename}View extends Laya.Scene {\n`);
       for (let k in view) {
         if (typeof view[k] === "string") continue;
         lines.push(...this.createViewNode(view[k], 1));
       }
       lines.push("}\n\n");
     }
-    console.log(lines);
     return lines.join("");
   }
 
