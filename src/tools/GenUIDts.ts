@@ -49,7 +49,7 @@ export class GenUIDts {
     const map = new Map<string, ViewInfo>();
     for (const file of files) {
       const content = await fs.readFile(file, { encoding: "utf-8" });
-      const child = (JSON.parse(content) as IChildNode)?._$child;
+      const child = (JSON.parse(content) as IChildNode)?._$child ?? [];
       const basename = path.basename(file).replace(".ls", "");
 
       // @ts-ignore
@@ -59,7 +59,7 @@ export class GenUIDts {
 
       const obj: ViewInfo = {};
       for (let c of child) {
-        await this.genChild(c, obj, 0);
+        await this.parseChild(c, obj, 0);
       }
 
       obj.fileName = file.replace(FsUtils.ProjectRoot, "");
@@ -69,15 +69,17 @@ export class GenUIDts {
     await this.writeDtsFile(fileContent, basename);
   }
 
-  public static async genChild(child: IChildNode, parent: { [key: string]: NodeInfo }, deep = 0): Promise<void> {
+  public static async parseChild(child: IChildNode, parent: { [key: string]: NodeInfo }, deep = 0): Promise<void> {
     const name: string = child?.name;
-    if (!name?.startsWith("$")) return;
+    if (!name?.startsWith("$")) {
+      return;
+    }
     if (child?._$prefab) {
-      const prefabInfo = await this.genPrefabNode(child._$prefab, name);
+      const prefabInfo = await this.createPrefabNode(child._$prefab, name);
       if (child?._$comp) {
         const compList: string[] = [];
         for (let c of child._$comp) {
-          const compStr = await this.getComponentNode(c.scriptPath);
+          const compStr = await this.createComponentNode(c.scriptPath);
           if (compStr?.length) {
             compList.push(...compStr);
           }
@@ -104,7 +106,7 @@ export class GenUIDts {
     if (child._$comp) {
       const compList: string[] = [];
       for (let c of child._$comp) {
-        const compStr = await this.getComponentNode(c.scriptPath);
+        const compStr = await this.createComponentNode(c.scriptPath);
         if (compStr?.length) {
           compList.push(...compStr);
         }
@@ -120,7 +122,7 @@ export class GenUIDts {
           continue;
         }
         if (!obj.node) obj.node = {};
-        await this.genChild(c, obj.node, deep + 1);
+        await this.parseChild(c, obj.node, deep + 1);
       }
     }
   }
@@ -128,44 +130,84 @@ export class GenUIDts {
   public static createViewStr(map: Map<string, any>): string {
     if (!map) return "";
     const entries = map.entries();
-    let rst = "";
-    for (let [key, obj] of entries) {
-      rst += `/** ${(obj["fileName"] as string).replace(/\\/g, "/")} */\n`;
-      rst += `export interface ${key} extends Laya.Scene {\n`;
-      for (let k in obj) {
-        rst += this.createNodeStr(obj[k], 1);
+    const lines: string[] = [];
+    for (let [key, view] of entries) {
+      lines.push(`/** ${(view["fileName"] as string).replace(/\\/g, "/")} */\n`);
+      lines.push(`export interface ${key} extends Laya.Scene {\n`);
+      for (let k in view) {
+        if (typeof view[k] === "string") continue;
+        lines.push(...this.createViewNode(view[k], 1));
       }
-      rst += "}\n\n";
+      lines.push("}\n\n");
     }
-    return rst;
+    console.log(lines);
+    return lines.join("");
   }
 
-  public static createNodeStr(node: NodeInfo, deep = 1): string {
-    console.log(deep, node);
-    if (!node?.name) return "";
-    let rst: string = "  ".repeat(deep) + `${node.name}: ${node.type}`;
+  public static createViewNode(node: NodeInfo, deep = 1): string[] {
+    if (!node?.name) return [];
+    const lines: string[] = ["  ".repeat(deep) + `${node.name}: ${node.type}`];
     if (node?.node) {
-      let rst1 = "";
+      let rst1: string[] = [];
       for (let k in node.node) {
-        rst1 += this.createNodeStr(node.node[k], deep + 1);
+        rst1 = rst1.concat(this.createViewNode(node.node[k], deep + 1));
       }
-      rst += " & {\n" + rst1;
+      lines.push(" & {\n");
+      lines.push(...rst1);
       if (node?.comp?.length) {
         for (const c of node.comp) {
-          rst += "  ".repeat(deep + 1) + c + "\n";
+          lines.push("  ".repeat(deep + 1) + c + "\n");
         }
       }
-      rst += "  ".repeat(deep) + "};\n";
+      lines.push("  ".repeat(deep) + "};\n");
     } else if (node?.comp?.length) {
-      rst += ` & {\n`;
+      lines.push(` & {\n`);
       node.comp.forEach(value => {
-        rst += "  ".repeat(deep + 1) + value + "\n";
+        lines.push("  ".repeat(deep + 1) + value + "\n");
       });
-      rst += "  ".repeat(deep) + "};\n";
+      lines.push("  ".repeat(deep) + "};\n");
     } else {
-      rst += ";\n";
+      lines.push(";\n");
     }
-    return rst;
+    return lines;
+  }
+
+  public static async createPrefabNode(uuid: string, name: string): Promise<NodeInfo | undefined> {
+    let prefabPath = await FsUtils.getPrefabByUUID(uuid);
+    if (!prefabPath) return undefined;
+    const prefabContent = await fs.readFile(prefabPath, { encoding: "utf-8" });
+    if (!prefabContent) return undefined;
+    const prefabJson: IChildNode = JSON.parse(prefabContent);
+    const obj = <NodeInfo>{};
+    obj.type = `Laya.${prefabJson._$type}`;
+    obj.name = name;
+    if (prefabJson._$child?.length) {
+      obj.node = {};
+      for (const c of prefabJson._$child) {
+        await this.parseChild(c, obj.node, 1);
+      }
+    }
+    if (prefabJson._$comp) {
+      const compList: string[] = [];
+      for (const c of prefabJson._$comp) {
+        const compStr = await this.createComponentNode(c.scriptPath);
+        if (compStr?.length) {
+          compList.push(...compStr);
+        }
+      }
+      if (compList?.length) {
+        obj.comp = compList;
+      }
+    }
+    return obj;
+  }
+
+  public static async createComponentNode(scriptPath: string): Promise<string[]> {
+    if (!scriptPath) return [];
+    const basename = path.basename(scriptPath);
+    const compName = basename.replace(".ts", "");
+    const prefabUIContent = await fs.readFile(path.join(FsUtils.ProjectRoot, "src/tools", "PrefabUI.json"), { encoding: "utf-8" });
+    return JSON.parse(prefabUIContent)[compName] ?? [];
   }
 
   public static async writeDtsFile(fileContent: string, basename: string): Promise<void> {
@@ -178,43 +220,5 @@ export class GenUIDts {
     } catch (err) {
       console.log(`❌ write ui .d.ts error: ${filePath}`, err);
     }
-  }
-
-  public static async genPrefabNode(uuid: string, name: string): Promise<NodeInfo | undefined> {
-    let prefabPath = await FsUtils.getPrefabByUUID(uuid);
-    if (!prefabPath) return undefined;
-    const prefabContent = await fs.readFile(prefabPath, { encoding: "utf-8" });
-    if (!prefabContent) return undefined;
-    const prefabJson: IChildNode = JSON.parse(prefabContent);
-    const obj = <NodeInfo>{};
-    obj.type = `Laya.${prefabJson._$type}`;
-    obj.name = name;
-    if (prefabJson._$child?.length) {
-      obj.node = {};
-      for (const c of prefabJson._$child) {
-        await this.genChild(c, obj.node, 1);
-      }
-    }
-    if (prefabJson._$comp) {
-      const compList: string[] = [];
-      for (const c of prefabJson._$comp) {
-        const compStr = await this.getComponentNode(c.scriptPath);
-        if (compStr?.length) {
-          compList.push(...compStr);
-        }
-      }
-      if (compList?.length) {
-        obj.comp = compList;
-      }
-    }
-    return obj;
-  }
-
-  public static async getComponentNode(scriptPath: string): Promise<string[]> {
-    if (!scriptPath) return [];
-    const basename = path.basename(scriptPath);
-    const compName = basename.replace(".ts", "");
-    const prefabUIContent = await fs.readFile(path.join(FsUtils.ProjectRoot, "src/tools", "PrefabUI.json"), { encoding: "utf-8" });
-    return JSON.parse(prefabUIContent)[compName] ?? [];
   }
 }
