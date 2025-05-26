@@ -62,7 +62,11 @@ export class GenUIDts {
           }
         }
         if (compList?.length) {
-          prefabInfo.comp = compList;
+          if (prefabInfo.comp?.length) {
+            prefabInfo.comp.push(...compList);
+          } else {
+            prefabInfo.comp = compList;
+          }
         }
       }
       if (prefabInfo) {
@@ -167,6 +171,18 @@ export class GenUIDts {
       obj.node = {};
       for (const c of prefabJson["_$child"]) {
         await this.genChild(c, obj.node, 1);
+      }
+    }
+    if (prefabJson["_$comp"]) {
+      const compList: string[] = [];
+      for (const c of prefabJson["_$comp"]) {
+        const compStr = await this.getComponentNode(c["scriptPath"]);
+        if (compStr?.length) {
+          compList.push(...compStr);
+        }
+      }
+      if (compList?.length) {
+        obj.comp = compList;
       }
     }
     return obj;
