@@ -2,6 +2,7 @@ import Script = Laya.Script;
 import UIComponent = Laya.UIComponent;
 import CallBack = base.CallBack;
 import regClass = Laya.regClass;
+import property = Laya.property;
 
 const CLICK_SCALE_DOWN = 1.1;
 const CLICK_SCALE_UP = 0.90;
@@ -14,7 +15,7 @@ const CLICK_SCALE_TIME = 100;
  */
 @regClass()
 export default class ClickScale extends Script {
-  /** @prop {name:noScale,tips:"点击不缩放效果,默认：false",type:Check,default=false} */
+  @property({ tips: "点击不缩放效果,默认：false", type: "boolean", default: false })
   public noScale = false;
 
   private _comp: UIComponent;
