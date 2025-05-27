@@ -4,6 +4,7 @@ import * as path from "path";
 
 interface NodeInfo {
   type?: string;
+  id?: string;
   name?: string;
   node?: NodeInfo;
   comp?: string[];
@@ -26,10 +27,13 @@ interface IComponentNode {
 // 节点结构
 interface IChildNode {
   name: string;
+  _$id?: string;
   _$type: string;
   _$prefab?: string;
   _$child?: IChildNode[];
   _$comp?: IComponentNode[];
+
+  _$override?: string;
 
   [key: string]: any;
 }
@@ -66,14 +70,13 @@ export class GenUIDts {
     await this.writeDtsFile(fileContent, basename);
   }
 
-  public static async parseChild(child: IChildNode, parent: { [key: string]: NodeInfo }, deep = 0): Promise<void> {
+  public static async parseChild(child: IChildNode, parent: {
+    [key: string]: NodeInfo
+  }, deep = 0, isPrefab = false): Promise<void> {
     const name: string = child?.name;
-    if (!name?.startsWith("$")) {
-      return;
-    }
     if (child?._$prefab) {
       const prefabInfo = await this.createPrefabNode(child._$prefab, name);
-      if (child?._$comp) {
+      if (child?._$comp?.length) {
         const compList: string[] = [];
         for (let c of child._$comp) {
           const compStr = await this.createComponentNode(c.scriptPath);
@@ -89,15 +92,38 @@ export class GenUIDts {
           }
         }
       }
+      if (child?._$child?.length) {
+        const overrideObj: { [key: string]: string } = {};
+        for (let c of child._$child) {
+          if (c._$override) {
+            overrideObj[c._$override] = c.name; // 重命名
+          } else {
+            await this.parseChild(c, prefabInfo.node); // 新加组件
+          }
+        }
+
+        if (prefabInfo.node && Object.keys(overrideObj)) {
+          for (let k in prefabInfo.node) {
+            const n: NodeInfo = prefabInfo.node[k];
+            if (n.id && overrideObj[n.id]) {
+              n.name = overrideObj[n.id];
+            }
+          }
+        }
+      }
       if (prefabInfo) {
         parent[name] = prefabInfo;
       }
+      return;
+    }
+    if (!name?.startsWith("$") && !isPrefab) {
       return;
     }
     let obj: NodeInfo = parent[name];
     if (!obj) {
       obj = parent[name] = <NodeInfo>{};
     }
+    obj.id = child._$id;
     obj.name = name;
     obj.type = `Laya.${child._$type}`;
     if (child._$comp) {
@@ -142,9 +168,9 @@ export class GenUIDts {
   }
 
   public static createViewNode(node: NodeInfo, deep = 1): string[] {
-    if (!node?.name) return [];
+    if (!node?.name?.startsWith("$")) return [];
     const lines: string[] = ["  ".repeat(deep) + `${node.name}: ${node.type}`];
-    if (node?.node) {
+    if (node?.node && Object.keys(node?.node).length) {
       let rst1: string[] = [];
       for (let k in node.node) {
         rst1 = rst1.concat(this.createViewNode(node.node[k], deep + 1));
@@ -176,12 +202,13 @@ export class GenUIDts {
     if (!prefabContent) return undefined;
     const prefabJson: IChildNode = JSON.parse(prefabContent);
     const obj = <NodeInfo>{};
+    obj.id = prefabJson._$id;
     obj.type = `Laya.${prefabJson._$type}`;
     obj.name = name;
     if (prefabJson._$child?.length) {
       obj.node = {};
       for (const c of prefabJson._$child) {
-        await this.parseChild(c, obj.node, 1);
+        await this.parseChild(c, obj.node, 1, true);
       }
     }
     if (prefabJson._$comp) {
