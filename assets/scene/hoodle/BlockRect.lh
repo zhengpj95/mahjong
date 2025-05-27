@@ -1,0 +1,58 @@
+{
+  "_$ver": 1,
+  "_$id": "niu3a21h",
+  "_$type": "Sprite",
+  "name": "BlockRect",
+  "x": 424,
+  "y": 1097,
+  "width": 60,
+  "height": 60,
+  "anchorX": 0.5,
+  "anchorY": 0.5,
+  "_gcmds": [
+    {
+      "_$type": "DrawRectCmd",
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 1,
+      "percent": true,
+      "lineWidth": 1,
+      "lineColor": "#000000",
+      "fillColor": "rgba(0, 0, 0, 1)"
+    }
+  ],
+  "_$comp": [
+    {
+      "_$type": "RigidBody",
+      "type": "static"
+    },
+    {
+      "_$id": "xhjg",
+      "_$type": "BoxCollider",
+      "restitution": 1,
+      "label": "enemy",
+      "width": 60,
+      "height": 60
+    }
+  ],
+  "_$child": [
+    {
+      "_$id": "b31mqc91",
+      "_$type": "Label",
+      "name": "$lab",
+      "x": 14,
+      "y": 19,
+      "width": 33,
+      "height": 23,
+      "centerX": 0,
+      "centerY": 0,
+      "text": "20",
+      "fontSize": 22,
+      "color": "#FFFFFF",
+      "fitContent": "yes",
+      "valign": "top",
+      "padding": "0,0,0,0"
+    }
+  ]
+}
