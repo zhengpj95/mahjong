@@ -246,7 +246,7 @@
           poolMgr.free(vo);
       }
       tick() {
-          var _a, _b, _c, _d, _e;
+          var _a, _b, _c, _d, _e, _f, _g;
           this._curTime = Date.now();
           this._curFrame++;
           while ((_a = this._deleteList) === null || _a === undefined ? undefined : _a.length) {
@@ -261,21 +261,19 @@
                       vo.callBack.exec(this._curFrame - vo.lastExeTime);
                       vo.lastExeTime = this._curFrame;
                       vo.exeTime += vo.interval;
-                      if (!vo.isRepeat) {
-                          if (vo.repeatCount > 0) {
-                              vo.repeatCount--;
-                          }
-                          else {
-                              (_c = vo.finishCallBack) === null || _c === undefined ? undefined : _c.exec(this._curFrame - vo.lastExeTime);
-                              if (!this._deleteList.includes(vo)) {
-                                  this._deleteList.push(vo);
-                              }
+                      if (!vo.isRepeat && vo.repeatCount > 0) {
+                          vo.repeatCount--;
+                      }
+                      if ((!vo.isRepeat && vo.repeatCount <= 0) || !((_c = vo.callBack) === null || _c === undefined ? undefined : _c.method)) {
+                          (_d = vo.finishCallBack) === null || _d === undefined ? undefined : _d.exec(this._curFrame - vo.lastExeTime);
+                          if (!this._deleteList.includes(vo)) {
+                              this._deleteList.push(vo);
                           }
                       }
                   }
               }
           }
-          if ((_d = this._timeList) === null || _d === undefined ? undefined : _d.length) {
+          if ((_e = this._timeList) === null || _e === undefined ? undefined : _e.length) {
               for (const vo of this._timeList) {
                   if (this._deleteList.includes(vo)) {
                       continue;
@@ -284,15 +282,13 @@
                       vo.callBack.exec(this._curTime - vo.lastExeTime);
                       vo.lastExeTime = this._curTime;
                       vo.exeTime = this._curTime + vo.interval;
-                      if (!vo.isRepeat) {
-                          if (vo.repeatCount > 0) {
-                              vo.repeatCount--;
-                          }
-                          else {
-                              (_e = vo.finishCallBack) === null || _e === undefined ? undefined : _e.exec(this._curFrame - vo.lastExeTime);
-                              if (!this._deleteList.includes(vo)) {
-                                  this._deleteList.push(vo);
-                              }
+                      if (!vo.isRepeat && vo.repeatCount > 0) {
+                          vo.repeatCount--;
+                      }
+                      if ((!vo.isRepeat && vo.repeatCount <= 0) || !((_f = vo.callBack) === null || _f === undefined ? undefined : _f.method)) {
+                          (_g = vo.finishCallBack) === null || _g === undefined ? undefined : _g.exec(this._curFrame - vo.lastExeTime);
+                          if (!this._deleteList.includes(vo)) {
+                              this._deleteList.push(vo);
                           }
                       }
                   }
