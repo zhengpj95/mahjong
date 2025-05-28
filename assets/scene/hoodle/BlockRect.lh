@@ -25,7 +25,7 @@
   "_$comp": [
     {
       "_$type": "RigidBody",
-      "type": "static"
+      "gravityScale": 0
     },
     {
       "_$id": "xhjg",
@@ -41,9 +41,9 @@
       "_$id": "b31mqc91",
       "_$type": "Label",
       "name": "$lab",
-      "x": 14,
+      "x": 19,
       "y": 19,
-      "width": 33,
+      "width": 22,
       "height": 23,
       "centerX": 0,
       "centerY": 0,

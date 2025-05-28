@@ -24,17 +24,13 @@
   "_$comp": [
     {
       "_$type": "RigidBody",
-      "type": "static",
-      "gravityScale": 0.8,
-      "angularVelocity": 0.5
+      "gravityScale": 0
     },
     {
-      "_$id": "xhjg",
-      "_$type": "BoxCollider",
-      "restitution": 1,
+      "_$id": "7l0q",
+      "_$type": "CircleCollider",
       "label": "enemy",
-      "width": 60,
-      "height": 60
+      "radius": 30
     }
   ],
   "_$child": [
