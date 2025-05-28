@@ -3,6 +3,7 @@ import UIComponent = Laya.UIComponent;
 import CallBack = base.CallBack;
 import regClass = Laya.regClass;
 import property = Laya.property;
+import findMediator = base.findMediator;
 
 const CLICK_SCALE_DOWN = 1.1;
 const CLICK_SCALE_UP = 0.90;
@@ -17,6 +18,12 @@ const CLICK_SCALE_TIME = 100;
 export default class ClickScale extends Script {
   @property({ tips: "点击不缩放效果,默认：false", type: "boolean", default: false })
   public noScale = false;
+  @property({ tips: "点击事件, mdr中的方法", type: "string" })
+  public mdrClickCall = "";
+  @property({ tips: "阻断点击事件上冒，与 mdrClickCall 关联", type: "boolean", default: false })
+  public stopClickPropagation = false;
+  @property({ tips: "点击间隔，默认220毫秒，与 mdrClickCall 关联", type: "boolean", default: false })
+  public clickInterval = false;
 
   private _comp: UIComponent;
   private _width: number;
@@ -26,6 +33,8 @@ export default class ClickScale extends Script {
   private _originScaleX = 1; // 初始尺寸
   private _originScaleY = 1;
   private _isTween = false;
+  private _mdrMethod: CallBack;
+  private preClickTime: number;
 
   public onAwake(): void {
     super.onAwake();
@@ -45,6 +54,15 @@ export default class ClickScale extends Script {
     this._comp.on(Laya.Event.MOUSE_DOWN, this, this.onClickMouseDown);
     this._comp.on(Laya.Event.MOUSE_UP, this, this.onClickMouseUp);
     this._comp.on(Laya.Event.MOUSE_OUT, this, this.onClickMouseUp);
+    this._comp.on(Laya.Event.CLICK, this, this.onClickMdrMethod);
+
+    if (this.mdrClickCall) {
+      const mdr = findMediator(this._comp);
+      const mdrMethod = (mdr as any)?.[this.mdrClickCall];
+      if (mdrMethod) {
+        this._mdrMethod = CallBack.alloc(mdr, mdrMethod, [this._comp]);
+      }
+    }
   }
 
   public destroy(): void {
@@ -86,5 +104,19 @@ export default class ClickScale extends Script {
       scaleX: this._originScaleX,
       scaleY: this._originScaleY
     }, CLICK_SCALE_TIME);
+  }
+
+  private onClickMdrMethod(e: Laya.Event): void {
+    if (e && this.stopClickPropagation) {
+      e.stopPropagation();
+    }
+    if (this.clickInterval) {
+      const now = Date.now();
+      if (now - this.preClickTime < 220) {
+        return;
+      }
+      this.preClickTime = now;
+    }
+    this._mdrMethod?.exec();
   }
 }
