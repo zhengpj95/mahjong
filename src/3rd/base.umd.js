@@ -237,11 +237,11 @@
           }
           let idx = this._timeList.indexOf(vo);
           if (idx > -1) {
-              this._timeList.splice(idx, 0);
+              this._timeList.splice(idx, 1);
           }
           idx = this._frameList.indexOf(vo);
           if (idx > -1) {
-              this._frameList.splice(idx, 0);
+              this._frameList.splice(idx, 1);
           }
           poolMgr.free(vo);
       }
