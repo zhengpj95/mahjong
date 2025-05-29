@@ -119,7 +119,7 @@
         {
           "_$id": "6dcr",
           "_$type": "BoxCollider",
-          "friction": 0,
+          "friction": 0.5,
           "label": "groundWall",
           "width": 640,
           "height": 5
@@ -195,11 +195,52 @@
       ]
     },
     {
+      "_$id": "fp59m8lh",
+      "_$type": "Box",
+      "name": "$boxTop",
+      "width": 640,
+      "height": 200,
+      "centerX": 0,
+      "_$child": [
+        {
+          "_$id": "uk1zb5aa",
+          "_$type": "Image",
+          "name": "img_bg1",
+          "width": 640,
+          "height": 200,
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "skin": "res://7e60d2bf-52bf-45ee-a680-95c6bbbdc938",
+          "color": "#ffffff"
+        },
+        {
+          "_$id": "i7ylls5b",
+          "_$type": "Label",
+          "name": "$labScore",
+          "x": 30,
+          "y": 85,
+          "width": 107,
+          "height": 31,
+          "centerY": 0,
+          "text": "得分：0",
+          "fontSize": 30,
+          "color": "#FFFFFF",
+          "fitContent": "yes",
+          "bold": true,
+          "valign": "top",
+          "overflow": "scroll",
+          "padding": "0,0,0,0"
+        }
+      ]
+    },
+    {
       "_$id": "yd502mrr",
       "_$type": "Sprite",
       "name": "$ballSprite",
       "x": 305,
-      "y": 300,
+      "y": 250,
       "width": 30,
       "height": 30,
       "anchorX": 0.5,
@@ -237,14 +278,14 @@
         {
           "_$id": "n35dria1",
           "_$type": "Label",
-          "name": "lab",
+          "name": "$lab",
           "x": 10,
           "y": 5,
           "width": 10,
           "height": 21,
           "centerX": 0,
           "centerY": 0,
-          "text": "2",
+          "text": "3",
           "fontSize": 20,
           "color": "rgba(255, 0, 0, 1)",
           "fitContent": "yes",

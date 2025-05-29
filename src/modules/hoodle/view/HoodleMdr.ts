@@ -6,6 +6,7 @@ import Label = Laya.Label;
 import RigidBody = Laya.RigidBody;
 import ColliderBase = Laya.ColliderBase;
 import Sprite = Laya.Sprite;
+import CircleCollider = Laya.CircleCollider;
 import { HoodleView } from "@3rd-types/hoodle";
 
 /**
@@ -17,6 +18,7 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
   private _initPoint: { x: number, y: number };
 
   private _blockRectPrefab: Laya.PrefabImpl;
+  private _blockCirclePrefab: Laya.PrefabImpl;
   private _blockList: Sprite[] = [];
 
   constructor() {
@@ -38,17 +40,18 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
     this.ui.timer.clearAll(this);
     this._blockRectPrefab = <any>undefined;
     this._blockList.length = 0;
+    this._score = 0;
   }
 
   protected onOpen(): void {
-    this.ui.timer.loop(10 * 1000, this, () => {
-      if (this._blockList.length > 5) return;
+    this.ui.timer.loop(2000, this, () => {
+      if (this._blockList.length > 6) return;
       this._blockList.forEach(value => {
         value.y -= 60;
       });
-      this.createRect();
+      this.loadBlock();
     });
-    this.createRect();
+    this.loadBlock();
 
     this.ui.timer.loop(100, this, () => {
       this._blockList.forEach(value => {
@@ -71,6 +74,13 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
     });
   }
 
+  private _score: number = 0;
+
+  private addScore(score: number): void {
+    this._score += score;
+    this.ui.$boxTop.$labScore.text = "得分：" + this._score;
+  }
+
   private onClickBall(e: Laya.Event): void {
     const ballSprite = this.ui.$ballSprite;
     const rigid = ballSprite.getComponent(RigidBody);
@@ -82,28 +92,34 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
       dir.setTo(clickPoint.x - center.x, clickPoint.y - center.y);
       dir.normalize();
       rigid.type = "dynamic";
-      rigid.gravityScale = 1;
+      rigid.allowRotation = true;
+      rigid.allowSleep = true;
+      rigid.angularVelocity = 10;
+      rigid.gravityScale = 0.8;
       rigid.linearVelocity = new Laya.Point((dir.x * 1000) >> 0, (dir.y * 1000) >> 0);
       clickPoint.recover();
       dir.recover();
     }
   }
 
-  private onBallTrigger(e: ColliderBase): void {
-    if (e.label === "enemy") {
-      const lab = (e.owner.getChildByName("$lab") as Label);
+  private onBallTrigger(other: ColliderBase, self: ColliderBase): void {
+    if (other.label === "enemy") {
+      const selfVal = +(self.owner.getChildByName("$lab") as Label).text;
+      const lab = (other.owner.getChildByName("$lab") as Label);
       const curVal = parseInt(lab.text);
-      lab.text = (curVal - 2) + "";
-      if (curVal - 2 <= 0) {
-        tweenMgr.get(e.owner).to({ alpha: 0 }, 100, null, CallBack.alloc(this, () => {
-          const idx = this._blockList.indexOf(<Sprite>e.owner);
+      const subtractVal = curVal > selfVal ? selfVal : Math.max(0, curVal);
+      lab.text = (curVal - subtractVal) + "";
+      this.addScore(subtractVal);
+      if (curVal - subtractVal <= 0) {
+        tweenMgr.get(other.owner).to({ alpha: 0 }, 100, null, CallBack.alloc(this, () => {
+          const idx = this._blockList.indexOf(<Sprite>other.owner);
           if (idx > -1) {
             this._blockList.splice(idx, 1);
           }
-          e.owner.removeSelf();
+          other.owner.removeSelf();
         }));
       }
-    } else if (e.label === "ground") {
+    } else if (other.label === "ground") {
       this.removeBallTrigger();
     }
   }
@@ -115,24 +131,42 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
     ballSprite.pos(this._initPoint?.x ?? 0, this._initPoint?.y ?? 0);
   }
 
-  private createRect(): void {
-    if (!this._blockRectPrefab) {
-      Laya.loader.load("scene/hoodle/BlockRect.lh").then((res: Laya.PrefabImpl) => {
-        this._blockRectPrefab = res;
-        this.addRect();
+  private loadBlock(): void {
+    if (!this._blockRectPrefab || !this._blockCirclePrefab) {
+      Laya.loader.load(["scene/hoodle/BlockRect.lh", "scene/hoodle/BlockCircle.lh"]).then((res: Laya.PrefabImpl[]) => {
+        [this._blockRectPrefab, this._blockCirclePrefab] = res;
+        this.createBlock();
       });
     } else {
-      this.addRect();
+      this.createBlock();
     }
   }
 
-  private addRect(): void {
+  private createBlock(): void {
+    const inRight = Math.random() > 0.5;
     if (this._blockRectPrefab) {
       const rect = <Sprite>this._blockRectPrefab.create();
-      rect.x = (Math.random() * 500 >> 0) + 50;
+      const val = Math.max(1, (Math.random() * 20 >> 0));
+      (rect.getChildByName("$lab") as Label).text = val + "";
+      rect.x = (Math.random() * 260 >> 0) + (inRight ? 320 : 0) + 30;
       rect.y = this.ui.height - rect.height / 2;
       this.ui.addChild(rect);
       this._blockList.push(rect);
+    }
+
+    if (this._blockCirclePrefab) {
+      const circle = <Sprite>this._blockCirclePrefab.create();
+      const val = Math.max(1, (Math.random() * 20 >> 0));
+      (circle.getChildByName("$lab") as Label).text = val + "";
+      const random = Math.random();
+      const size = random > 0.7 ? 30 : random > 0.3 ? 25 : 20;
+      circle.size(size * 2, size * 2);
+      const collider = circle.getComponent(CircleCollider);
+      collider.radius = size;
+      circle.x = (Math.random() * 260 >> 0) + (inRight ? 0 : 320) + 30;
+      circle.y = this.ui.height - circle.height / 2;
+      this.ui.addChild(circle);
+      this._blockList.push(circle);
     }
   }
 }

@@ -30,6 +30,7 @@
     {
       "_$id": "xhjg",
       "_$type": "BoxCollider",
+      "friction": 0.3,
       "restitution": 1,
       "label": "enemy",
       "width": 60,

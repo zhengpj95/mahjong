@@ -29,6 +29,7 @@
     {
       "_$id": "7l0q",
       "_$type": "CircleCollider",
+      "friction": 0.3,
       "label": "enemy",
       "radius": 30
     }
