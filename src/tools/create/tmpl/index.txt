@@ -1,0 +1,25 @@
+import BaseModule = base.BaseModule;
+import { ModuleType, ProxyType } from "@def/module-type";
+import { #MODULENAME#Proxy } from "./model/#MODULENAME#Proxy";
+
+/**
+ * @author zpj
+ * @date #DATE#
+ */
+export class #MODULENAME#Module extends BaseModule {
+  constructor() {
+    super(ModuleType.#MODULENAME#);
+  }
+
+  protected initCmd(): void {
+    //
+  }
+
+  protected initMdr(): void {
+    //
+  }
+
+  protected initProxy(): void {
+    this.regProxy(ProxyType.#MODULENAME#, #MODULENAME#Proxy);
+  }
+}

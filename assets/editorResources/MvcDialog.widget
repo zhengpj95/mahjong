@@ -1,0 +1,89 @@
+{
+  "_$ver": 1,
+  "_$id": "cqne3s0e",
+  "_$type": "Widget",
+  "name": "Root",
+  "width": 400,
+  "height": 400,
+  "childrenRenderOrder": 1,
+  "_$child": [
+    {
+      "_$id": "y8twcswf",
+      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
+      "name": "btnConfirm",
+      "active": true,
+      "x": 246,
+      "y": 341,
+      "visible": true,
+      "touchable": true,
+      "title": "构建"
+    },
+    {
+      "_$id": "5df7otlm",
+      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
+      "name": "btnCancel",
+      "active": true,
+      "x": 80,
+      "y": 340,
+      "visible": true,
+      "touchable": true,
+      "title": "取消",
+      "selectedTitle": "确定取消吗"
+    },
+    {
+      "_$id": "kaxht0rs",
+      "_$type": "Label",
+      "name": "labModule",
+      "x": 20,
+      "y": 50,
+      "width": 100,
+      "height": 20,
+      "title": "模块名：",
+      "titleColor": 16777215,
+      "titleFontSize": 16,
+      "titleWidget": {
+        "_$ref": "wbqgi5ue"
+      },
+      "_$child": [
+        {
+          "_$id": "wbqgi5ue",
+          "_$type": "TextField",
+          "name": "title",
+          "width": 80,
+          "height": 20,
+          "relations": [
+            {
+              "_$type": "Relation",
+              "target": {
+                "_$ref": "kaxht0rs"
+              },
+              "data": [
+                1,
+                0,
+                2,
+                0
+              ]
+            }
+          ],
+          "text": "模块名：",
+          "style": {
+            "fontSize": 16,
+            "valign": 1
+          }
+        },
+        {
+          "_$id": "8m3i53kt",
+          "_$prefab": "25b38c03-cefe-a4c8-cad2-9f64513caa90",
+          "name": "textInput",
+          "active": true,
+          "x": 83,
+          "y": 0,
+          "width": 240,
+          "height": 20,
+          "visible": true,
+          "touchable": true
+        }
+      ]
+    }
+  ]
+}

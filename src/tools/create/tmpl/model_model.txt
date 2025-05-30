@@ -1,0 +1,7 @@
+/**
+ * @author zpj
+ * @date #DATE#
+ */
+export class #MODULENAME#Model {
+  //
+}

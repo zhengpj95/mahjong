@@ -1,0 +1,22 @@
+import BaseProxy = base.BaseProxy;
+import { #MODULENAME#Model } from "./#MODULENAME#Model"
+
+/**
+ * @author zpj
+ * @date #DATE#
+ */
+export class #MODULENAME#Proxy extends BaseProxy {
+  private _model: #MODULENAME#Model;
+
+  public get model(): #MODULENAME#Model {
+    if (!this._model) {
+      this._model = new #MODULENAME#Model();
+    }
+    return this._model;
+  }
+
+  public init(): void {
+    //
+  }
+
+}

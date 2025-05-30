@@ -30,7 +30,7 @@ export class FsUtils {
         }
       }
     } catch (err) {
-      console.error(`FsUtils.getAllLhFiles 读取目录失败: ${dir}`, err);
+      console.error(`FsUtils.getAllFilesByExt 读取目录失败: ${dir}`, err);
     }
 
     return results;
