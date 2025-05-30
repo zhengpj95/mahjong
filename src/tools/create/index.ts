@@ -1,6 +1,7 @@
 import { FsUtils } from "../FsUtils";
 import * as path from "path";
 import * as fs from "fs/promises";
+import { toolsObj } from "../index";
 
 /**
  * @author zpj
@@ -8,11 +9,11 @@ import * as fs from "fs/promises";
  */
 export async function startCreate(moduleName: string): Promise<void> {
   moduleName = moduleName.toLowerCase();
-  const srcPath = path.join(FsUtils.ProjectRoot, "src/modules/", moduleName);
+  const srcPath = path.join(toolsObj.ProjectRoot, "src/modules/", moduleName);
   await fs.mkdir(srcPath, { recursive: true });
   await fs.mkdir(path.join(srcPath, "model"), { recursive: true });
 
-  const scenePath = path.join(FsUtils.ProjectRoot, "assets/scene/", moduleName);
+  const scenePath = path.join(toolsObj.ProjectRoot, "assets/scene/", moduleName);
   await fs.mkdir(scenePath, { recursive: true });
 
   const realName = toPascalCase(moduleName);

@@ -1,6 +1,7 @@
 import { FsUtils } from "./FsUtils";
 import * as fs from "fs/promises";
 import * as path from "path";
+import { toolsObj } from "./index";
 
 interface NodeInfo {
   type?: string;
@@ -63,7 +64,7 @@ export class GenUIDts {
         await this.parseChild(c, obj, 0);
       }
 
-      let fileName = file.replace(FsUtils.ProjectRoot, "");
+      let fileName = file.replace(toolsObj.ProjectRoot, "");
       map.set(fileName, obj);
     }
     const fileContent = this.createViewStr(map);
@@ -230,12 +231,12 @@ export class GenUIDts {
     if (!scriptPath) return [];
     const basename = path.basename(scriptPath);
     const compName = basename.replace(".ts", "");
-    const prefabUIContent = await fs.readFile(path.join(FsUtils.ProjectRoot, "src/tools", "PrefabUI.json"), { encoding: "utf-8" });
+    const prefabUIContent = await fs.readFile(path.join(toolsObj.ProjectRoot, "src/tools", "PrefabUI.json"), { encoding: "utf-8" });
     return JSON.parse(prefabUIContent)[compName] ?? [];
   }
 
   public static async writeDtsFile(fileContent: string, basename: string): Promise<void> {
-    const rooPath = path.join(FsUtils.ProjectRoot + "src/3rd-types",);
+    const rooPath = path.join(toolsObj.ProjectRoot + "src/3rd-types",);
     const filePath = path.join(rooPath, basename + ".d.ts");
     try {
       await fs.mkdir(rooPath, { recursive: true });

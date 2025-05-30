@@ -1,8 +1,8 @@
 import TextInput = gui.TextInput;
 import * as fs from "fs";
-import { FsUtils } from "./FsUtils";
 import * as path from "path";
 import { startCreate } from "./create/index";
+import { toolsObj } from "./index";
 
 // @IEditor.panel("TestPanel", {
 //   title: "TestPanel",
@@ -57,7 +57,7 @@ export class MmvDialog extends IEditor.Dialog {
   private createModule(moduleName: string): void {
     if (!moduleName) return;
     const dirList: string[] = [];
-    const modulesPath = path.join(FsUtils.ProjectRoot, "/src/modules");
+    const modulesPath = path.join(toolsObj.ProjectRoot, "/src/modules");
     const dirs = fs.readdirSync(modulesPath, { withFileTypes: true });
     dirs.forEach(value => {
       if (value.isDirectory()) {
@@ -70,7 +70,7 @@ export class MmvDialog extends IEditor.Dialog {
     }
 
     dirList.length = 0;
-    const sceneDirs = fs.readdirSync(path.join(FsUtils.ProjectRoot, "assets/scene"), { withFileTypes: true });
+    const sceneDirs = fs.readdirSync(path.join(toolsObj.ProjectRoot, "assets/scene"), { withFileTypes: true });
     sceneDirs.forEach(value => {
       if (value.isDirectory()) {
         dirList.push(value.name);

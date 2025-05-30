@@ -1,13 +1,12 @@
 import * as fs from "fs/promises";
 import * as path from "path";
+import { toolsObj } from "./index";
 
 /**
  * @author zpj
  * @date 2025/5/22
  */
 export class FsUtils {
-
-  public static ProjectRoot = "E:\\project_laya_3.0\\mahjong\\";// todo
 
   /**
    * 异步递归查找指定目录下所有指定扩展名的文件
@@ -43,7 +42,7 @@ export class FsUtils {
     const map = new Map<string, string[]>();
     const dirList = ["assets/prefab/", "assets/scene/"];
     for (let dir of dirList) {
-      const p = path.join(this.ProjectRoot, dir);
+      const p = path.join(toolsObj.ProjectRoot, dir);
       const files = await this.getAllFilesByExt(p, ".lh");
       for (let f of files) {
         const basename = path.basename(f);
@@ -57,7 +56,7 @@ export class FsUtils {
   }
 
   public static async walk(dir: string, ext: string): Promise<string[]> {
-    const dirPath = path.join(this.ProjectRoot, dir);
+    const dirPath = path.join(toolsObj.ProjectRoot, dir);
     return this.getAllFilesByExt(dirPath, ext);
   }
 

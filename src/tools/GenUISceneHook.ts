@@ -1,6 +1,6 @@
 import * as path from "path";
-import { FsUtils } from "./FsUtils";
 import { GenUIDts } from "./GenUIDts";
+import { toolsObj } from "./index";
 
 interface SceneStructure {
   name: string;
@@ -32,7 +32,7 @@ class GenUISceneHook implements IEditorEnv.ISceneHook {
     if (!scenePath.endsWith(".ls")) {
       return; // 不是场景文件，过滤
     }
-    let filePath = path.dirname(scenePath.replace(FsUtils.ProjectRoot, ""));
+    let filePath = path.dirname(scenePath.replace(toolsObj.ProjectRoot, ""));
     GenUIDts.generateDts(filePath).then(() => {
       console.log(`✅ gen ui 执行成功`);
     }).catch((err) => {
