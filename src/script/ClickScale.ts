@@ -9,9 +9,11 @@ const CLICK_SCALE_DOWN = 1.1;
 const CLICK_SCALE_UP = 0.90;
 const CLICK_SCALE_TIME = 100;
 
+const CONSTRAINT_LIST = <const>["left", "right", "top", "bottom", "centerX", "centerY"];
+type ConstraintKey = typeof CONSTRAINT_LIST[number]
+
 /**
  * 按钮点击缩放效果
- * 不要使用约束（left,right,top,bottom,centerX,centerY）
  * @date 2025/4/25
  */
 @regClass()
@@ -24,6 +26,8 @@ export default class ClickScale extends Script {
   public stopClickPropagation = false;
   @property({ tips: "点击间隔，默认220毫秒，与 mdrClickCall 关联", type: "boolean", default: false })
   public clickInterval = false;
+
+  private _originConstraint = new Map<ConstraintKey, number>;
 
   private _comp: UIComponent;
   private _width: number;
@@ -46,11 +50,20 @@ export default class ClickScale extends Script {
     this._originScaleX = this._comp.scaleX;
     this._originScaleY = this._comp.scaleY;
     this._isTween = false;
+
+    this._originConstraint.clear();
+    CONSTRAINT_LIST.forEach(item => {
+      const val = this._comp[item];
+      if (!isNaN(val)) {
+        this._originConstraint.set(item, this._comp[item]);
+      }
+    });
   }
 
   public onEnable(): void {
     super.onEnable();
     this.setAnchor();
+    this.updateWidget();
     this._comp.on(Laya.Event.MOUSE_DOWN, this, this.onClickMouseDown);
     this._comp.on(Laya.Event.MOUSE_UP, this, this.onClickMouseUp);
     this._comp.on(Laya.Event.MOUSE_OUT, this, this.onClickMouseUp);
@@ -81,6 +94,7 @@ export default class ClickScale extends Script {
     this._isTween = false;
     base.tweenMgr.remove(this._comp);
     base.tweenMgr.get(this._comp).to({ scaleX: CLICK_SCALE_DOWN, scaleY: CLICK_SCALE_DOWN }, CLICK_SCALE_TIME);
+    this.updateWidget(false);
   }
 
   private onClickMouseUp(): void {
@@ -118,5 +132,11 @@ export default class ClickScale extends Script {
       this.preClickTime = now;
     }
     this._mdrMethod?.exec();
+  }
+
+  private updateWidget(isInit = false): void {
+    for (const [k, v] of this._originConstraint) {
+      this._comp[k] = isInit ? v : NaN;
+    }
   }
 }
