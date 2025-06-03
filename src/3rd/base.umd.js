@@ -1339,13 +1339,16 @@
       open(params) {
           this.params = params;
           if (!this.ui && this.uiUrl) {
-              Laya.Scene.load(this.uiUrl, Laya.Handler.create(this, (scene) => {
-                  const children = scene["_children"];
+              Laya.loader
+                  .load(this.uiUrl, Laya.Loader.HIERARCHY)
+                  .then((r) => {
+                  const s = r.create();
+                  const children = s["_children"];
                   for (const child of children) {
-                      buildNodeRecursive(child, scene);
+                      buildNodeRecursive(child, s);
                   }
-                  this.onUILoaded(scene);
-              }));
+                  this.onUILoaded(s);
+              });
           }
           else {
               this.initView(Laya.Handler.create(this, this.onUILoaded));
