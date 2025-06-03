@@ -1,15 +1,7 @@
 /**
+ * 通用颜色管理模块，用于统一管理游戏中的色值
  * @date 2025/4/25
  */
-
-export const enum FengType {
-  DONG = 1,
-  NAN = 2,
-  XI = 3,
-  BEI = 4
-}
-
-// 通用颜色管理模块，用于统一管理游戏中的色值
 export const enum UIColorStr {
   // 主色
   RED = "#E64545",          // 错误/敌人/伤害提示
@@ -33,8 +25,8 @@ export const enum UIColorStr {
   MP_BLUE = "#007AFF",       // 法力/能量条（MP）
 }
 
-//黑底颜色
-export const enum UIColorStr1 {
+// 黑底颜色
+export const enum UIColorBlackStr {
   GRAY = "#a8b6ba",
   YELLOW = "#ffff00",
   WHITE = "#ffffff",
@@ -47,8 +39,8 @@ export const enum UIColorStr1 {
   DARK_YELLOW = "#EBD196",
 }
 
-//白底颜色
-export const enum UIColorStr2 {
+// 白底颜色
+export const enum UIColorWhiteStr {
   GRAY = "#a8b6ba",
   YELLOW = "#edb214",
   WHITE = "#426e7b",
