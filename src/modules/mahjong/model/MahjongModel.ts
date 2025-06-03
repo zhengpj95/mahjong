@@ -1,7 +1,7 @@
 import { CardType, IMahjongResultParam, MahjongEvent, MahjongViewType } from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar";
 import { MahjongCardData } from "./MahjongCardData";
-import { CARD_COUNT, CARD_NUM_LIST, CardData } from "../MahjongConst";
+import { CARD_COUNT, CARD_NUM_LIST, CardData } from "./MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { ModuleType } from "@def/module-type";
 import { ConfigName } from "@configName";
@@ -158,14 +158,6 @@ export class MahjongModel {
     return paths || [];
   }
 
-  public canConnect(startData: MahjongCardData, targetData: MahjongCardData): boolean {
-    if (!startData || !targetData) {
-      return false;
-    }
-    const paths = this.findPath(startData, targetData);
-    return !!paths.length;
-  }
-
   // 根据某张牌得到相同牌的信息
   public getConnectCardDataList(cardData: MahjongCardData): MahjongCardData[] {
     if (!cardData) {
@@ -192,7 +184,6 @@ export class MahjongModel {
     if (!this.data.length) {
       return [];
     }
-    let minPath = Number.MAX_SAFE_INTEGER;
     let rst: MahjongCardData[] = [];
     const checkSet = new Set<string>();
     for (let rows of this.data) {
@@ -210,13 +201,9 @@ export class MahjongModel {
             const cardJ = connectList[j];
             if (!cardJ || !cardJ.isValid()) continue;
             const paths = this.findPath(cardI, cardJ);
-            if (!paths.length) continue;
-            if (paths.length === 2) {
-              return [cardI, cardJ];
-            }
-            if (paths.length < minPath) {
+            if (paths.length) {
               rst = [cardI, cardJ];
-              minPath = paths.length;
+              break;
             }
           }
         }
@@ -265,12 +252,6 @@ export class MahjongModel {
       return cfg.time;
     }
     return 90;
-  }
-
-  /**重新挑战*/
-  public challengeAgain(): void {
-    this.clearData();
-    this.updateData();
   }
 
   /**下一关*/

@@ -3,7 +3,7 @@
  * @date 2025/3/21
  */
 
-import { CardData, getCardTypeRes } from "../MahjongConst";
+import { CardData, getCardTypeRes } from "./MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { ConfigName } from "@configName";
 import PoolObject = base.PoolObject;
