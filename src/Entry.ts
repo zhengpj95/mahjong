@@ -1,9 +1,9 @@
 import protobuf from "protobufjs";
 import Long from "long";
 import { initModules } from "./modules/index";
-import { ModuleType } from "@def/module-type";
-import { MahjongViewType } from "@def/mahjong";
+import { ModuleName } from "@def/module-name";
 import { GameCfg } from "@base/cfg/GameCfg";
+import { MahjongViewType } from "@def/mahjong";
 import facade = base.facade;
 
 function initDebug(): void {
@@ -27,7 +27,7 @@ export async function main() {
   GameCfg.init();
   initModules();
 
-  facade.openView(ModuleType.MAHJONG, MahjongViewType.HOME);
+  facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
 }
 
 let _lastLoop = 0;
@@ -65,14 +65,3 @@ function initLoop(): void {
   _rawLoop = stage._loop;
   stage._loop = _loop;
 }
-
-// setInterval(_bgLoop, 1);
-//
-// function _bgLoop(): void {
-//   const now = Date.now();
-//   const elapsed = now - _lastLoop;
-//   if (elapsed < UpdateFrame.SLOW * 1.5) {
-//     return;
-//   }
-//   _loop();
-// }

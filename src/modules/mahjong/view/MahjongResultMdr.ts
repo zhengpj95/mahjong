@@ -1,7 +1,7 @@
 import { IMahjongResultParam, MahjongEvent, MahjongViewType } from "@def/mahjong";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
-import { ModuleType, ProxyType } from "@def/module-type";
+import { ModuleName, ProxyType } from "@def/module-name";
 import Label = Laya.Label;
 import eventMgr = base.eventMgr;
 import BaseMediator = base.BaseMediator;
@@ -38,7 +38,7 @@ export default class MahjongResultMdr extends BaseMediator<Sprite> {
   }
 
   protected onOpen(): void {
-    this._proxy = base.facade.getProxy(ModuleType.MAHJONG, ProxyType.MAHJONG);
+    this._proxy = base.facade.getProxy(ModuleName.MAHJONG, ProxyType.MAHJONG);
     this._param = this.params;
 
     this._lab = ComUtils.getNodeByNameList<Label>(this.ui, ["boxHtml", "lab"]);
@@ -63,8 +63,8 @@ export default class MahjongResultMdr extends BaseMediator<Sprite> {
 
   private onClickHome(): void {
     console.warn("MahjongResultMdr.onClickHome...");
-    facade.openView(ModuleType.MAHJONG, MahjongViewType.HOME);
-    facade.closeView(ModuleType.MAHJONG, MahjongViewType.MAIN);
+    facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
+    facade.closeView(ModuleName.MAHJONG, MahjongViewType.MAIN);
     this.close();
   }
 

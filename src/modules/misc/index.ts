@@ -1,5 +1,5 @@
 import BaseModule = base.BaseModule;
-import { ModuleType } from "@def/module-type";
+import { ModuleName } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
 import RuleMdr from "./view/RuleMdr";
 import { ShowTipsCmd } from "./cmd/ShowTipsCmd";
@@ -10,7 +10,7 @@ import { ShowTipsCmd } from "./cmd/ShowTipsCmd";
  */
 export class MiscModule extends BaseModule {
   constructor() {
-    super(ModuleType.MISC);
+    super(ModuleName.MISC);
   }
 
   protected initCmd(): void {

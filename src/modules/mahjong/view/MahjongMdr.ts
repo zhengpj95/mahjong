@@ -3,7 +3,7 @@ import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent, MahjongScoreType, MahjongViewType } from "@def/mahjong";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { BarProgressComp } from "@script/index";
-import { ModuleType, ProxyType } from "@def/module-type";
+import { ModuleName, ProxyType } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
 import List = Laya.List;
 import Handler = Laya.Handler;
@@ -67,7 +67,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   }
 
   protected initUI(): void {
-    this._proxy = base.facade.getProxy(ModuleType.MAHJONG, ProxyType.MAHJONG);
+    this._proxy = base.facade.getProxy(ModuleName.MAHJONG, ProxyType.MAHJONG);
 
     this._list = <List>this.ui.getChildByName("listItem");
     this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
@@ -286,12 +286,12 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   }
 
   private onClickRule(): void {
-    facade.openView(ModuleType.MISC, MiscViewType.RULE, ruleDesc);
+    facade.openView(ModuleName.MISC, MiscViewType.RULE, ruleDesc);
   }
 
   private onClickBack(): void {
     this.close();
-    facade.openView(ModuleType.MAHJONG, MahjongViewType.HOME);
+    facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
   }
 
   private _lineSprite: Sprite;

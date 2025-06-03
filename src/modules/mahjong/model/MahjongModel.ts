@@ -3,7 +3,7 @@ import { AStarMgr, GridPoint } from "@base/astar";
 import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "./MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { ModuleType } from "@def/module-type";
+import { ModuleName } from "@def/module-name";
 import { ConfigName } from "@configName";
 import poolMgr = base.poolMgr;
 import eventMgr = base.eventMgr;
@@ -267,6 +267,6 @@ export class MahjongModel {
   /**展示结算弹窗*/
   public showResult(param?: IMahjongResultParam): void {
     eventMgr.emit(MahjongEvent.SHOW_RESULT);
-    facade.openView(ModuleType.MAHJONG, MahjongViewType.RESULT, param);
+    facade.openView(ModuleName.MAHJONG, MahjongViewType.RESULT, param);
   }
 }

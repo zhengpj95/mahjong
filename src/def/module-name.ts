@@ -2,7 +2,7 @@
  * @author zpj
  * @date 2025/4/29
  */
-export const enum ModuleType {
+export const enum ModuleName {
   MISC = 1,
   MAHJONG = 2, // 麻将
   HOODLE = 3, // 弹珠

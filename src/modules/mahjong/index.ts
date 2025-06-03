@@ -1,5 +1,5 @@
 import BaseModule = base.BaseModule;
-import { ModuleType, ProxyType } from "@def/module-type";
+import { ModuleName, ProxyType } from "@def/module-name";
 import { MahjongProxy } from "./model/MahjongProxy";
 import { MahjongViewType } from "@def/mahjong";
 import MahjongHomeMdr from "./view/MahjongHomeMdr";
@@ -12,7 +12,7 @@ import MahjongResultMdr from "./view/MahjongResultMdr";
  */
 export class MahjongModule extends BaseModule {
   constructor() {
-    super(ModuleType.MAHJONG);
+    super(ModuleName.MAHJONG);
   }
 
   protected initCmd(): void {

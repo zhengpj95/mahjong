@@ -1,5 +1,5 @@
 import BaseModule = base.BaseModule;
-import { ModuleType } from "@def/module-type";
+import { ModuleName } from "@def/module-name";
 import { HoodleMdr } from "./view/HoodleMdr";
 import { HoodleViewType } from "@def/hoodle";
 
@@ -9,7 +9,7 @@ import { HoodleViewType } from "@def/hoodle";
  */
 export class HoodleModule extends BaseModule {
   constructor() {
-    super(ModuleType.HOODLE);
+    super(ModuleName.HOODLE);
   }
 
   protected initCmd(): void {
