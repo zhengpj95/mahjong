@@ -55,7 +55,27 @@
       "_$comp": [
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
-          "scriptPath": "../src/script/ClickScale.ts"
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": "onClickBtnStart"
+        }
+      ]
+    },
+    {
+      "_$id": "k6arf7gs",
+      "_$type": "Image",
+      "name": "$btnHoodle",
+      "x": 551,
+      "y": 480,
+      "width": 84,
+      "height": 84,
+      "right": 5,
+      "skin": "res://c256f931-47d9-4e7c-9b90-22bcf6702838",
+      "color": "#ffffff",
+      "_$comp": [
+        {
+          "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": "onClickBtnHoodle"
         }
       ]
     }

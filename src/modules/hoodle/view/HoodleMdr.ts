@@ -7,7 +7,10 @@ import RigidBody = Laya.RigidBody;
 import ColliderBase = Laya.ColliderBase;
 import Sprite = Laya.Sprite;
 import CircleCollider = Laya.CircleCollider;
+import facade = base.facade;
 import { HoodleView } from "@3rd-types/hoodle";
+import { ModuleName } from "@def/module-name";
+import { MahjongViewType } from "@def/mahjong";
 
 /**
  * @author zpj
@@ -168,5 +171,10 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
       this.ui.addChild(circle);
       this._blockList.push(circle);
     }
+  }
+
+  public onBack(): void {
+    this.close();
+    facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
   }
 }

@@ -6,7 +6,7 @@
   "right": 0,
   "top": 0,
   "bottom": 0,
-  "name": "2dUI",
+  "name": "Scene2D",
   "width": 640,
   "height": 1136,
   "_$child": [
@@ -219,7 +219,7 @@
           "_$id": "i7ylls5b",
           "_$type": "Label",
           "name": "$labScore",
-          "x": 30,
+          "x": 12,
           "y": 85,
           "width": 107,
           "height": 31,
@@ -292,6 +292,25 @@
           "bold": true,
           "valign": "top",
           "padding": "0,0,0,0"
+        }
+      ]
+    },
+    {
+      "_$id": "wxrrgs58",
+      "_$type": "Image",
+      "name": "img_btn_back",
+      "x": 5,
+      "y": 5,
+      "width": 64,
+      "height": 64,
+      "skin": "res://24566db0-9297-4f85-b13a-1974f3b8591e",
+      "useSourceSize": true,
+      "color": "#ff0601",
+      "_$comp": [
+        {
+          "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": "onBack"
         }
       ]
     }
