@@ -8,6 +8,7 @@ import ColliderBase = Laya.ColliderBase;
 import Sprite = Laya.Sprite;
 import CircleCollider = Laya.CircleCollider;
 import facade = base.facade;
+import BoxCollider = Laya.BoxCollider;
 import { HoodleView } from "@3rd-types/hoodle";
 import { ModuleName } from "@def/module-name";
 import { MahjongViewType } from "@def/mahjong";
@@ -24,12 +25,16 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
   private _blockCirclePrefab: Laya.PrefabImpl;
   private _blockList: Sprite[] = [];
 
+  private _score: number = 0;
+
   constructor() {
     super(LayerIndex.MAIN, "scene/hoodle/Hoodle.ls");
   }
 
   protected addEvents(): void {
-    this.onLaya(Laya.stage, Laya.Event.CLICK, this.onClickBall, this);
+    this.onLaya(Laya.stage, Laya.Event.MOUSE_DOWN, this.onClickBallDown, this);
+    this.onLaya(Laya.stage, Laya.Event.MOUSE_DRAG, this.onClickBallDown, this);
+    this.onLaya(Laya.stage, Laya.Event.MOUSE_UP, this.onClickBallUp, this);
     this.onLaya(this.ui.$ballSprite, Laya.Event.TRIGGER_EXIT, this.onBallTrigger);
   }
 
@@ -77,31 +82,49 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
     });
   }
 
-  private _score: number = 0;
-
   private addScore(score: number): void {
     this._score += score;
     this.ui.$boxTop.$labScore.text = "得分：" + this._score;
   }
 
-  private onClickBall(e: Laya.Event): void {
+  private onClickBallDown(e: Laya.Event): void {
     const ballSprite = this.ui.$ballSprite;
     const rigid = ballSprite.getComponent(RigidBody);
     if (rigid.type === "static" || rigid.gravityScale === 0) {
-      const clickPoint = Laya.Point.create();
-      clickPoint.setTo(e.stageX, e.stageY);
-      const center = rigid.getWorldCenter();
-      const dir = Laya.Point.create();
-      dir.setTo(clickPoint.x - center.x, clickPoint.y - center.y);
+      const targetPoint = this.ui.localToGlobal(Laya.Point.create().setTo(e.stageX, e.stageY));
+      const fromPoint = this.ui.localToGlobal(Laya.Point.create().setTo(ballSprite.x, ballSprite.y));
+      const dir = Laya.Point.create().setTo(targetPoint.x - fromPoint.x, targetPoint.y - fromPoint.y);
       dir.normalize();
-      rigid.type = "dynamic";
-      rigid.allowRotation = true;
-      rigid.allowSleep = true;
-      rigid.angularVelocity = 10;
-      rigid.gravityScale = 0.8;
-      rigid.linearVelocity = new Laya.Point((dir.x * 1000) >> 0, (dir.y * 1000) >> 0);
-      clickPoint.recover();
+      const p = Laya.Point.create().setTo(dir.x * 1000 >> 0, dir.y * 1000 >> 0);
+      this.drawPath(fromPoint, p);
+      targetPoint.recover();
+      fromPoint.recover();
       dir.recover();
+      p.recover();
+    }
+  }
+
+  private onClickBallUp(e: Laya.Event): void {
+    const ballSprite = this.ui.$ballSprite;
+    const rigid = ballSprite.getComponent(RigidBody);
+    if (rigid.type === "static" || rigid.gravityScale === 0) {
+      this.ui.$box.graphics.clear();
+      rigid.setVelocity({ x: 0, y: 0 });
+      rigid.type = "dynamic";
+      rigid.allowRotation = false;
+      rigid.allowSleep = true;
+      rigid.angularVelocity = 5;
+      rigid.gravityScale = 0.8;
+      const targetPoint = this.ui.localToGlobal(Laya.Point.create().setTo(e.stageX, e.stageY));
+      const fromPoint = this.ui.localToGlobal(Laya.Point.create().setTo(ballSprite.x, ballSprite.y));
+      const dir = Laya.Point.create().setTo(targetPoint.x - fromPoint.x, targetPoint.y - fromPoint.y);
+      dir.normalize();
+      const p = Laya.Point.create().setTo(dir.x * 1000 >> 0, dir.y * 1000 >> 0);
+      rigid.linearVelocity = p;
+      targetPoint.recover();
+      fromPoint.recover();
+      dir.recover();
+      p.recover();
     }
   }
 
@@ -151,6 +174,8 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
       const rect = <Sprite>this._blockRectPrefab.create();
       const val = Math.max(1, (Math.random() * 20 >> 0));
       (rect.getChildByName("$lab") as Label).text = val + "";
+      const collider = rect.getComponent(BoxCollider);
+      collider.label = "enemy";
       rect.x = (Math.random() * 260 >> 0) + (inRight ? 320 : 0) + 30;
       rect.y = this.ui.height - rect.height / 2;
       this.ui.addChild(rect);
@@ -166,6 +191,7 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
       circle.size(size * 2, size * 2);
       const collider = circle.getComponent(CircleCollider);
       collider.radius = size;
+      collider.label = "enemy";
       circle.x = (Math.random() * 260 >> 0) + (inRight ? 0 : 320) + 30;
       circle.y = this.ui.height - circle.height / 2;
       this.ui.addChild(circle);
@@ -173,8 +199,56 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
     }
   }
 
+  // noinspection JSUnusedGlobalSymbols
   public onBack(): void {
     this.close();
     facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
+  }
+
+  private drawPath(start: Laya.Point, velocity: Laya.Point): void {
+    this.ui.$box.graphics.clear();
+
+    let pos = new Laya.Point(start.x, start.y);
+    let vx = velocity.x;
+    let vy = velocity.y;
+
+    const g = 9.8 * 60; // 重力像素/秒²
+    const dt = 1 / 60;
+    const steps = 180;
+
+    const stageWidth = this.ui.stage.width;
+
+    let isRev = 0;
+    for (let i = 0; i < steps; i++) {
+      if (isRev > 1) break;
+      const p = this.ui.globalToLocal(pos);
+      const nextX = p.x + vx * dt;
+      const nextY = p.y + vy * dt;
+
+      // 撞到左右墙壁：反弹 X
+      if (nextX <= 0 || nextX >= stageWidth) {
+        vx = -vx;
+        isRev += 1;
+      }
+
+      // 撞到顶部（可选）反弹 Y
+      if (nextY <= 0) {
+        vy = -vy;
+      }
+
+      const next = this.ui.globalToLocal(new Laya.Point(
+        this.clamp(nextX, 0, stageWidth),
+        nextY
+      ));
+
+      this.ui.$box.graphics.drawLine(pos.x, pos.y, next.x, next.y, "#00ff00", 1);
+
+      pos = next;
+      vy += g * dt;
+    }
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(value, max));
   }
 }

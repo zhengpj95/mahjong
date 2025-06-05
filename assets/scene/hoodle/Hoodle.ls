@@ -313,6 +313,17 @@
           "mdrClickCall": "onBack"
         }
       ]
+    },
+    {
+      "_$id": "ozfn2b2f",
+      "_$type": "Box",
+      "name": "$box",
+      "width": 640,
+      "height": 1136,
+      "left": 0,
+      "right": 0,
+      "top": 0,
+      "bottom": 0
     }
   ]
 }
