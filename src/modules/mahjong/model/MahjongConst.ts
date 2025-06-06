@@ -15,6 +15,6 @@ export const CARD_NUM_LIST: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export type CardData = [CardType, number | FengType]
 
 export function getCardTypeRes(type: CardType, num: number): string {
-  const cardCfg = GameCfg.getCfgByNameId<CardConfig>(ConfigName.CARD, type);
+  const cardCfg = GameCfg.getCfgByNameId(ConfigName.CARD, type);
   return `atlas/mahjong/${cardCfg.res + num}.png`;
 }

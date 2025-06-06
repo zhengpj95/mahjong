@@ -1,6 +1,5 @@
 /** 关联配置表结构 */
 
-// declare module config {
 /** 牌资源 */
 interface CardConfig {
   /** card */
@@ -22,6 +21,3 @@ interface LevelConfig {
   /** 布局[行,列] */
   readonly layout: number[];
 }
-
-//   export { CardConfig, LevelConfig };
-// }

@@ -18,7 +18,7 @@ export class MahjongCardData implements PoolObject {
     this.row = row;
     this.col = col;
     this.cardData = data;
-    const cardCfg = GameCfg.getCfgByNameId<CardConfig>(ConfigName.CARD, data[0]);
+    const cardCfg = GameCfg.getCfgByNameId(ConfigName.CARD, data[0]);
     (this as any)["cardName"] = cardCfg.res + data[1];
   }
 

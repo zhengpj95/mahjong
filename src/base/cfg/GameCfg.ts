@@ -1,5 +1,11 @@
 import TextResource = Laya.TextResource;
 import { DebugUtils } from "@base/utils/DebugUtils";
+import { ConfigMap, ConfigMultiMap } from "@configName";
+
+type ConfigName = keyof ConfigMap; // 单key、多key
+type ConfigMultiName<K extends ConfigName> = keyof ConfigMultiMap<K>; // 多key
+type ConfigTableMap<K extends ConfigName> = Omit<ConfigMap, ConfigMultiName<K>>; // 单key，集合中的差集
+type ConfigTableName<K extends ConfigName> = keyof ConfigTableMap<K>; // 单key
 
 /**
  * @author zpj
@@ -8,10 +14,8 @@ import { DebugUtils } from "@base/utils/DebugUtils";
 export class GameCfg {
   private static jsonPath = "resources/json/";
   private static jsonCfgListPath = "resources/json/cfglist.json";
-  public static cfgMap: {
-    [cfgName: string]: Record<string, any>;
-  } = {};
-  public static cfgListMap: { [cfgName: string]: any[] } = {};
+  public static cfgMap: { [key in ConfigName]?: Record<string, ConfigMap[key]> } = {};
+  public static cfgListMap: { [key in ConfigName]?: ConfigMap[key][] } = {};
 
   public static init(): void {
     Laya.loader.load(
@@ -34,16 +38,15 @@ export class GameCfg {
           null,
           Laya.Loader.JSON,
           0,
-        ).then(value => {
-          this.onLoadedJson(jsonName, value?.data ?? {});
+        ).then((value: TextResource): void => {
+          const name = <ConfigName>jsonName.replace(".json", "");
+          this.onLoadedJson(name, value?.data ?? {});
         });
       }
     }
   }
 
-  private static onLoadedJson(jsonName: string, data: any): void {
-    // console.log(jsonName, data);
-    jsonName = jsonName.replace(".json", "");
+  private static onLoadedJson(jsonName: ConfigName, data: any): void {
     this.cfgMap[jsonName] = data;
 
     const list: any[] = [];
@@ -53,15 +56,25 @@ export class GameCfg {
     this.cfgListMap[jsonName] = list;
   }
 
-  /**获取配置列表*/
-  public static getCfgListByName<T>(cfgName: string): T[] {
+  /**获取配置单项，单key*/
+  public static getCfgByNameId<K extends ConfigTableName<K>>(cfgName: K, id: number | string): ConfigMap[K] | undefined {
+    const obj = this.cfgMap[cfgName];
+    return obj ? obj[id] : undefined;
+  }
+
+  /**获取配置列表，单key或多key*/
+  public static getCfgListByName<K extends ConfigName>(cfgName: K): ConfigMap[K][] {
     return this.cfgListMap[cfgName] || [];
   }
 
-  /**获取配置单项*/
-  public static getCfgByNameId<T>(cfgName: string, id: number | string): T | undefined {
-    const obj = this.cfgMap[cfgName];
-    return obj ? obj[id] : undefined;
+  /**获取配置整表，多key*/
+  public static getCfgListMoreByName<K extends ConfigMultiName<K>>(cfgName: K): ConfigMultiMap<K>[K] | undefined {
+    return this.cfgMap[cfgName];
+  }
+
+  /**获取配置整表，单key*/
+  public static getCfgByName<K extends ConfigTableName<K>>(name: K): Record<string, ConfigMap[K]> | undefined {
+    return this.cfgMap[name];
   }
 }
 
