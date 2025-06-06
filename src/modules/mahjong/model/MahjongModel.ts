@@ -17,15 +17,16 @@ export const MAHJONG_LEVEL = "mahjong_level";
 export class MahjongModel {
   public row = 0;
   public col = 0;
-  public data: MahjongCardData[][] = [];
 
   public level = 0;
   public levelScore = 0;
 
-  private _rowColStrList: string[];
+  private _dataMap = new Map<string, MahjongCardData>();
+  private _sameMap = new Map<string, Map<string, MahjongCardData>>();
+
+  private _rowColStrList: string[] = [];
   private _pathData: number[][] = [];
   private _astarMgr: AStarMgr;
-  private _sameCardMap: { [key: string]: MahjongCardData[] } = {};
 
   private getLevelCfg(): LevelConfig {
     const lv = this.getNextLevel();
@@ -45,7 +46,7 @@ export class MahjongModel {
     const cfg = this.getLevelCfg();
     this.row = cfg && cfg.layout ? cfg.layout[0] : 8;
     this.col = cfg && cfg.layout ? cfg.layout[1] : 10;
-    this.data = [];
+    this._dataMap.clear();
   }
 
   // 清除当前关卡数据
@@ -53,11 +54,11 @@ export class MahjongModel {
     this.levelScore = 0;
     this.row = 0;
     this.col = 0;
-    this.data.length = 0;
     this._pathData.length = 0;
     this._astarMgr = <any>undefined;
     this._rowColStrList = <any>undefined;
-    this._sameCardMap = {};
+    this._dataMap.clear();
+    this._sameMap.clear();
   }
 
   // 麻将牌类型集
@@ -77,7 +78,7 @@ export class MahjongModel {
   }
 
   private getRowColStrList(): string[] {
-    if (!this._rowColStrList) {
+    if (!this._rowColStrList?.length) {
       const rst: string[] = [];
       for (let i = 0; i < this.row; i++) {
         for (let j = 0; j < this.col; j++) {
@@ -89,6 +90,7 @@ export class MahjongModel {
     return this._rowColStrList || [];
   }
 
+  // 随机位置
   private getRandomRowCol(): number[] {
     const list = this.getRowColStrList();
     const idx = Math.random() * list.length >> 0;
@@ -96,35 +98,47 @@ export class MahjongModel {
     return listItem.split("_").map(item => +item);
   }
 
-  public getMahjongData(): MahjongCardData[][] {
+  public getMahjongData(): MahjongCardData[] {
     const list = this.getMahjongCardList();
     for (let item of list) {
       for (let i = 0; i < CARD_COUNT; i++) {
         const randomItemAry = this.getRandomRowCol();
-        if (!this.data[randomItemAry[0]]) {
-          this.data[randomItemAry[0]] = [];
-        }
         const cardData = poolMgr.alloc(MahjongCardData);
         cardData.updateInfo(randomItemAry[0], randomItemAry[1], item);
-        this.data[randomItemAry[0]][randomItemAry[1]] = cardData;
+        this._dataMap.set(randomItemAry.join("_"), cardData);
+        if (!this._sameMap.has(item.join("_"))) {
+          this._sameMap.set(item.join("_"), new Map<string, MahjongCardData>());
+        }
+        this._sameMap.get(item.join("_")).set(cardData.row + "_" + cardData.col, cardData);
       }
     }
-    return this.data;
+    const rst: MahjongCardData[] = [];
+    this._dataMap.forEach(value =>
+      rst[value.row * 10 + value.col] = value
+    );
+    return rst;
   }
 
   // 移除牌
   public deleteCard(index: number): boolean {
     const row = (index / 10 >> 0);
     const col = index % 10;
-    if (!this.data || !this.data[row]) {
+    if (!this._dataMap.has(`${row}_${col}`)) {
       return false;
     }
-    poolMgr.free(this.data[row][col]);
-    this.data[row][col] = undefined;
+    const cardData = this._dataMap.get(`${row}_${col}`);
+    const key = cardData.cardData.join("_");
+    const key1 = `${row}_${col}`;
+    this._dataMap.delete(key1);
+    this._sameMap.get(key).delete(key1);
+    poolMgr.free(cardData);
+    if (!this._sameMap.get(key).size) {
+      this._sameMap.delete(key);
+    }
     if (this._pathData.length) {
       this._pathData[row + 1][col + 1] = 0;
     }
-    const cnt = this.getLeaveCardDataList().length;
+    const cnt = this._dataMap.size;
     if (cnt <= 0) {
       this.showResult();
     }
@@ -138,15 +152,15 @@ export class MahjongModel {
     }
     if (!this._astarMgr) {
       const dfsAry: number[][] = [];
-      for (let i = 0; i < this.row + 2; i++) {
-        for (let j = 0; j < this.col + 2; j++) {
+      for (let i = 0; i <= this.row + 1; i++) {
+        for (let j = 0; j <= this.col + 1; j++) {
           if (!dfsAry[i]) {
             dfsAry[i] = [];
           }
           if (i === 0 || j === 0 || i === this.row + 1 || j === this.col + 1) {
             dfsAry[i][j] = 0;
           } else {
-            const cardData = this.data[i - 1][j - 1];
+            const cardData = this._dataMap.get(`${i - 1}_${j - 1}`);
             dfsAry[i][j] = cardData ? 1 : 0;
           }
         }
@@ -163,48 +177,36 @@ export class MahjongModel {
     if (!cardData) {
       return [];
     }
-    const cardKey = cardData.cardData.toString();
-    if (this._sameCardMap[cardKey]) {
-      return this._sameCardMap[cardKey] || [];
-    }
+    const map = this._sameMap.get(cardData.cardData.join("_"));
     const rst: MahjongCardData[] = [];
-    for (let data of this.data) {
-      for (let item of data) {
-        if (item && item.checkSame(cardData)) {
-          rst.push(item);
-        }
-      }
-    }
-    this._sameCardMap[cardKey] = rst;
+    map.forEach(value => rst.push(value));
     return rst;
   }
 
   // 提示可消除的牌
   public getTipsCardDataList(): MahjongCardData[] {
-    if (!this.data.length) {
+    if (!this._dataMap.size) {
       return [];
     }
     let rst: MahjongCardData[] = [];
     const checkSet = new Set<string>();
-    for (let rows of this.data) {
-      if (!rows || !rows.length) continue;
-      for (let item of rows) {
-        if (!item || !item.cardData || !item.isValid()) continue;// 已消除
-        if (checkSet.has(item.cardData.toString())) continue;
-        checkSet.add(item.cardData.toString());
-        const connectList = this.getConnectCardDataList(item);
-        if (!connectList.length) continue;
-        for (let i = 0; i < connectList.length; i++) {
-          const cardI = connectList[i];
-          if (!cardI || !cardI.isValid()) continue;
-          for (let j = i + 1; j < connectList.length; j++) {
-            const cardJ = connectList[j];
-            if (!cardJ || !cardJ.isValid()) continue;
-            const paths = this.findPath(cardI, cardJ);
-            if (paths.length) {
-              rst = [cardI, cardJ];
-              break;
-            }
+    const list = this._dataMap.entries();
+    for (let [_, item] of list) {
+      if (!item || !item.cardData || !item.isValid()) continue;// 已消除
+      if (checkSet.has(item.cardData.toString())) continue;
+      checkSet.add(item.cardData.toString());
+      const connectList = this.getConnectCardDataList(item);
+      if (!connectList.length) continue;
+      for (let i = 0; i < connectList.length; i++) {
+        const cardI = connectList[i];
+        if (!cardI || !cardI.isValid()) continue;
+        for (let j = i + 1; j < connectList.length; j++) {
+          const cardJ = connectList[j];
+          if (!cardJ || !cardJ.isValid()) continue;
+          const paths = this.findPath(cardI, cardJ);
+          if (paths.length) {
+            rst = [cardI, cardJ];
+            break;
           }
         }
       }
@@ -212,37 +214,32 @@ export class MahjongModel {
     return rst;
   }
 
-  // 剩余牌列表
-  public getLeaveCardDataList(): MahjongCardData[] {
-    return this.data.reduce((arr, item) => {
-        return arr.concat(item.filter(card => card && card.isValid()));
-      },
-      []
-    );
-  }
-
   // 洗牌
-  public getRefreshCardDataList(): MahjongCardData[][] {
-    const list = this.getLeaveCardDataList();
+  public getRefreshCardDataList(): MahjongCardData[] {
+    const list: MahjongCardData[] = [];
+    for (const item of this._dataMap.values()) {
+      list.push(item);
+    }
+
     this._astarMgr = <any>undefined;
     this._rowColStrList = <any>undefined;
-    this.data = [];
-    for (let i = 0; i < this.row; i++) {
-      this.data[i] = new Array(this.col).fill(undefined);
-    }
+    this._dataMap.clear();
     this._pathData = [];
+
     for (let card of list) {
       if (!card) {
         continue;
       }
       const random = this.getRandomRowCol();
-      if (!this.data[random[0]]) {
-        this.data[random[0]] = new Array(this.col).fill(undefined);
-      }
       card.updateInfo(random[0], random[1], card.cardData);
-      this.data[random[0]][random[1]] = card;
+      this._dataMap.set(random.join("_"), card);
     }
-    return this.data;
+
+    const rst: MahjongCardData[] = [];
+    this._dataMap.forEach(value =>
+      rst[value.row * 10 + value.col] = value
+    );
+    return rst;
   }
 
   // 关卡挑战时间

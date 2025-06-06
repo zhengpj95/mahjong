@@ -54,6 +54,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   private _endTime = 0;
   private _btnRule: Image;
   private _btnBack: Image;
+  private _autoRefresh = false;
 
   constructor() {
     super(LayerIndex.MAIN, "scene/mahjong/Mahjong.ls");
@@ -101,6 +102,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
     base.tweenMgr.remove(bar);
     Tween.clearAll(this);
     Laya.timer.clearAll(this);
+    this._autoRefresh = false;
   }
 
   private removeEvents(): void {
@@ -116,8 +118,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
 
     this.resetScore();
     this.updateLevel();
-    const list = this._proxy.model.getMahjongData();
-    this._list.array = list.reduce((a, b) => a.concat(b));
+    this._list.array = this._proxy.model.getMahjongData();
     this.updateBar();
   }
 
@@ -268,19 +269,20 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
       }
     } else {
       this.emit(MiscEvent.SHOW_TIPS, "无可消除的卡牌，请洗牌!");
-      this.onBtnRefresh(true); // 主动洗牌
+      this._autoRefresh = true;
+      this.onBtnRefresh(); // 主动洗牌
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
   }
 
+
   // 洗牌
-  private onBtnRefresh(auto = false): void {
+  private onBtnRefresh(): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
-    const list = this._proxy.model.getRefreshCardDataList();
-    this._list.array = list.reduce((a, b) => a.concat(b));
+    this._list.array = this._proxy.model.getRefreshCardDataList();
     this._list.refresh();
     this.emit(MiscEvent.SHOW_TIPS, "洗牌成功!");
-    if (!auto) {
+    if (!this._autoRefresh) {
       this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
     }
   }
