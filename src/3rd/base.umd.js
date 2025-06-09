@@ -1641,15 +1641,17 @@
               },
           ], Laya.Handler.create(this, this.onLoadComplete, [bitmap]))
               .then((r) => {
-              console.log(`MergedBitmap onLoad `, r);
           });
       }
       static onLoadComplete(bitmap) {
           const texture = Laya.loader.getRes(bitmap._url + ".png");
-          const json = Laya.loader.getRes(bitmap._url + ".json");
+          const json = (Laya.loader.getRes(bitmap._url + ".json"));
+          if (!texture || !json) {
+              throw new Error("MergedBitmap onLoadComplete error " + bitmap._url);
+          }
           bitmap._texture = texture;
-          bitmap._atlas = json;
-          bitmap._frames = json.frames;
+          bitmap._atlas = json.data;
+          bitmap._frames = json.data.frames;
           if (bitmap._callback) {
               bitmap._callback.exec(bitmap);
           }
@@ -1658,12 +1660,21 @@
           this._url = url;
           this._callback = callback;
           Laya.loader
-              .load(url + ".png", Laya.Handler.create(this, this.onLoadPng), undefined, Laya.Loader.IMAGE)
+              .load([
+              {
+                  url: url + ".png",
+                  type: Laya.Loader.IMAGE,
+                  priority: 1,
+              },
+              {
+                  url: url + ".json",
+                  type: Laya.Loader.JSON,
+                  priority: 1,
+              },
+          ])
               .then((r) => {
-          });
-          Laya.loader
-              .load(url + ".json", Laya.Handler.create(this, this.onLoadJson), undefined, Laya.Loader.JSON)
-              .then((r) => {
+              this.onLoadPng(r[0]);
+              this.onLoadJson(r[1].data);
           });
       }
       onLoadPng(data) {
