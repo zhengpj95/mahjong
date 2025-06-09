@@ -1,0 +1,92 @@
+{"frames": [
+
+{
+	"filename": "Circle_explosion/Circle_explosion1",
+	"frame": {"x":98,"y":208,"w":50,"h":43},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":106,"y":109,"w":50,"h":43},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion2",
+	"frame": {"x":98,"y":153,"w":59,"h":53},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":101,"y":106,"w":59,"h":53},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion3",
+	"frame": {"x":85,"y":253,"w":72,"h":72},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":94,"y":98,"w":72,"h":72},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion4",
+	"frame": {"x":1,"y":241,"w":82,"h":81},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":89,"y":89,"w":82,"h":81},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion5",
+	"frame": {"x":1,"y":153,"w":95,"h":86},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":85,"y":87,"w":95,"h":86},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion6",
+	"frame": {"x":170,"y":151,"w":123,"h":107},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":73,"y":81,"w":123,"h":107},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion7",
+	"frame": {"x":332,"y":143,"w":134,"h":127},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":65,"y":71,"w":134,"h":127},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion8",
+	"frame": {"x":332,"y":1,"w":138,"h":140},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":62,"y":64,"w":138,"h":140},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion9",
+	"frame": {"x":1,"y":1,"w":167,"h":150},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":55,"y":55,"w":167,"h":150},
+	"sourceSize": {"w":256,"h":256}
+},
+{
+	"filename": "Circle_explosion/Circle_explosion10",
+	"frame": {"x":170,"y":1,"w":160,"h":148},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":55,"y":58,"w":160,"h":148},
+	"sourceSize": {"w":256,"h":256}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "circle_explosion.png",
+	"format": "RGBA8888",
+	"size": {"w":512,"h":512},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:85c19f5533b5c28cb9f0dfedfbfed5c6:db6ac8febdf0ec21b7eab0d341943052:8876240684f9b57ee56e277fc3ee0f9f$"
+}
+}
