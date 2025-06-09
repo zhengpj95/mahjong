@@ -95,7 +95,7 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
       const fromPoint = this.ui.localToGlobal(Laya.Point.create().setTo(ballSprite.x, ballSprite.y));
       const dir = Laya.Point.create().setTo(targetPoint.x - fromPoint.x, targetPoint.y - fromPoint.y);
       dir.normalize();
-      const p = Laya.Point.create().setTo(dir.x * 1000 >> 0, dir.y * 1000 >> 0);
+      const p = Laya.Point.create().setTo(dir.x * 1000, dir.y * 1000);
       this.drawPath(fromPoint, p);
       targetPoint.recover();
       fromPoint.recover();
@@ -208,12 +208,12 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
   private drawPath(start: Laya.Point, velocity: Laya.Point): void {
     this.ui.$box.graphics.clear();
 
-    let pos = new Laya.Point(start.x, start.y);
+    let pos = Laya.Point.create().setTo(start.x, start.y);
     let vx = velocity.x;
     let vy = velocity.y;
 
     const g = 9.8 * 60; // 重力像素/秒²
-    const dt = 1 / 60;
+    const dt = 1 / 120;
     const steps = 180;
 
     const stageWidth = this.ui.stage.width;
@@ -236,7 +236,7 @@ export class HoodleMdr extends BaseMediator<HoodleView> {
         vy = -vy;
       }
 
-      const next = this.ui.globalToLocal(new Laya.Point(
+      const next = this.ui.globalToLocal(Laya.Point.create().setTo(
         this.clamp(nextX, 0, stageWidth),
         nextY
       ));
