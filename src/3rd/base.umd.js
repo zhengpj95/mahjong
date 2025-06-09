@@ -177,6 +177,142 @@
   }
   const poolMgr = new PoolManager();
 
+  const LoadPriority = {
+      FIRST: 0,
+      UI: 1,
+      UI_SCENE: 2,
+      SCENE: 3,
+      DEFAULT: 4,
+  };
+  function resetDisplay(dis) {
+      if (!dis || dis.destroyed) {
+          return;
+      }
+      dis._bits = 0;
+      dis.x = dis.y = 0;
+      dis.scaleX = dis.scaleY = dis.alpha = 1;
+      dis.rotation = 0;
+      dis.width = dis.height = NaN;
+      dis.pivot(0, 0);
+      dis.visible = true;
+      dis.filters = null;
+  }
+  class BitmapBase extends Laya.Sprite {
+      constructor() {
+          super(...arguments);
+          this._oldStr = "";
+          this.keepOnRem = false;
+          this.center = false;
+          this.loadPri = LoadPriority.UI;
+      }
+      _onAdded() {
+          super._onAdded();
+          if (this.keepOnRem) {
+              return;
+          }
+          if (this._oldStr) {
+              if (!this._source) {
+                  this.source = this._oldStr;
+              }
+              this._oldStr = "";
+          }
+      }
+      _onRemoved() {
+          super._onRemoved();
+          if (this.keepOnRem) {
+              return;
+          }
+          if (typeof this._source === "string") {
+              this._oldStr = this._source;
+              this.source = undefined;
+          }
+      }
+      set source(value) {
+          if (!value) {
+              value = undefined;
+          }
+          if (value === this._source) {
+              if (this.texture) {
+                  this.resize();
+                  this.event(Laya.Event.COMPLETE);
+                  this.onLoaded();
+              }
+              return;
+          }
+          if (typeof value === "string") {
+              this.removeCur();
+              this._source = value;
+              Laya.loader
+                  .load(value, Laya.Handler.create(this, this.onComplete, [value]), undefined, undefined, this.loadPri)
+                  .then((r) => {
+                  console.log("BitmapBase source: ", r);
+              });
+              return;
+          }
+          this.removeCur();
+          this._source = value;
+          this.texture = value;
+          this.resize();
+      }
+      get source() {
+          return this._source;
+      }
+      setAnchor(x = 0, y = 0) {
+          const pivotX = x === 0 ? 0 : this.width * x;
+          const pivotY = y === 0 ? 0 : this.height * y;
+          this.pivot(pivotX, pivotY);
+      }
+      removeCur() {
+          this.texture = null;
+          this._source = undefined;
+      }
+      resize() {
+          const text = this.texture;
+          if (text) {
+              this.width = text.sourceWidth || text.width;
+              this.height = text.sourceHeight || text.height;
+          }
+          if (this.center) {
+              this.pivot(this.width / 2, this.height / 2);
+          }
+      }
+      onComplete(url) {
+          if (this._source !== url)
+              return;
+          this.texture = Laya.loader.getRes(url);
+          this.resize();
+          this.event(Laya.Event.COMPLETE);
+          this.onLoaded();
+      }
+      onLoaded() {
+      }
+      onAlloc() {
+          this.loadPri = LoadPriority.UI;
+      }
+      onFree() {
+          this.center = false;
+          this.removeSelf();
+          resetDisplay(this);
+          this.removeCur();
+          this._oldStr = "";
+      }
+      free() {
+          poolMgr.free(this);
+      }
+  }
+
+  class Singleton {
+      static ins() {
+          if (!this._instance) {
+              this._instance = new this();
+              if (this.name && typeof window !== "undefined") {
+                  window[this.name] = this._instance;
+              }
+          }
+          return this._instance;
+      }
+  }
+
   class TimerVo {
       constructor() {
           this.useFrame = false;
@@ -1474,6 +1610,314 @@
   class BaseProxy extends BaseEmitter {
   }
 
+  class MergedBitmap {
+      constructor() {
+          this._url = "";
+      }
+      get frames() {
+          return this._frames;
+      }
+      get texture() {
+          return this._texture;
+      }
+      get loadComplete() {
+          return !!this.frames && !!this.texture;
+      }
+      static onLoad(url, callback) {
+          const bitmap = poolMgr.alloc(MergedBitmap);
+          bitmap._url = url;
+          bitmap._callback = callback;
+          Laya.loader
+              .load([
+              {
+                  url: url + ".png",
+                  type: Laya.Loader.IMAGE,
+                  priority: 1,
+              },
+              {
+                  url: url + ".json",
+                  type: Laya.Loader.JSON,
+                  priority: 1,
+              },
+          ], Laya.Handler.create(this, this.onLoadComplete, [bitmap]))
+              .then((r) => {
+              console.log(`MergedBitmap onLoad `, r);
+          });
+      }
+      static onLoadComplete(bitmap) {
+          const texture = Laya.loader.getRes(bitmap._url + ".png");
+          const json = Laya.loader.getRes(bitmap._url + ".json");
+          bitmap._texture = texture;
+          bitmap._atlas = json;
+          bitmap._frames = json.frames;
+          if (bitmap._callback) {
+              bitmap._callback.exec(bitmap);
+          }
+      }
+      onLoad(url, callback) {
+          this._url = url;
+          this._callback = callback;
+          Laya.loader
+              .load(url + ".png", Laya.Handler.create(this, this.onLoadPng), undefined, Laya.Loader.IMAGE)
+              .then((r) => {
+          });
+          Laya.loader
+              .load(url + ".json", Laya.Handler.create(this, this.onLoadJson), undefined, Laya.Loader.JSON)
+              .then((r) => {
+          });
+      }
+      onLoadPng(data) {
+          this._texture = data;
+          this.onLoadComplete();
+      }
+      onLoadJson(data) {
+          this._atlas = data;
+          this._frames = data ? data.frames : undefined;
+          this.onLoadComplete();
+      }
+      onLoadComplete() {
+          if (this._callback && this.loadComplete) {
+              this._callback.exec(this);
+          }
+      }
+      getTextureList() {
+          var _a;
+          if (!this.loadComplete)
+              return [];
+          if (this._textureList)
+              return this._textureList;
+          this._textureList = [];
+          for (const f of (_a = this._frames) !== null && _a !== undefined ? _a : []) {
+              const txt = Laya.Texture.create(this._texture, f.frame.x, f.frame.y, f.frame.w, f.frame.h, f.spriteSourceSize.x, f.spriteSourceSize.y, f.sourceSize.w, f.sourceSize.h);
+              this._textureList.push(txt);
+          }
+          return this._textureList;
+      }
+      onAlloc() {
+          this.onRelease();
+      }
+      onRelease() {
+          this._url = undefined;
+          this._atlas = undefined;
+          this._frames = undefined;
+          if (this._callback) {
+              this._callback.free();
+          }
+          this._callback = undefined;
+          this._texture = undefined;
+          this._textureList = undefined;
+      }
+  }
+
+  const INIT_FPS$1 = 16;
+  class BmpMovieClip extends BitmapBase {
+      constructor() {
+          super(...arguments);
+          this._total = 0;
+          this._current = 0;
+          this._playCnt = 1;
+          this._interval = 1000 / INIT_FPS$1;
+          this._remove = false;
+          this._removeParent = false;
+          this.center = true;
+      }
+      play(url, container, cnt = 1, callBack, remove, removeParent) {
+          this._container = container;
+          this._playCnt = cnt;
+          this._callBack = callBack;
+          this._remove = remove !== null && remove !== undefined ? remove : false;
+          this._removeParent = removeParent !== null && removeParent !== undefined ? removeParent : false;
+          MergedBitmap.onLoad(url, CallBack.alloc(this, this.onLoadedMergedBitmap));
+      }
+      onLoadedMergedBitmap(bitmap) {
+          var _a, _b;
+          if (!bitmap) {
+              throw new Error(`BmpMovieClip load alta fail`);
+          }
+          this._mergedBitmap = bitmap;
+          this._total = bitmap.getTextureList().length;
+          this._current = 0;
+          if (!((_a = this._container) === null || _a === undefined ? undefined : _a.contains(this))) {
+              (_b = this._container) === null || _b === undefined ? undefined : _b.addChild(this);
+          }
+          Laya.timer.loop(this._interval, this, this.onUpdate);
+      }
+      onUpdate() {
+          this._current++;
+          if (this._current <= this._total) {
+              this.source = this._mergedBitmap.getTextureList()[this._current - 1];
+              return;
+          }
+          if (this._playCnt < 0) {
+              this._current = 0;
+              this.source = this._mergedBitmap.getTextureList()[this._current];
+              return;
+          }
+          this._playCnt--;
+          if (this._playCnt) {
+              this._current = 0;
+              this.source = this._mergedBitmap.getTextureList()[this._current];
+          }
+          else {
+              Laya.timer.clearAll(this);
+              this.playEnd();
+          }
+      }
+      playEnd() {
+          if (this._callBack) {
+              this._callBack.exec();
+          }
+          if (this._remove) {
+              this.removeSelf();
+          }
+          if (this._removeParent && this._container) {
+              this._container.removeSelf();
+          }
+      }
+      onAlloc() {
+          super.onAlloc();
+          this.onFree();
+          this._interval = 1000 / INIT_FPS$1;
+          this.center = true;
+      }
+      onFree() {
+          super.onFree();
+          if (this._mergedBitmap) {
+              poolMgr.free(this._mergedBitmap);
+          }
+          this._mergedBitmap = undefined;
+          if (this._callBack) {
+              this._callBack.free();
+          }
+          this._callBack = undefined;
+          this._total = 0;
+          this._current = 0;
+          this._playCnt = 0;
+          this._remove = false;
+      }
+  }
+
+  const INIT_FPS = 10;
+  class RpgMovieClip extends BitmapBase {
+      constructor() {
+          super(...arguments);
+          this._total = 0;
+          this._current = 0;
+          this._playCnt = 1;
+          this._interval = 1000 / INIT_FPS;
+          this._remove = false;
+          this._textureMap = {};
+          this._currentAction = "";
+          this._nextAction = "";
+          this.center = true;
+      }
+      setAction(action) {
+          if (this._currentAction !== action) {
+              this._nextAction = action;
+          }
+      }
+      setCnt(cnt) {
+          this._playCnt = cnt;
+      }
+      play(url, container, cnt = 1, loadCallBack, finishCallback, remove) {
+          this._container = container;
+          this._playCnt = cnt;
+          this._loadCallBack = loadCallBack;
+          this._finishCallBack = finishCallback;
+          this._remove = remove !== null && remove !== undefined ? remove : false;
+          MergedBitmap.onLoad(url, CallBack.alloc(this, this.onLoadedMergedBitmap));
+      }
+      onLoadedMergedBitmap(bitmap) {
+          var _a, _b;
+          if (!bitmap || !bitmap.loadComplete) {
+              throw new Error(`BmpMovieClip load alta fail`);
+          }
+          this._mergedBitmap = bitmap;
+          const frames = bitmap.frames || [];
+          const texture = bitmap.texture;
+          for (const f of frames) {
+              const name = f.filename.split("/")[0];
+              if (!this._textureMap[name]) {
+                  this._textureMap[name] = [];
+              }
+              const txt = Laya.Texture.create(texture, f.frame.x, f.frame.y, f.frame.w, f.frame.h, f.spriteSourceSize.x, f.spriteSourceSize.y, f.sourceSize.w, f.sourceSize.h);
+              this._textureMap[name].push(txt);
+          }
+          if (!((_a = this._container) === null || _a === undefined ? undefined : _a.contains(this))) {
+              (_b = this._container) === null || _b === undefined ? undefined : _b.addChild(this);
+          }
+          Laya.timer.loop(this._interval, this, this.onUpdate);
+          if (this._loadCallBack) {
+              this._loadCallBack.exec();
+          }
+      }
+      getTextureList(action) {
+          return this._textureMap[action || this._currentAction] || [];
+      }
+      onUpdate() {
+          if (this._currentAction !== this._nextAction) {
+              this._total = this.getTextureList(this._nextAction).length;
+              this._current = 0;
+              this._currentAction = this._nextAction;
+          }
+          this._current++;
+          if (this._current <= this._total) {
+              this.source = this.getTextureList()[this._current - 1];
+              return;
+          }
+          if (this._playCnt < 0) {
+              this._current = 0;
+              this.source = this.getTextureList()[this._current];
+              return;
+          }
+          this._playCnt--;
+          if (this._playCnt) {
+              this._current = 0;
+              this.source = this.getTextureList()[this._current];
+          }
+          else {
+              Laya.timer.clearAll(this);
+              this.playEnd();
+          }
+      }
+      playEnd() {
+          if (this._finishCallBack) {
+              this._finishCallBack.exec();
+          }
+          if (this._remove) {
+              this.removeSelf();
+          }
+      }
+      onAlloc() {
+          super.onAlloc();
+          this.onFree();
+          this._interval = 1000 / INIT_FPS;
+          this.center = true;
+      }
+      onFree() {
+          super.onFree();
+          if (this._mergedBitmap) {
+              poolMgr.free(this._mergedBitmap);
+          }
+          this._mergedBitmap = undefined;
+          if (this._loadCallBack) {
+              this._loadCallBack.free();
+          }
+          this._loadCallBack = undefined;
+          if (this._finishCallBack) {
+              this._finishCallBack.free();
+          }
+          this._finishCallBack = undefined;
+          this._total = 0;
+          this._current = 0;
+          this._playCnt = 0;
+          this._remove = false;
+          this._textureMap = {};
+          this._currentAction = "";
+          this._nextAction = "";
+      }
+  }
+
   function baseLoop() {
       _loopTween();
       timerMgr.tick();
@@ -1486,10 +1930,16 @@
   exports.BaseMediator = BaseMediator;
   exports.BaseModule = BaseModule;
   exports.BaseProxy = BaseProxy;
+  exports.BitmapBase = BitmapBase;
+  exports.BmpMovieClip = BmpMovieClip;
   exports.CallBack = CallBack;
   exports.Ease = Ease;
   exports.EventData = EventData;
   exports.LayerIndex = LayerIndex;
+  exports.LoadPriority = LoadPriority;
+  exports.MergedBitmap = MergedBitmap;
+  exports.RpgMovieClip = RpgMovieClip;
+  exports.Singleton = Singleton;
   exports.baseInit = baseInit;
   exports.baseLoop = baseLoop;
   exports.eventMgr = eventMgr;
@@ -1497,6 +1947,7 @@
   exports.findMediator = findMediator;
   exports.layerMgr = layerMgr;
   exports.poolMgr = poolMgr;
+  exports.resetDisplay = resetDisplay;
   exports.resourceMgr = resourceMgr;
   exports.socketMgr = socketMgr;
   exports.timerMgr = timerMgr;

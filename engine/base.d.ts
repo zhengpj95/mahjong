@@ -14,6 +14,7 @@ declare module base {
   
   interface PoolObject {
       free?: () => void;
+      destroy?: () => void;
       onAlloc?: () => void;
       onFree?: () => void;
   }
@@ -23,6 +24,36 @@ declare module base {
       free(obj: any): boolean;
   }
   const poolMgr: PoolManager;
+  
+  const LoadPriority: {
+      FIRST: number;
+      UI: number;
+      UI_SCENE: number;
+      SCENE: number;
+      DEFAULT: number;
+  };
+  type LoadPriority = (typeof LoadPriority)[keyof typeof LoadPriority];
+  function resetDisplay(dis: Laya.Sprite): void;
+  class BitmapBase extends Laya.Sprite implements PoolObject {
+      center: boolean;
+      loadPri: LoadPriority;
+      set source(value: Laya.Texture | string | undefined);
+      get source(): Laya.Texture | string | undefined;
+      setAnchor(x?: number, y?: number): void;
+      protected onLoaded(): void;
+      onAlloc(): void;
+      onFree(): void;
+      free(): void;
+  }
+  
+  type SingletonConstructor<T> = {
+      new (): T;
+      _instance?: T;
+      name?: string;
+  };
+  class Singleton<T> {
+      static ins<T>(this: SingletonConstructor<T>): T;
+  }
   
   class EventData<T = any> implements PoolObject {
       static alloc<T>(type: string, data: T): EventData<T>;
@@ -218,9 +249,57 @@ declare module base {
   }
   const facade: Facade;
   
+  interface IFrameData {
+      filename: string;
+      frame: {
+          x: number;
+          y: number;
+          w: number;
+          h: number;
+      };
+      rotated: boolean;
+      trimmed: boolean;
+      spriteSourceSize: {
+          x: number;
+          y: number;
+          w: number;
+          h: number;
+      };
+      sourceSize: {
+          w: number;
+          h: number;
+      };
+  }
+  class MergedBitmap implements PoolObject {
+      get frames(): IFrameData[] | undefined;
+      get texture(): Laya.Texture | undefined;
+      get loadComplete(): boolean;
+      static onLoad(url: string, callback: CallBack<[MergedBitmap]>): void;
+      onLoad(url: string, callback: CallBack<[MergedBitmap]>): void;
+      getTextureList(): Laya.Texture[];
+      onAlloc(): void;
+      onRelease(): void;
+  }
+  
+  class BmpMovieClip extends BitmapBase implements PoolObject {
+      center: boolean;
+      play(url: string, container: Laya.Sprite, cnt?: number, callBack?: CallBack, remove?: boolean, removeParent?: boolean): void;
+      onAlloc(): void;
+      onFree(): void;
+  }
+  
+  class RpgMovieClip extends BitmapBase implements PoolObject {
+      center: boolean;
+      setAction(action: string): void;
+      setCnt(cnt: number): void;
+      play(url: string, container: Laya.Sprite, cnt?: number, loadCallBack?: CallBack, finishCallback?: CallBack, remove?: boolean): void;
+      onAlloc(): void;
+      onFree(): void;
+  }
+  
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, CallBack, Ease, EventData, LayerIndex, PoolObject, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, resourceMgr, socketMgr, timerMgr, tweenMgr };
+  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventData, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr };
   
 }
