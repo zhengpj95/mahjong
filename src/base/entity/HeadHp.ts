@@ -24,12 +24,12 @@ export class HeadHp extends Sprite implements PoolObject {
     }
     if (!this._imgBarBg) {
       this._imgBarBg = new Image();
-      this._imgBarBg.skin = `modules/common/img_fight_boss_hp_bg.png`;
+      this._imgBarBg.skin = `atlas/common/img_fight_boss_hp_bg.png`;
       this._box.addChild(this._imgBarBg);
     }
     if (!this._imgBar) {
       this._imgBar = new Image();
-      this._imgBar.skin = `modules/common/img_fight_hp_red.png`;
+      this._imgBar.skin = `atlas/common/img_fight_hp_red.png`;
       this._imgBar.x = this._imgBar.y = 1;
       this._box.addChild(this._imgBar);
     }

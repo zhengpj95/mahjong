@@ -7,7 +7,7 @@ import { ComponentType } from "./ComponentConst";
 import { ScenePlayerVO } from "../entity/SceneEntityVO";
 
 function getSkillEffect(skillId: number): string {
-  return "effect/circle_explosion";
+  return "resources/effect/circle_explosion";
 }
 
 let sprite: Sprite;

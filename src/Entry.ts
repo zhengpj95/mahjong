@@ -4,6 +4,7 @@ import { initModules } from "./modules/index";
 import { ModuleName } from "@def/module-name";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { MahjongViewType } from "@def/mahjong";
+import { UpdateMgr } from "@base/UpdateMgr";
 import facade = base.facade;
 
 function initDebug(): void {
@@ -57,6 +58,7 @@ function _loop(): boolean {
     console.log(e);
   }
   base.baseLoop();
+  UpdateMgr.ins().update(elapsed);
   return true;
 }
 
