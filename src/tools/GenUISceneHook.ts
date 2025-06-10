@@ -27,6 +27,12 @@ interface ChildStructure {
  */
 @IEditorEnv.regSceneHook()
 class GenUISceneHook implements IEditorEnv.ISceneHook {
+  onCreateNode(scene: IEditorEnv.IMyScene, node: Laya.Node): void | Promise<void> {
+    if (node instanceof Laya.Image) {
+      node.skin = ""; // 清除image的skin默认值
+    }
+  }
+
   async onSaveScene(scene: IEditorEnv.IMyScene, data: SceneStructure): Promise<void> {
     const scenePath: string = (scene as any)["_sceneFilePath"];
     if (!scenePath.endsWith(".ls")) {
