@@ -12,40 +12,6 @@ declare module base {
       isEqual(caller: any, method: (...args: any[]) => any): boolean;
   }
   
-  interface PoolObject {
-      free?: () => void;
-      destroy?: () => void;
-      onAlloc?: () => void;
-      onFree?: () => void;
-  }
-  
-  class PoolManager {
-      alloc<T>(cls: new (...params: any[]) => T, ...args: any[]): T;
-      free(obj: any): boolean;
-  }
-  const poolMgr: PoolManager;
-  
-  const LoadPriority: {
-      FIRST: number;
-      UI: number;
-      UI_SCENE: number;
-      SCENE: number;
-      DEFAULT: number;
-  };
-  type LoadPriority = (typeof LoadPriority)[keyof typeof LoadPriority];
-  function resetDisplay(dis: Laya.Sprite): void;
-  class BitmapBase extends Laya.Sprite implements PoolObject {
-      center: boolean;
-      loadPri: LoadPriority;
-      set source(value: Laya.Texture | string | undefined);
-      get source(): Laya.Texture | string | undefined;
-      setAnchor(x?: number, y?: number): void;
-      protected onLoaded(): void;
-      onAlloc(): void;
-      onFree(): void;
-      free(): void;
-  }
-  
   type SingletonConstructor<T> = {
       new (): T;
       _instance?: T;
@@ -54,6 +20,19 @@ declare module base {
   class Singleton<T> {
       static ins<T>(this: SingletonConstructor<T>): T;
   }
+  
+  interface PoolObject {
+      free?: () => void;
+      destroy?: () => void;
+      onAlloc?: () => void;
+      onFree?: () => void;
+  }
+  
+  class PoolManager extends Singleton<PoolManager> {
+      alloc<T>(cls: new (...params: any[]) => T, ...args: any[]): T;
+      free(obj: any): boolean;
+  }
+  const poolMgr: PoolManager;
   
   class EventData<T = any> implements PoolObject {
       static alloc<T>(type: string, data: T): EventData<T>;
@@ -65,7 +44,7 @@ declare module base {
   }
   
   type EventFunc = (...args: any[]) => any;
-  class EventManager {
+  class EventManager extends Singleton<EventManager> {
       on(event: string, method: EventFunc, caller: any, args?: any[]): void;
       once(event: string, method: EventFunc, caller: any, args?: any[]): void;
       off(event: string, method: EventFunc, caller: any): void;
@@ -113,7 +92,7 @@ declare module base {
   
   const tweenMgr: TweenManger;
   
-  class TimerManager {
+  class TimerManager extends Singleton<TimerManager> {
       tick(): boolean;
       setTimeOut(delay: number, cb: CallBack): void;
       setFrameOut(delay: number, cb: CallBack): void;
@@ -134,7 +113,7 @@ declare module base {
       decodeMsg(): any;
       encodeMsg(data: any): any;
   }
-  class SocketManager implements ISocket {
+  class SocketManager extends Singleton<SocketManager> implements ISocket {
       connect(host?: string, port?: number): void;
       send(data: string): void;
       receive(event?: MessageEvent): void;
@@ -144,7 +123,7 @@ declare module base {
   const socketMgr: SocketManager;
   
   type ResourceLoader = (url: string, callback: (err: any, asset: any) => void) => void;
-  class ResourceManager {
+  class ResourceManager extends Singleton<ResourceManager> {
       init(loader: ResourceLoader): void;
       load(url: string, callback: (err: any, asset: any) => void): void;
       preload(urls: string[], onComplete?: () => void): void;
@@ -167,7 +146,7 @@ declare module base {
       constructor(idx?: number);
       onResize(): void;
   }
-  class LayerManager {
+  class LayerManager extends Singleton<LayerManager> {
       getLayer(idx: LayerIndex): BaseLayer;
       onResize(): void;
   }
@@ -182,14 +161,14 @@ declare module base {
       args?: any[] | undefined;
   };
   class BaseEmitter {
-      protected emit(event: string, args?: any): void;
-      protected mulOn(events: string[], method: VoidMethod, caller?: any): void;
-      protected on(event: string, method: VoidMethod, caller?: any, args?: any[]): void;
-      protected once(event: string, method: VoidMethod, caller?: any, args?: any[]): void;
-      protected off(event: string, method: VoidMethod, caller?: any): void;
-      protected onLaya(target: LayaEvent["target"], event: LayaEvent["event"], method: LayaEvent["method"], thisObject?: LayaEvent["thisObject"], args?: any[] | undefined): void;
-      protected offLaya(target: LayaEvent["target"], event: LayaEvent["event"], listener: LayaEvent["method"], thisObject?: LayaEvent["thisObject"]): void;
-      protected offAll(): void;
+      emit(event: string, args?: any): void;
+      mulOn(events: string[], method: VoidMethod, caller?: any): void;
+      on(event: string, method: VoidMethod, caller?: any, args?: any[]): void;
+      once(event: string, method: VoidMethod, caller?: any, args?: any[]): void;
+      off(event: string, method: VoidMethod, caller?: any): void;
+      onLaya(target: LayaEvent["target"], event: LayaEvent["event"], method: LayaEvent["method"], thisObject?: LayaEvent["thisObject"], args?: any[] | undefined): void;
+      offLaya(target: LayaEvent["target"], event: LayaEvent["event"], listener: LayaEvent["method"], thisObject?: LayaEvent["thisObject"]): void;
+      offAll(): void;
   }
   
   abstract class BaseProxy extends BaseEmitter {
@@ -249,6 +228,38 @@ declare module base {
   }
   const facade: Facade;
   
+  type PATH_TYPE = string | number;
+  class RedPointManager extends Singleton<RedPointManager> {
+      setRp(value: boolean, paths: PATH_TYPE[]): void;
+      getRp(paths: PATH_TYPE[]): boolean;
+      getPath(paths: PATH_TYPE[]): string;
+      checkPath(rootStr: string, paths: PATH_TYPE[]): boolean;
+  }
+  const redPointMgr: RedPointManager;
+  function registerRed(view: Laya.Sprite, paths: PATH_TYPE[], cb?: CallBack<[boolean]>): void;
+  function unregisterRed(view: Laya.Sprite): void;
+  
+  const LoadPriority: {
+      FIRST: number;
+      UI: number;
+      UI_SCENE: number;
+      SCENE: number;
+      DEFAULT: number;
+  };
+  type LoadPriority = (typeof LoadPriority)[keyof typeof LoadPriority];
+  function resetDisplay(dis: Laya.Sprite): void;
+  class BitmapBase extends Laya.Sprite implements PoolObject {
+      center: boolean;
+      loadPri: LoadPriority;
+      set source(value: Laya.Texture | string | undefined);
+      get source(): Laya.Texture | string | undefined;
+      setAnchor(x?: number, y?: number): void;
+      protected onLoaded(): void;
+      onAlloc(): void;
+      onFree(): void;
+      free(): void;
+  }
+  
   interface IFrameData {
       filename: string;
       frame: {
@@ -297,9 +308,13 @@ declare module base {
       onFree(): void;
   }
   
+  const enum BaseEvent {
+      COMMON_UPDATE_RED_POINT = "common_update_red_point"
+  }
+  
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventData, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr };
+  export { BaseCommand, BaseEvent, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventData, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, redPointMgr, registerRed, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr, unregisterRed };
   
 }

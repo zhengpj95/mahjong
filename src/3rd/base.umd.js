@@ -91,6 +91,18 @@
   CallBack._pool = [];
   CallBack._gid = 1;
 
+  class Singleton {
+      static ins() {
+          if (!this._instance) {
+              this._instance = new this();
+              if (this.name && typeof window !== "undefined") {
+                  window[this.name] = this._instance;
+              }
+          }
+          return this._instance;
+      }
+  }
+
   function getQualifiedClassName(value) {
       const type = typeof value;
       if (!value || (type !== "object" && !value.prototype)) {
@@ -120,8 +132,9 @@
       return className;
   }
   const PoolObjectName = "__PoolObjectName__";
-  class PoolManager {
+  class PoolManager extends Singleton {
       constructor() {
+          super(...arguments);
           this._poolMap = {};
       }
       alloc(cls, ...args) {
@@ -177,142 +190,6 @@
   }
   const poolMgr = new PoolManager();
 
-  const LoadPriority = {
-      FIRST: 0,
-      UI: 1,
-      UI_SCENE: 2,
-      SCENE: 3,
-      DEFAULT: 4,
-  };
-  function resetDisplay(dis) {
-      if (!dis || dis.destroyed) {
-          return;
-      }
-      dis._bits = 0;
-      dis.x = dis.y = 0;
-      dis.scaleX = dis.scaleY = dis.alpha = 1;
-      dis.rotation = 0;
-      dis.width = dis.height = NaN;
-      dis.pivot(0, 0);
-      dis.visible = true;
-      dis.filters = null;
-  }
-  class BitmapBase extends Laya.Sprite {
-      constructor() {
-          super(...arguments);
-          this._oldStr = "";
-          this.keepOnRem = false;
-          this.center = false;
-          this.loadPri = LoadPriority.UI;
-      }
-      _onAdded() {
-          super._onAdded();
-          if (this.keepOnRem) {
-              return;
-          }
-          if (this._oldStr) {
-              if (!this._source) {
-                  this.source = this._oldStr;
-              }
-              this._oldStr = "";
-          }
-      }
-      _onRemoved() {
-          super._onRemoved();
-          if (this.keepOnRem) {
-              return;
-          }
-          if (typeof this._source === "string") {
-              this._oldStr = this._source;
-              this.source = undefined;
-          }
-      }
-      set source(value) {
-          if (!value) {
-              value = undefined;
-          }
-          if (value === this._source) {
-              if (this.texture) {
-                  this.resize();
-                  this.event(Laya.Event.COMPLETE);
-                  this.onLoaded();
-              }
-              return;
-          }
-          if (typeof value === "string") {
-              this.removeCur();
-              this._source = value;
-              Laya.loader
-                  .load(value, Laya.Handler.create(this, this.onComplete, [value]), undefined, undefined, this.loadPri)
-                  .then((r) => {
-                  console.log("BitmapBase source: ", r);
-              });
-              return;
-          }
-          this.removeCur();
-          this._source = value;
-          this.texture = value;
-          this.resize();
-      }
-      get source() {
-          return this._source;
-      }
-      setAnchor(x = 0, y = 0) {
-          const pivotX = x === 0 ? 0 : this.width * x;
-          const pivotY = y === 0 ? 0 : this.height * y;
-          this.pivot(pivotX, pivotY);
-      }
-      removeCur() {
-          this.texture = null;
-          this._source = undefined;
-      }
-      resize() {
-          const text = this.texture;
-          if (text) {
-              this.width = text.sourceWidth || text.width;
-              this.height = text.sourceHeight || text.height;
-          }
-          if (this.center) {
-              this.pivot(this.width / 2, this.height / 2);
-          }
-      }
-      onComplete(url) {
-          if (this._source !== url)
-              return;
-          this.texture = Laya.loader.getRes(url);
-          this.resize();
-          this.event(Laya.Event.COMPLETE);
-          this.onLoaded();
-      }
-      onLoaded() {
-      }
-      onAlloc() {
-          this.loadPri = LoadPriority.UI;
-      }
-      onFree() {
-          this.center = false;
-          this.removeSelf();
-          resetDisplay(this);
-          this.removeCur();
-          this._oldStr = "";
-      }
-      free() {
-          poolMgr.free(this);
-      }
-  }
-
-  class Singleton {
-      static ins() {
-          if (!this._instance) {
-              this._instance = new this();
-              if (this.name && typeof window !== "undefined") {
-                  window[this.name] = this._instance;
-              }
-          }
-          return this._instance;
-      }
-  }
-
   class TimerVo {
       constructor() {
           this.useFrame = false;
@@ -354,8 +231,9 @@
       }
   }
 
-  class TimerManager {
+  class TimerManager extends Singleton {
       constructor() {
+          super();
           this._curTime = 0;
           this._curFrame = 0;
           this._timeList = [];
@@ -498,7 +376,7 @@
           return !!list.find((vo) => { var _a; return cb && cb.id === ((_a = vo.callBack) === null || _a === undefined ? undefined : _a.id); });
       }
   }
-  const timerMgr = new TimerManager();
+  const timerMgr = TimerManager.ins();
 
   function checkInStage(target) {
       if (!target) {
@@ -624,25 +502,26 @@
 
   let TWEEN_ID = 0;
   const TWEEN_ID_FLAG = "$TWEEN_ID";
-  class TweenManagerImpl {
+  class TweenManagerImpl extends Singleton {
       constructor() {
-          this._tweens = [];
-          this._tmpTweens = [];
+          super(...arguments);
+          this._tweenList = [];
+          this._tmpTweenList = [];
       }
       reg(tw) {
           tw[TWEEN_ID_FLAG] = ++TWEEN_ID;
-          this._tmpTweens.push(tw);
+          this._tmpTweenList.push(tw);
           return tw;
       }
       get(target, vars) {
           return this.reg(new TweenImpl().init(target, vars));
       }
       remove(target) {
-          if (this._tmpTweens.length) {
-              this._tweens.push(...this._tmpTweens);
-              this._tmpTweens.length = 0;
+          if (this._tmpTweenList.length) {
+              this._tweenList.push(...this._tmpTweenList);
+              this._tmpTweenList.length = 0;
           }
-          for (const tw of this._tweens) {
+          for (const tw of this._tweenList) {
               if (tw.checkTarget(target)) {
                   tw.dispose();
               }
@@ -650,12 +529,12 @@
       }
       update() {
           const currentTime = Date.now();
-          if (this._tmpTweens.length) {
-              this._tweens.push(...this._tmpTweens);
-              this._tmpTweens.length = 0;
+          if (this._tmpTweenList.length) {
+              this._tweenList.push(...this._tmpTweenList);
+              this._tmpTweenList.length = 0;
           }
           const delList = [];
-          const list = this._tweens;
+          const list = this._tweenList;
           for (const tw of list) {
               if (tw.update(currentTime)) {
                   delList.push(tw);
@@ -665,9 +544,9 @@
               for (const tw of delList) {
                   if (tw) {
                       tw.dispose();
-                      const idx = this._tweens.indexOf(tw);
+                      const idx = this._tweenList.indexOf(tw);
                       if (idx > -1) {
-                          this._tweens.splice(idx, 1);
+                          this._tweenList.splice(idx, 1);
                       }
                   }
               }
@@ -675,7 +554,7 @@
           }
       }
   }
-  const tweenMgr = new TweenManagerImpl();
+  const tweenMgr = TweenManagerImpl.ins();
   function _loopTween() {
       tweenMgr.update();
   }
@@ -812,8 +691,9 @@
           super(LayerIndex.TIPS);
       }
   }
-  class LayerManager {
+  class LayerManager extends Singleton {
       constructor() {
+          super();
           this._layers = Object.create(null);
       }
       initLayer() {
@@ -839,7 +719,7 @@
           }
       }
   }
-  const layerMgr = new LayerManager();
+  const layerMgr = LayerManager.ins();
   function initLayer() {
       layerMgr.initLayer();
   }
@@ -873,8 +753,9 @@
       }
   }
 
-  class EventManager {
+  class EventManager extends Singleton {
       constructor() {
+          super(...arguments);
           this._messages = {};
       }
       on(event, method, caller, args) {
@@ -951,7 +832,7 @@
           this._messages = {};
       }
   }
-  const eventMgr = new EventManager();
+  const eventMgr = EventManager.ins();
 
   const Linear = {
       in: EaseNone,
@@ -1132,8 +1013,9 @@
 
   const SOCKET_HOST = "127.0.0.1";
   const SOCKET_PORT = 8080;
-  class SocketManager {
+  class SocketManager extends Singleton {
       constructor() {
+          super(...arguments);
           this._socket = undefined;
           this._url = "";
       }
@@ -1186,10 +1068,11 @@
       encodeMsg(data) {
       }
   }
-  const socketMgr = new SocketManager();
+  const socketMgr = SocketManager.ins();
 
-  class ResourceManager {
+  class ResourceManager extends Singleton {
       constructor() {
+          super(...arguments);
           this._cache = {};
           this._lastUsedTime = {};
           this._maxCacheSize = 50;
@@ -1222,8 +1105,8 @@
       }
       preload(urls, onComplete) {
           let loadedCount = 0;
-          for (let i = 0; i < urls.length; i++) {
-              this.load(urls[i], () => {
+          for (const item of urls) {
+              this.load(item, () => {
                   loadedCount++;
                   if (loadedCount === urls.length && onComplete) {
                       onComplete();
@@ -1256,11 +1139,11 @@
           }
       }
   }
-  const resourceMgr = new ResourceManager();
+  const resourceMgr = ResourceManager.ins();
   resourceMgr.init((url, callback) => {
-      Laya.loader.load(url, Laya.Handler.create(null, (asset) => {
-          callback(null, asset);
-      }));
+      Laya.loader.load(url).then((r) => {
+          callback(null, r);
+      });
   });
 
   class Facade {
@@ -1608,6 +1491,321 @@
   }
 
   class BaseProxy extends BaseEmitter {
+  }
+
+  class RedPointManager extends Singleton {
+      constructor() {
+          super(...arguments);
+          this._redPointMap = {};
+          this._sep = ".";
+      }
+      setRp(value, paths) {
+          if (!paths || !paths.length) {
+              console.error(`RedPointMgr.setRp: 设置红点时至少需要一个参数`);
+              return;
+          }
+          const keys = [];
+          for (const param of paths) {
+              keys.push(this.getObjectName(param));
+          }
+          this.write(value, this._redPointMap, 0, keys);
+      }
+      getRp(paths) {
+          if (!paths || !paths.length) {
+              console.error(`RedPointMgr.getRp: 获取红点时至少需要一个参数`);
+              return false;
+          }
+          const keys = [];
+          for (const param of paths) {
+              keys.push(this.getObjectName(param));
+          }
+          return this.read(this._redPointMap, 0, keys);
+      }
+      write(value, obj, index, keyList) {
+          const key = keyList[index];
+          if (index < keyList.length - 1) {
+              if (obj[key] === null || obj[key] === undefined) {
+                  obj[key] = {};
+              }
+              else if (typeof obj[key] !== "object") {
+                  console.error(`[${keyList.slice(0, index + 1)}] 本层已设置为值，无法再设置下一层 ${keyList}`);
+                  return;
+              }
+              this.write(value, obj[key], index + 1, keyList);
+          }
+          else {
+              if (typeof obj[key] !== "object") {
+                  const oldValue = this.getObjectValue(obj[key]);
+                  obj[key] = value;
+                  if (oldValue !== value) {
+                      timerMgr.doFrame(5, 1, CallBack.alloc(null, () => {
+                          eventMgr.emit("common_update_red_point", keyList.join(this._sep));
+                      }));
+                  }
+              }
+              else {
+                  console.error(`[${keyList}] 下层有值，不可设置`);
+                  return;
+              }
+          }
+      }
+      read(obj, index, keyList) {
+          const key = keyList[index];
+          if (index < keyList.length) {
+              if (index < keyList.length - 1 && obj[key]) {
+                  return this.read(obj[key], index + 1, keyList);
+              }
+              else {
+                  if (obj) {
+                      return this.getObjectValue(obj[key]);
+                  }
+                  else {
+                      return false;
+                  }
+              }
+          }
+          return false;
+      }
+      getObjectValue(obj) {
+          if (typeof obj === "boolean") {
+              return obj;
+          }
+          else if (typeof obj === "object") {
+              let result = false;
+              for (const key in obj) {
+                  result = this.getObjectValue(obj[key]);
+                  if (result) {
+                      break;
+                  }
+              }
+              return result;
+          }
+          return false;
+      }
+      getObjectName(obj) {
+          let result = "";
+          if (typeof obj === "number") {
+              result = obj + "";
+          }
+          else if (typeof obj === "string") {
+              result = obj;
+          }
+          else if (typeof obj === "function") {
+              result = obj.name;
+          }
+          else if (typeof obj === "object") {
+              const prototype = obj.prototype
+                  ? obj.prototype
+                  : Object.getPrototypeOf(obj);
+              if (prototype && prototype.name) {
+                  result = prototype.name;
+              }
+              else {
+                  const constructorStr = prototype.constructor.toString().trim();
+                  const idx = constructorStr.indexOf("(");
+                  result = constructorStr.substring(9, idx);
+              }
+          }
+          else {
+              console.log(`需要获取的对象类型错误 ${obj}`);
+          }
+          return result;
+      }
+      getPath(paths) {
+          const rst = [];
+          if (paths && paths.length) {
+              for (const param of paths) {
+                  rst.push(this.getObjectName(param));
+              }
+          }
+          return rst.join(this._sep);
+      }
+      checkPath(rootStr, paths) {
+          if (!rootStr) {
+              return false;
+          }
+          const path = this.getPath(paths);
+          return rootStr.indexOf(path) > -1;
+      }
+  }
+  const redPointMgr = RedPointManager.ins();
+  const __RedPointPath__ = "__redPointPath__";
+  function registerRed(view, paths, cb) {
+      if (!(view === null || view === undefined ? undefined : view.displayedInStage)) {
+          unregisterRed(view);
+          return;
+      }
+      const redPoint = getRedPointImg(view);
+      if (redPoint) {
+          redPoint.visible = redPointMgr.getRp(paths);
+      }
+      view[__RedPointPath__] = paths;
+      const mdr = findMediator(view);
+      if (mdr) {
+          mdr.off("common_update_red_point", onListenRedPoint, mdr);
+          mdr.on("common_update_red_point", onListenRedPoint, mdr, [
+              view,
+              cb,
+          ]);
+      }
+  }
+  function unregisterRed(view) {
+      if (!view)
+          return;
+      const mdr = findMediator(view);
+      mdr === null || mdr === undefined ? undefined : mdr.off("common_update_red_point", onListenRedPoint, mdr);
+  }
+  function onListenRedPoint(view, cb, ev) {
+      var _a;
+      const paths = view[__RedPointPath__];
+      const root = (_a = ev === null || ev === undefined ? undefined : ev.data) !== null && _a !== undefined ? _a : "";
+      if (redPointMgr.checkPath(root, paths)) {
+          const redPoint = getRedPointImg(view);
+          const isRed = redPointMgr.getRp(paths);
+          if (redPoint) {
+              redPoint.visible = isRed;
+          }
+          cb === null || cb === undefined ? undefined : cb.exec(isRed);
+      }
+  }
+  function getRedPointImg(view) {
+      const RedPoint = "_RedPoint_";
+      let imgRed = ((view.getChildByName("redPoint") ||
+          view.getChildByName("$redPoint") ||
+          view[RedPoint]));
+      if (!imgRed) {
+          imgRed = new Laya.Image();
+          imgRed.top = -2;
+          imgRed.right = -2;
+          imgRed.skin = `atlas/common/img_common_redpoint1.png`;
+          view[RedPoint] = imgRed;
+          view.addChild(imgRed);
+      }
+      return imgRed;
+  }
+
+  const LoadPriority = {
+      FIRST: 0,
+      UI: 1,
+      UI_SCENE: 2,
+      SCENE: 3,
+      DEFAULT: 4,
+  };
+  function resetDisplay(dis) {
+      if (!dis || dis.destroyed) {
+          return;
+      }
+      dis._bits = 0;
+      dis.x = dis.y = 0;
+      dis.scaleX = dis.scaleY = dis.alpha = 1;
+      dis.rotation = 0;
+      dis.width = dis.height = NaN;
+      dis.pivot(0, 0);
+      dis.visible = true;
+      dis.filters = null;
+  }
+  class BitmapBase extends Laya.Sprite {
+      constructor() {
+          super(...arguments);
+          this._oldStr = "";
+          this.keepOnRem = false;
+          this.center = false;
+          this.loadPri = LoadPriority.UI;
+      }
+      _onAdded() {
+          super._onAdded();
+          if (this.keepOnRem) {
+              return;
+          }
+          if (this._oldStr) {
+              if (!this._source) {
+                  this.source = this._oldStr;
+              }
+              this._oldStr = "";
+          }
+      }
+      _onRemoved() {
+          super._onRemoved();
+          if (this.keepOnRem) {
+              return;
+          }
+          if (typeof this._source === "string") {
+              this._oldStr = this._source;
+              this.source = undefined;
+          }
+      }
+      set source(value) {
+          if (!value) {
+              value = undefined;
+          }
+          if (value === this._source) {
+              if (this.texture) {
+                  this.resize();
+                  this.event(Laya.Event.COMPLETE);
+                  this.onLoaded();
+              }
+              return;
+          }
+          if (typeof value === "string") {
+              this.removeCur();
+              this._source = value;
+              Laya.loader
+                  .load(value, Laya.Handler.create(this, this.onComplete, [value]), undefined, undefined, this.loadPri)
+                  .then((r) => {
+                  console.log("BitmapBase source: ", r);
+              });
+              return;
+          }
+          this.removeCur();
+          this._source = value;
+          this.texture = value;
+          this.resize();
+      }
+      get source() {
+          return this._source;
+      }
+      setAnchor(x = 0, y = 0) {
+          const pivotX = x === 0 ? 0 : this.width * x;
+          const pivotY = y === 0 ? 0 : this.height * y;
+          this.pivot(pivotX, pivotY);
+      }
+      removeCur() {
+          this.texture = null;
+          this._source = undefined;
+      }
+      resize() {
+          const text = this.texture;
+          if (text) {
+              this.width = text.sourceWidth || text.width;
+              this.height = text.sourceHeight || text.height;
+          }
+          if (this.center) {
+              this.pivot(this.width / 2, this.height / 2);
+          }
+      }
+      onComplete(url) {
+          if (this._source !== url)
+              return;
+          this.texture = Laya.loader.getRes(url);
+          this.resize();
+          this.event(Laya.Event.COMPLETE);
+          this.onLoaded();
+      }
+      onLoaded() {
+      }
+      onAlloc() {
+          this.loadPri = LoadPriority.UI;
+      }
+      onFree() {
+          this.center = false;
+          this.removeSelf();
+          resetDisplay(this);
+          this.removeCur();
+          this._oldStr = "";
+      }
+      free() {
+          poolMgr.free(this);
+      }
   }
 
   class MergedBitmap {
@@ -1958,10 +2156,13 @@
   exports.findMediator = findMediator;
   exports.layerMgr = layerMgr;
   exports.poolMgr = poolMgr;
+  exports.redPointMgr = redPointMgr;
+  exports.registerRed = registerRed;
   exports.resetDisplay = resetDisplay;
   exports.resourceMgr = resourceMgr;
   exports.socketMgr = socketMgr;
   exports.timerMgr = timerMgr;
   exports.tweenMgr = tweenMgr;
+  exports.unregisterRed = unregisterRed;
 
 }));
