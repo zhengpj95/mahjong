@@ -54,7 +54,7 @@ export default class ClickScale extends Script {
     this._originConstraint.clear();
     CONSTRAINT_LIST.forEach(item => {
       const val = this._comp[item];
-      if (!isNaN(val)) {
+      if (!isNaN(val) && typeof val === "number") {
         this._originConstraint.set(item, this._comp[item]);
       }
     });
@@ -135,8 +135,10 @@ export default class ClickScale extends Script {
   }
 
   private updateWidget(isInit = false): void {
-    for (const [k, v] of this._originConstraint) {
-      this._comp[k] = isInit ? v : NaN;
+    if (this._originConstraint.size) {
+      for (const [k, v] of this._originConstraint) {
+        this._comp[k] = isInit ? v : NaN;
+      }
     }
   }
 }
