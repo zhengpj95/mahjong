@@ -29,7 +29,11 @@ interface ChildStructure {
 class GenUISceneHook implements IEditorEnv.ISceneHook {
   onCreateNode(scene: IEditorEnv.IMyScene, node: Laya.Node): void | Promise<void> {
     if (node instanceof Laya.Image) {
-      node.skin = ""; // 清除image的skin默认值
+      Laya.loader.load(node.skin).then((r: Laya.Texture) => {
+        if (!r) {
+          node.skin = ""; // 清除image的skin默认值
+        }
+      });
     }
   }
 
