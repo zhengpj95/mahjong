@@ -11,8 +11,8 @@ import Handler = Laya.Handler;
 import BaseMediator = base.BaseMediator;
 import LayerIndex = base.LayerIndex;
 import eventMgr = base.eventMgr;
-import EventData = base.EventData;
 import poolMgr = base.poolMgr;
+import EventVo = base.EventVo;
 
 function createMonster(): SceneMonsterVo {
   return {
@@ -119,7 +119,7 @@ export class SceneMdr extends BaseMediator {
     UpdateMgr.ins().addTimer(this, this.update);
   }
 
-  private onAddEntity(e: EventData<SceneEntity>): void {
+  private onAddEntity(e: EventVo<SceneEntity>): void {
     const entity = e.data;
     if (!entity) return;
     const avatar = entity.getComponent(ComponentType.AVATAR);
@@ -131,7 +131,7 @@ export class SceneMdr extends BaseMediator {
     }
   }
 
-  private onDelEntity(e: EventData<SceneEntity>): void {
+  private onDelEntity(e: EventVo<SceneEntity>): void {
     const entity = e.data;
     if (!entity) return;
     const idx = this._entityList.indexOf(entity);

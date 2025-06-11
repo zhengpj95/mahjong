@@ -34,8 +34,8 @@ declare module base {
   }
   const poolMgr: PoolManager;
   
-  class EventData<T = any> implements PoolObject {
-      static alloc<T>(type: string, data: T): EventData<T>;
+  class EventVo<T = any> implements PoolObject {
+      static alloc<T>(type: string, data: T): EventVo<T>;
       get type(): string;
       get data(): T;
       free(): void;
@@ -251,6 +251,7 @@ declare module base {
   class BitmapBase extends Laya.Sprite implements PoolObject {
       center: boolean;
       loadPri: LoadPriority;
+      constructor();
       set source(value: Laya.Texture | string | undefined);
       get source(): Laya.Texture | string | undefined;
       setAnchor(x?: number, y?: number): void;
@@ -294,6 +295,7 @@ declare module base {
   
   class BmpMovieClip extends BitmapBase implements PoolObject {
       center: boolean;
+      constructor();
       play(url: string, container: Laya.Sprite, cnt?: number, callBack?: CallBack, remove?: boolean, removeParent?: boolean): void;
       onAlloc(): void;
       onFree(): void;
@@ -301,6 +303,7 @@ declare module base {
   
   class RpgMovieClip extends BitmapBase implements PoolObject {
       center: boolean;
+      constructor();
       setAction(action: string): void;
       setCnt(cnt: number): void;
       play(url: string, container: Laya.Sprite, cnt?: number, loadCallBack?: CallBack, finishCallback?: CallBack, remove?: boolean): void;
@@ -315,6 +318,6 @@ declare module base {
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseEvent, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventData, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, redPointMgr, registerRed, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr, unregisterRed };
+  export { BaseCommand, BaseEvent, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventVo, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, redPointMgr, registerRed, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr, unregisterRed };
   
 }

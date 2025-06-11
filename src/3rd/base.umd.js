@@ -724,13 +724,13 @@
       layerMgr.initLayer();
   }
 
-  class EventData {
+  class EventVo {
       constructor() {
           this._type = "";
           this._data = undefined;
       }
       static alloc(type, data) {
-          const eData = poolMgr.alloc(EventData);
+          const eData = poolMgr.alloc(EventVo);
           eData._type = type;
           eData._data = data;
           return eData;
@@ -803,7 +803,7 @@
                   i--;
                   continue;
               }
-              const nt = EventData.alloc(event, data);
+              const nt = EventVo.alloc(event, data);
               callBack.exec(nt);
               nt.free();
           }
@@ -1706,7 +1706,7 @@
   }
   class BitmapBase extends Laya.Sprite {
       constructor() {
-          super(...arguments);
+          super();
           this._oldStr = "";
           this.keepOnRem = false;
           this.center = false;
@@ -1921,7 +1921,7 @@
   const INIT_FPS$1 = 16;
   class BmpMovieClip extends BitmapBase {
       constructor() {
-          super(...arguments);
+          super();
           this._total = 0;
           this._current = 0;
           this._playCnt = 1;
@@ -2009,7 +2009,7 @@
   const INIT_FPS = 10;
   class RpgMovieClip extends BitmapBase {
       constructor() {
-          super(...arguments);
+          super();
           this._total = 0;
           this._current = 0;
           this._playCnt = 1;
@@ -2143,7 +2143,7 @@
   exports.BmpMovieClip = BmpMovieClip;
   exports.CallBack = CallBack;
   exports.Ease = Ease;
-  exports.EventData = EventData;
+  exports.EventVo = EventVo;
   exports.LayerIndex = LayerIndex;
   exports.LoadPriority = LoadPriority;
   exports.MergedBitmap = MergedBitmap;
