@@ -8,4 +8,12 @@ export class SceneProxy extends BaseProxy {
   public init(): void {
     //
   }
+
+  protected updateRedEvent(): string[] {
+    return [];
+  }
+
+  protected updateRed(): void {
+    //
+  }
 }

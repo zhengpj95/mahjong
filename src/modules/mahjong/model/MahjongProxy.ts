@@ -42,4 +42,11 @@ export class MahjongProxy extends BaseProxy {
       eventMgr.emit(MahjongEvent.UPDATE_INFO);
     });
   }
+
+  protected updateRedEvent(): string[] {
+    return [];
+  }
+
+  protected updateRed() {
+  }
 }

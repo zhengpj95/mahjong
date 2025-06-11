@@ -103,6 +103,10 @@
       }
   }
 
+  function createObj() {
+      return Object.create(null);
+  }
+
   function getQualifiedClassName(value) {
       const type = typeof value;
       if (!value || (type !== "object" && !value.prototype)) {
@@ -694,7 +698,7 @@
   class LayerManager extends Singleton {
       constructor() {
           super();
-          this._layers = Object.create(null);
+          this._layers = createObj();
       }
       initLayer() {
           this.setLayer(new MapLayer());
@@ -1457,6 +1461,7 @@
           }
           const cls = new proxy();
           cls.init();
+          cls.initRed();
           this._proxyInsMap[type] = cls;
       }
       retProxy(type) {
@@ -1491,12 +1496,18 @@
   }
 
   class BaseProxy extends BaseEmitter {
+      initRed() {
+          const events = this.updateRedEvent();
+          if (events === null || events === undefined ? undefined : events.length) {
+              this.mulOn(events, this.updateRed, this);
+          }
+      }
   }
 
   class RedPointManager extends Singleton {
       constructor() {
           super(...arguments);
-          this._redPointMap = {};
+          this._redPointMap = createObj();
           this._sep = ".";
       }
       setRp(value, paths) {
@@ -1525,7 +1536,7 @@
           const key = keyList[index];
           if (index < keyList.length - 1) {
               if (obj[key] === null || obj[key] === undefined) {
-                  obj[key] = {};
+                  obj[key] = createObj();
               }
               else if (typeof obj[key] !== "object") {
                   console.error(`[${keyList.slice(0, index + 1)}] 本层已设置为值，无法再设置下一层 ${keyList}`);
@@ -1538,7 +1549,7 @@
                   const oldValue = this.getObjectValue(obj[key]);
                   obj[key] = value;
                   if (oldValue !== value) {
-                      timerMgr.doFrame(5, 1, CallBack.alloc(null, () => {
+                      timerMgr.setTimeOut(100, CallBack.alloc(null, () => {
                           eventMgr.emit("common_update_red_point", keyList.join(this._sep));
                       }));
                   }
@@ -2151,6 +2162,7 @@
   exports.Singleton = Singleton;
   exports.baseInit = baseInit;
   exports.baseLoop = baseLoop;
+  exports.createObj = createObj;
   exports.eventMgr = eventMgr;
   exports.facade = facade;
   exports.findMediator = findMediator;

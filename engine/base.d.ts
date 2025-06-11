@@ -21,6 +21,8 @@ declare module base {
       static ins<T>(this: SingletonConstructor<T>): T;
   }
   
+  function createObj<T = any>(): T;
+  
   interface PoolObject {
       free?: () => void;
       destroy?: () => void;
@@ -173,6 +175,9 @@ declare module base {
   
   abstract class BaseProxy extends BaseEmitter {
       abstract init(): void;
+      initRed(): void;
+      protected abstract updateRedEvent(): string[];
+      protected abstract updateRed(): void;
   }
   
   abstract class BaseCommand extends BaseEmitter {
@@ -318,6 +323,6 @@ declare module base {
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseEvent, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventVo, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, eventMgr, facade, findMediator, layerMgr, poolMgr, redPointMgr, registerRed, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr, unregisterRed };
+  export { BaseCommand, BaseEvent, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventVo, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, createObj, eventMgr, facade, findMediator, layerMgr, poolMgr, redPointMgr, registerRed, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr, unregisterRed };
   
 }
