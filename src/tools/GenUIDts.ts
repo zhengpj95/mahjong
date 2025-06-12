@@ -52,11 +52,10 @@ export class GenUIDts {
     for (const file of files) {
       const content = await fs.readFile(file, { encoding: "utf-8" });
       const child = (JSON.parse(content) as IChildNode)?._$child ?? [];
-      const basename = path.basename(file).replace(".ls", "");
 
       // @ts-ignore
       if (DEBUG) {
-        console.log(`▶️ start to generate ls file: `, file, basename);
+        console.log(`▶️ start to generate ls file: `, file.replace(toolsObj.ProjectRoot, ""));
       }
 
       const obj: ViewInfo = {};
@@ -241,9 +240,9 @@ export class GenUIDts {
     try {
       await fs.mkdir(rooPath, { recursive: true });
       await fs.writeFile(filePath, fileContent, { encoding: "utf-8" });
-      console.log(`✅ write ui .d.ts success: ${filePath}`);
+      console.log(`✅ write ui .d.ts success: ${filePath.replace(toolsObj.ProjectRoot, "")}`);
     } catch (err) {
-      console.log(`❌ write ui .d.ts error: ${filePath}`, err);
+      console.log(`❌ write ui .d.ts error: ${filePath.replace(toolsObj.ProjectRoot, "")}`, err);
     }
   }
 }
