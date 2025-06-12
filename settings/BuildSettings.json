@@ -2,7 +2,15 @@
   "name": "mahjong",
   "icon": "",
   "useCompressedEngine": false,
+  "sourcesContent": true,
   "startupScene": "res://41f51542-55de-4390-817c-1d8168680af1",
+  "includedScenes": [],
+  "alwaysIncluded": [
+    "atlas",
+    "prefab",
+    "scene"
+  ],
+  "subpackages": [],
   "android": {
     "targetArchitectures": {
       "ARMv7": true,
@@ -11,5 +19,8 @@
       "x86-64": false
     },
     "exportFormat": "APK"
+  },
+  "wxgame": {
+    "appid": "wxc08d5ac88f4c9850"
   }
 }

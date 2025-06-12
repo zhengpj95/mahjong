@@ -13,7 +13,7 @@
     "laya.physics2D": true
   },
   "splash": {
-    "backgroundColor": "rgba(149, 103, 103, 1)",
+    "enabled": false,
     "fit": "center"
   }
 }
