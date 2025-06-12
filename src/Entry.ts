@@ -5,6 +5,7 @@ import { ModuleName } from "@def/module-name";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { MahjongViewType } from "@def/mahjong";
 import { UpdateMgr } from "@base/UpdateMgr";
+import { initEnhancedConsole } from "@base/logger";
 import facade = base.facade;
 
 function initDebug(): void {
@@ -19,6 +20,9 @@ function initDebug(): void {
 export async function main() {
   console.log("Hello LayaAir! Game main!");
   initDebug();
+  if (_DEBUG_) {
+    initEnhancedConsole();
+  }
 
   protobuf.util.Long = Long;
   protobuf.configure();
