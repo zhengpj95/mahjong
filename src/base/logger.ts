@@ -30,7 +30,8 @@ const LEVEL_STYLES: Record<LoggerLevel, { color: string; background?: string }> 
 };
 
 // 设置当前日志等级过滤
-const FILTER_LEVEL = "warn";
+const FILTER_LEVEL = "debug";
+const SHOW_LEVEL_ICON = false;
 
 function pad(n: number, len = 2, prefix = "0"): string {
   const str = prefix.repeat(len) + n.toString();
@@ -57,7 +58,7 @@ function wrapConsoleMethod(originalMethod: (...args: any[]) => void, name = ""):
     }
     const timestamp = getTimestamp();
     const logName = padString(logLevel, 5, " ");
-    const icon = LEVEL_ICON[logLevel] || "";
+    const icon = SHOW_LEVEL_ICON ? LEVEL_ICON[logLevel] || "" : "";
     const prefix = `${timestamp}`;
     const style = `background: ${LEVEL_STYLES[logLevel].background}; padding: 2px 0.5em; border-radius: 0.5em; font-weight: bold;`;
     originalMethod.call(console, `%c${logName}`, style, icon, prefix, ...args);
