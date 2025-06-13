@@ -3,9 +3,9 @@ import Long from "long";
 import { initModules } from "./modules/index";
 import { ModuleName } from "@def/module-name";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { MahjongViewType } from "@def/mahjong";
 import { UpdateMgr } from "@base/UpdateMgr";
 import { initEnhancedConsole } from "@base/logger";
+import { LoginViewType } from "@def/login";
 import facade = base.facade;
 
 function initDebug(): void {
@@ -32,7 +32,7 @@ export async function main() {
   GameCfg.init();
   initModules();
 
-  facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
+  facade.openView(ModuleName.LOGIN, LoginViewType.LOGIN);
 }
 
 let _lastLoop = 0;

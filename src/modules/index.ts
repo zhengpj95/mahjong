@@ -2,6 +2,7 @@ import { MiscModule } from "./misc/index";
 import { MahjongModule } from "./mahjong/index";
 import { HoodleModule } from "./hoodle/index";
 import { SceneModule } from "./scene/index";
+import { LoginModule } from "./login/loginModule";
 
 /**
  * @author zpj
@@ -9,6 +10,7 @@ import { SceneModule } from "./scene/index";
  */
 function regModules(): void {
   base.facade.push(MiscModule);
+  base.facade.push(LoginModule);
   base.facade.push(MahjongModule);
   base.facade.push(HoodleModule);
   base.facade.push(SceneModule);

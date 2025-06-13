@@ -4,14 +4,16 @@
  */
 export const enum ModuleName {
   MISC = 1,
-  MAHJONG = 2, // 麻将
-  HOODLE = 3, // 弹珠
-  SCENE = 4,
+  LOGIN = 2,
+  MAHJONG = 3, // 麻将
+  HOODLE = 4, // 弹珠
+  SCENE = 5,
 }
 
 export const enum ProxyType {
   MISC = 1,
-  MAHJONG = 2, // 麻将
-  HOODLE = 3, // 弹珠
-  SCENE = 4,
+  LOGIN = 2,
+  MAHJONG = 3, // 麻将
+  HOODLE = 4, // 弹珠
+  SCENE = 5,
 }

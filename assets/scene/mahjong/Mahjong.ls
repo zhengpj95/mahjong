@@ -21,7 +21,6 @@
       "bottom": 0,
       "centerX": 0,
       "skin": "res://35f8f6aa-6052-4195-8bc9-ab0ad95e363f",
-      "sizeGrid": "838,256,50,306,0",
       "color": "#ffffff"
     },
     {
@@ -50,7 +49,8 @@
       "_$comp": [
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
-          "scriptPath": "../src/script/ClickScale.ts"
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": ""
         }
       ],
       "_$child": [
@@ -88,7 +88,8 @@
       "_$comp": [
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
-          "scriptPath": "../src/script/ClickScale.ts"
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": ""
         }
       ],
       "_$child": [
@@ -126,7 +127,8 @@
       "_$comp": [
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
-          "scriptPath": "../src/script/ClickScale.ts"
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": ""
         }
       ]
     },
@@ -144,7 +146,8 @@
       "_$comp": [
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
-          "scriptPath": "../src/script/ClickScale.ts"
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": ""
         }
       ],
       "_$child": [

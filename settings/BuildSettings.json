@@ -3,7 +3,7 @@
   "icon": "",
   "useCompressedEngine": false,
   "sourcesContent": true,
-  "startupScene": "res://41f51542-55de-4390-817c-1d8168680af1",
+  "startupScene": "res://92d06b4e-a1c1-4fff-a692-993d94b4bc86",
   "includedScenes": [],
   "alwaysIncluded": [
     "atlas",
