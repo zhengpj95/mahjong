@@ -29,9 +29,6 @@ export class LoginMdr extends BaseMediator<LoginView> {
     tweenMgr.remove(this.ui.$ProgressBar);
     const randomTime = (Math.random() * 500 + 1500) >> 0;
     tweenMgr.get(this.ui.$ProgressBar).to({ value: 1 }, randomTime, null, CallBack.alloc(this, this.onLoadComplete));
-    Laya.loader.load("scene/mahjong/MahjongHome.ls", Laya.Loader.HIERARCHY).then(r => {
-      console.log(r);
-    });
   }
 
   protected onClose(): void {
