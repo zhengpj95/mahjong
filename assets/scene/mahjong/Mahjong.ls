@@ -43,14 +43,14 @@
       "y": 1008,
       "width": 142,
       "height": 48,
-      "skin": "res://64dbfcd1-7881-47db-b1d3-af7139fbed16",
+      "skin": "res://2735e004-71b9-4143-a6c5-11a0f095eab0",
       "useSourceSize": true,
       "color": "#ffffff",
       "_$comp": [
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
           "scriptPath": "../src/script/ClickScale.ts",
-          "mdrClickCall": ""
+          "mdrClickCall": "onBtnTips"
         }
       ],
       "_$child": [
@@ -70,7 +70,8 @@
           "fitContent": "yes",
           "valign": "top",
           "padding": "0,0,0,0",
-          "stroke": 2
+          "stroke": 2,
+          "strokeColor": "rgba(103, 55, 0, 1)"
         }
       ]
     },
@@ -89,7 +90,7 @@
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
           "scriptPath": "../src/script/ClickScale.ts",
-          "mdrClickCall": ""
+          "mdrClickCall": "onBtnRefresh"
         }
       ],
       "_$child": [
@@ -109,7 +110,8 @@
           "fitContent": "yes",
           "valign": "top",
           "padding": "0,0,0,0",
-          "stroke": 2
+          "stroke": 2,
+          "strokeColor": "rgba(103, 55, 0, 1)"
         }
       ]
     },
@@ -117,8 +119,8 @@
       "_$id": "sokmf7zd",
       "_$type": "Image",
       "name": "btnRule",
-      "x": 580,
-      "y": 157,
+      "x": 590,
+      "y": 1008,
       "width": 42,
       "height": 43,
       "skin": "res://7b247024-2187-4b21-85b0-22a7e8f0c105",
@@ -128,7 +130,7 @@
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
           "scriptPath": "../src/script/ClickScale.ts",
-          "mdrClickCall": ""
+          "mdrClickCall": "onClickRule"
         }
       ]
     },
@@ -147,7 +149,7 @@
         {
           "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
           "scriptPath": "../src/script/ClickScale.ts",
-          "mdrClickCall": ""
+          "mdrClickCall": "onClickBack"
         }
       ],
       "_$child": [
@@ -168,22 +170,52 @@
       ]
     },
     {
+      "_$id": "olhtw6jo",
+      "_$type": "Image",
+      "name": "$imgTime",
+      "x": 30,
+      "y": 166,
+      "width": 70,
+      "height": 29,
+      "left": 30,
+      "skin": "res://7e60d2bf-52bf-45ee-a680-95c6bbbdc938",
+      "color": "#ffffff",
+      "_$child": [
+        {
+          "_$id": "czf2eskx",
+          "_$type": "Label",
+          "name": "$lab",
+          "x": 10,
+          "y": 4,
+          "width": 50,
+          "height": 21,
+          "centerX": 0,
+          "centerY": 0,
+          "text": "00:00",
+          "fontSize": 20,
+          "color": "#FFFFFF",
+          "fitContent": "yes",
+          "valign": "top",
+          "padding": "0,0,0,0"
+        }
+      ]
+    },
+    {
       "_$id": "3sul2o8g",
       "_$prefab": "5b041417-76b6-4e13-8097-5ad27bb7a39f",
-      "name": "bar",
+      "name": "$bar",
       "active": true,
-      "x": 70,
+      "x": 122,
       "y": 165,
-      "width": 500,
-      "visible": true,
-      "centerX": 0
+      "width": 480,
+      "visible": true
     },
     {
       "_$id": "asghca1v",
       "_$type": "Label",
-      "name": "labLevel",
+      "name": "$labLevel",
       "x": 100,
-      "y": 130,
+      "y": 105.5,
       "width": 100,
       "height": 51,
       "anchorX": 0.5,
@@ -199,24 +231,25 @@
     {
       "_$id": "53vmd9uh",
       "_$type": "HBox",
-      "name": "boxScore",
-      "x": 470,
-      "y": 130,
+      "name": "$boxScore",
+      "x": 480,
+      "y": 105.5,
       "width": 150,
       "height": 30,
       "anchorX": 0.5,
       "anchorY": 0.5,
       "_mouseState": 2,
-      "centerX": 150,
-      "space": 3,
+      "centerX": 160,
+      "space": 0,
       "align": "middle",
       "_$child": [
         {
           "_$id": "c31n7t8m",
           "_$type": "Label",
           "name": "Label",
-          "width": 120,
-          "height": 30,
+          "y": -0.5,
+          "width": 80,
+          "height": 31,
           "text": "得分：",
           "fontSize": 30,
           "color": "#FFFFFF",
@@ -226,8 +259,8 @@
         {
           "_$id": "fb4amvri",
           "_$type": "Label",
-          "name": "lab",
-          "x": 123,
+          "name": "$lab",
+          "x": 80,
           "width": 15,
           "height": 30,
           "text": "0",
@@ -241,7 +274,7 @@
     {
       "_$id": "qensfnul",
       "_$type": "List",
-      "name": "listItem",
+      "name": "$listItem",
       "x": 44,
       "y": 267,
       "width": 552,

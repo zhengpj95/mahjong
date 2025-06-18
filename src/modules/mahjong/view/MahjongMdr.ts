@@ -2,16 +2,16 @@ import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { MahjongEvent, MahjongScoreType, MahjongViewType } from "@def/mahjong";
 import { MahjongCardData } from "../model/MahjongCardData";
-import { BarProgressComp } from "@script/index";
 import { ModuleName, ProxyType } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
+import { MahjongView } from "@3rd-types/mahjong";
+import { TimeUtils } from "@base/utils/TimeUtils";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
 import Image = Laya.Image;
 import Event = Laya.Event;
 import SoundManager = Laya.SoundManager;
-import Label = Laya.Label;
 import BaseMediator = base.BaseMediator;
 import CallBack = base.CallBack;
 import facade = base.facade;
@@ -44,17 +44,14 @@ const ruleDesc = `
 /**
  * @date 2024/12/22
  */
-export default class MahjongMdr extends BaseMediator<Sprite> {
+export default class MahjongMdr extends BaseMediator<MahjongView> {
   private _proxy: MahjongProxy;
   private _list: List;
   private _preIdx = -1;
-  private _btnTips: Image;
-  private _btnRefresh: Image;
   private _lastScoreTime = 0;
   private _endTime = 0;
-  private _btnRule: Image;
-  private _btnBack: Image;
   private _autoRefresh = false;
+  private _haveTick = false;
 
   constructor() {
     super(LayerIndex.MAIN, "scene/mahjong/Mahjong.ls");
@@ -70,19 +67,8 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   protected initUI(): void {
     this._proxy = base.facade.getProxy(ModuleName.MAHJONG, ProxyType.MAHJONG);
 
-    this._list = <List>this.ui.getChildByName("listItem");
+    this._list = this.ui.$listItem;
     this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
-
-    this._btnTips = <Image>this.ui.getChildByName("btnTips");
-    this._btnRefresh = <Image>this.ui.getChildByName("btnRefresh");
-    this._btnTips.on(Laya.Event.CLICK, this, this.onBtnTips);
-    this._btnRefresh.on(Laya.Event.CLICK, this, this.onBtnRefresh);
-
-    this._btnRule = <Image>this.ui.getChildByName("btnRule");
-    this._btnRule.on(Laya.Event.CLICK, this, this.onClickRule);
-
-    this._btnBack = <Image>this.ui.getChildByName("btnBack");
-    this.onLaya(this._btnBack, Event.CLICK, this.onClickBack);
   }
 
   protected onOpen(): void {
@@ -94,22 +80,12 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   protected onClose(): void {
     console.log(`11111 MahjongMdr onClose`);
     this._preIdx = -1;
-    this._btnTips.off(Laya.Event.CLICK, this, this.onBtnTips);
-    this._btnRefresh.off(Laya.Event.CLICK, this, this.onBtnRefresh);
-    this.removeEvents();
 
-    const bar = <BarProgressComp>this.ui.getChildByName("bar");
-    base.tweenMgr.remove(bar);
+    base.tweenMgr.remove(this.ui.$bar);
     Tween.clearAll(this);
-    Laya.timer.clearAll(this);
+    this.ui.timer.clearAll(this);
     this._autoRefresh = false;
-  }
-
-  private removeEvents(): void {
-    this.off(MahjongEvent.UPDATE_INFO, this.onRefreshNext, this);
-    this.off(MahjongEvent.UPDATE_NEXT, this.onRefreshNext, this);
-    this.off(MahjongEvent.SHOW_RESULT, this.showResultToClear, this);
-    this.off(MahjongEvent.UPDATE_SCORE, this.updateScore, this);
+    this._haveTick = false;
   }
 
   private onRefreshNext(): void {
@@ -120,21 +96,38 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
     this.updateLevel();
     this._list.array = this._proxy.model.getMahjongData();
     this.updateBar();
+
+    if (!this._haveTick) {
+      this._haveTick = true;
+      this.ui.timer.loop(1000, this, this.tick);
+    }
   }
 
   private updateBar(): void {
     const now = Date.now() / 1000 >> 0;
     this._endTime = now + this._proxy.model.getChallengeTime();
-    const bar = <BarProgressComp>this.ui.getChildByName("bar");
+    const bar = this.ui.$bar;
     bar.value = 1;
     base.tweenMgr.remove(bar);
     base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+    this.tick();
+  }
+
+  private tick(): void {
+    const nowSecond = Date.now() / 1000 >> 0;
+    const leaveTime = this._endTime - nowSecond;
+    if (leaveTime <= 0) {
+      this._haveTick = false;
+      this.ui.timer.clear(this, this.tick);
+      this.ui.$imgTime.$lab.text = TimeUtils.formatSecond(0, "mm:ss");
+      return;
+    }
+    this.ui.$imgTime.$lab.text = TimeUtils.formatSecond(leaveTime || 0, "mm:ss");
   }
 
   // 展示结算弹窗时候，清除操作
   private showResultToClear(): void {
-    const bar = <Box>this.ui.getChildByName("bar");
-    base.tweenMgr.remove(bar);
+    base.tweenMgr.remove(this.ui.$bar);
   }
 
   // 失败结束
@@ -208,8 +201,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   }
 
   private updateLevel(): void {
-    const lab = <Label>this.ui.getChildByName("labLevel");
-    lab.text = "关卡：" + this._proxy.model.getNextLevel();
+    this.ui.$labLevel.text = "关卡：" + this._proxy.model.getNextLevel();
   }
 
   private addScore(): void {
@@ -227,15 +219,14 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   }
 
   private updateScore(): void {
-    const lab = ComUtils.getNodeByNameList<Label>(this.ui, ["boxScore", "lab"]);
+    const lab = this.ui.$boxScore.$lab;
     lab.text = this._proxy.model.levelScore + "";
     lab.color = this._proxy.model.levelScore > 0 ? "#42e422" : "#ff4646";
   }
 
   private resetScore(): void {
     this._lastScoreTime = 0;
-    const lab = ComUtils.getNodeByNameList<Label>(this.ui, ["boxScore", "lab"]);
-    lab.text = "0";
+    this.ui.$boxScore.$lab.text = "0";
   }
 
   private clearCardItem(box: BoxCard, index: number): void {
@@ -254,8 +245,8 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
     if (imgSel) imgSel.visible = isSel;
   }
 
-  // 提示
-  private onBtnTips(): void {
+  // noinspection JSUnusedGlobalSymbols 提示
+  public onBtnTips(): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
     const cardList = this._proxy.model.getTipsCardDataList();
     if (cardList.length) {
@@ -276,8 +267,8 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
   }
 
 
-  // 洗牌
-  private onBtnRefresh(): void {
+  // noinspection JSUnusedGlobalSymbols 洗牌
+  public onBtnRefresh(): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
     this._list.array = this._proxy.model.getRefreshCardDataList();
     this._list.refresh();
@@ -287,11 +278,13 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
     }
   }
 
-  private onClickRule(): void {
+// noinspection JSUnusedGlobalSymbols
+  public onClickRule(): void {
     facade.openView(ModuleName.MISC, MiscViewType.RULE, ruleDesc);
   }
 
-  private onClickBack(): void {
+// noinspection JSUnusedGlobalSymbols
+  public onClickBack(): void {
     this.close();
     facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
   }
@@ -316,7 +309,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
     const gPoint = Point.create();
     gPoint.x = this._list.x;
     gPoint.y = this._list.y;
-    const time = path.length >= 10 ? 15 : path.length >= 5 ? 30 : 120;
+    const time = this.getEffectTime(path);
 
     function drawNextSegment(): void {
       if (i >= path.length - 1) {
@@ -382,7 +375,7 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
     );
     let index = 0;
     const glow = this._glowSprite;
-    const time = path.length >= 10 ? 15 : path.length >= 5 ? 30 : 120;
+    const time = this.getEffectTime(path);
 
     function moveNext(): void {
       if (index >= points.length - 1) {
@@ -400,5 +393,9 @@ export default class MahjongMdr extends BaseMediator<Sprite> {
     }
 
     moveNext();
+  }
+
+  private getEffectTime(path: { x: number, y: number }[]): number {
+    return path.length > 15 ? 8 : (path.length >= 10 ? 15 : (path.length >= 5 ? 30 : 120));
   }
 }
