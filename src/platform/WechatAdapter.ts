@@ -24,7 +24,7 @@ export class WechatPlatformStorage implements IPlatformStorage {
     try {
       wx.getStorage({
         key: key,
-        success: (result): void => {
+        success: (result: { data: string }): void => {
           if (callback) callback(JSON.parse(result.data));
         },
         fail: () => {
