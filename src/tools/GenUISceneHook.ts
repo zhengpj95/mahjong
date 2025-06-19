@@ -34,6 +34,8 @@ class GenUISceneHook implements IEditorEnv.ISceneHook {
           node.skin = ""; // 清除image的skin默认值
         }
       });
+    } else if (node instanceof Laya.FontClip || node instanceof Laya.Clip || node instanceof Laya.Button) {
+      node.skin = "";
     }
   }
 
