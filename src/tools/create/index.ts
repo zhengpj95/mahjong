@@ -1,7 +1,7 @@
 import { FsUtils } from "../FsUtils";
 import * as path from "path";
 import * as fs from "fs/promises";
-import { toolsObj } from "../index";
+import { toolsObj, toPascalCase } from "../index";
 
 /**
  * @author zpj
@@ -35,16 +35,4 @@ export async function startCreate(moduleName: string): Promise<void> {
   }
 
   return Promise.resolve();
-}
-
-
-/**
- * 将字符串转换为 PascalCase（每个单词首字母大写）
- * @param input 输入字符串
- * @returns 转换后的 PascalCase 字符串
- */
-function toPascalCase(input: string): string {
-  return input
-    .replace(/[-_\s]+(.)?/g, (_, group1) => group1 ? group1.toUpperCase() : "")
-    .replace(/^(.)/, (_, group1) => group1.toUpperCase());
 }

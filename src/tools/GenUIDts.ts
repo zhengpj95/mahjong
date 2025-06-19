@@ -1,7 +1,7 @@
 import { FsUtils } from "./FsUtils";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { toolsObj } from "./index";
+import { toolsObj, toPascalCase } from "./index";
 
 interface NodeInfo {
   type?: string;
@@ -60,6 +60,13 @@ export class GenUIDts {
 
       const obj: ViewInfo = {};
       for (let c of child) {
+        if (c._$type === "List") {
+          const renderObj = {};
+          await this.parseChild(c._$child[0]?._$child[0], renderObj, 0);
+          const cName = toPascalCase(c.name.replace("$", ""));
+          map.set(file.replace(toolsObj.ProjectRoot, "") + cName, renderObj);
+          (renderObj as any)["isRender"] = true; // list的item子项
+        }
         await this.parseChild(c, obj, 0);
       }
 
@@ -155,9 +162,14 @@ export class GenUIDts {
     const entries = map.entries();
     const lines: string[] = [];
     for (let [key, view] of entries) {
+      const isRender = !!view["isRender"]; // 处理list的item子项，独立的继承Box组件
       const basename = path.basename(key).replace(".ls", "");
-      lines.push(`/** ${key.replace(/\\/g, "/")} */\n`);
-      lines.push(`export interface ${basename}View extends Laya.Scene {\n`);
+      let lsKey = key.replace(/\\/g, "/");
+      if (!lsKey.endsWith(".ls")) {
+        lsKey = lsKey.replace(".ls", ".ls ");
+      }
+      lines.push(`/** ${lsKey} */\n`);
+      lines.push(`export interface ${basename}${isRender ? "Render" : "View"} extends Laya.${isRender ? "Box" : "Scene"} {\n`);
       for (let k in view) {
         if (typeof view[k] === "string") continue;
         lines.push(...this.createViewNode(view[k], 1));
