@@ -21,9 +21,7 @@ import Tween = Laya.Tween;
 import LayerIndex = base.LayerIndex;
 
 type BoxRender = Box & {
-  boxCard: Box & {
-    img: Image
-  }
+  boxCard: BoxCard
 }
 
 type BoxCard = Box & {
