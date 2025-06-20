@@ -199,7 +199,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   }
 
   private updateLevel(): void {
-    this.ui.$labLevel.text = "关卡：" + this._proxy.model.getNextLevel();
+    this.ui.$labLevel.text = "关卡" + this._proxy.model.getNextLevel();
   }
 
   private addScore(): void {
@@ -217,14 +217,13 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   }
 
   private updateScore(): void {
-    const lab = this.ui.$boxScore.$lab;
-    lab.text = this._proxy.model.levelScore + "";
-    lab.color = this._proxy.model.levelScore > 0 ? "#42e422" : "#ff4646";
+    const lab = this.ui.$labScore;
+    lab.text = "得分：" + `[color=#${this._proxy.model.levelScore >= 0 ? "42e422" : "ff4646"}]${this._proxy.model.levelScore}[/color]`;
   }
 
   private resetScore(): void {
     this._lastScoreTime = 0;
-    this.ui.$boxScore.$lab.text = "0";
+    this.ui.$labScore.text = "得分：[color=#42e422]0[/color]";
   }
 
   private clearCardItem(box: BoxCard, index: number): void {
