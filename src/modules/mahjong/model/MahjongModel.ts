@@ -9,8 +9,6 @@ import poolMgr = base.poolMgr;
 import eventMgr = base.eventMgr;
 import facade = base.facade;
 
-export const MAHJONG_LEVEL = "mahjong_level";
-
 /**
  * @date 2024/12/22
  */

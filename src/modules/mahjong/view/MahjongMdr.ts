@@ -11,7 +11,6 @@ import Handler = Laya.Handler;
 import Box = Laya.Box;
 import Image = Laya.Image;
 import Event = Laya.Event;
-import SoundManager = Laya.SoundManager;
 import BaseMediator = base.BaseMediator;
 import CallBack = base.CallBack;
 import facade = base.facade;
@@ -159,7 +158,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       return;
     }
 
-    SoundManager.playSound("resources/audio/mixkit-flop.wav");
+    this.emit(MiscEvent.PLAY_SOUND);
     if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);

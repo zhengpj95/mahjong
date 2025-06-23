@@ -127,6 +127,25 @@
       "padding": "0,0,0,0",
       "stroke": 2,
       "strokeColor": "rgba(0, 0, 0, 1)"
+    },
+    {
+      "_$id": "hlyo5dfq",
+      "_$type": "Image",
+      "name": "$btnSound",
+      "x": 14,
+      "y": 89,
+      "width": 46,
+      "height": 46,
+      "skin": "res://bafdf4ea-921c-4e9d-9d28-439f03a9cc11",
+      "useSourceSize": true,
+      "color": "#ffffff",
+      "_$comp": [
+        {
+          "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
+          "scriptPath": "../src/script/ClickScale.ts",
+          "mdrClickCall": "onClickSound"
+        }
+      ]
     }
   ]
 }

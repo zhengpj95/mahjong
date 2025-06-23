@@ -3,6 +3,7 @@ import { ModuleName } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
 import RuleMdr from "./view/RuleMdr";
 import { ShowTipsCmd } from "./cmd/ShowTipsCmd";
+import { PlaySoundCmd } from "./cmd/PlaySoundCmd";
 
 /**
  * @author zpj
@@ -15,6 +16,7 @@ export class MiscModule extends BaseModule {
 
   protected initCmd(): void {
     this.regCmd(MiscEvent.SHOW_TIPS, ShowTipsCmd);
+    this.regCmd(MiscEvent.PLAY_SOUND, PlaySoundCmd);
   }
 
   protected initMdr(): void {
