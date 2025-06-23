@@ -1,4 +1,5 @@
 import BaseCommand = base.BaseCommand;
+import EventVo = base.EventVo;
 import { TipsMdr } from "../view/TipsMdr";
 
 let mdr: TipsMdr | undefined;
@@ -8,7 +9,8 @@ let mdr: TipsMdr | undefined;
  * @date 2025/5/6
  */
 export class ShowTipsCmd extends BaseCommand {
-  public exec(str: string): void {
+  public exec(e: EventVo<string>): void {
+    const str = e.data ?? "";
     if (!mdr) {
       mdr = new TipsMdr();
     }

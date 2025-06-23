@@ -1448,11 +1448,11 @@
           this._cmdMap[event] = cls;
       }
       exeCmd(data) {
-          var _a, _b;
+          var _a;
           const cls = this._cmdMap[(_a = data === null || data === undefined ? undefined : data.type) !== null && _a !== undefined ? _a : ""];
           if (cls) {
               const cmd = new cls();
-              cmd.exec((_b = data === null || data === undefined ? undefined : data.data) !== null && _b !== undefined ? _b : "");
+              cmd.exec(data);
           }
       }
       regProxy(type, proxy) {

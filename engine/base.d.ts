@@ -181,7 +181,7 @@ declare module base {
   }
   
   abstract class BaseCommand extends BaseEmitter {
-      abstract exec(args: any): void;
+      abstract exec(e: EventVo<any>): void;
   }
   
   const MdrKey = "_mediator_";

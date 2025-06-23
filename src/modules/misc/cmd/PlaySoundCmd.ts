@@ -1,4 +1,5 @@
 import BaseCommand = base.BaseCommand;
+import EventVo = base.EventVo;
 import SoundManager = Laya.SoundManager;
 import { globalAdapter } from "@platform/index";
 import { MiscStorageKey } from "@def/misc";
@@ -9,7 +10,7 @@ import { MiscStorageKey } from "@def/misc";
  * @date 2025/6/23
  */
 export class PlaySoundCmd extends BaseCommand {
-  public exec(args: any): void {
+  public exec(e: EventVo<any>): void {
     globalAdapter.storage.getItem(MiscStorageKey.PLAY_SOUND, (data: number) => {
       if (!!data) {
         return;
