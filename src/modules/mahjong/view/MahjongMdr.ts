@@ -168,15 +168,12 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       const paths = this._proxy.model.findPath(preItemData, curItemData);
       if (curItemData && curItemData.checkSame(preItemData) && !!paths.length) {
         ComUtils.setScale(curItem, BIG_SCALE);
-        this.clearCardItem(curItem, index);
         this.setSelect(curItem, true);
-        this.clearCardItem(preItem, this._preIdx);
         this.addScore();
         const p = paths.map(item => {
           return { x: item[1] - 1, y: item[0] - 1 };
         });
-        this.animateDrawLine(p);
-        this.createGlowEffect(p);
+        this.animateDrawLine(p, [curItem, index, preItem, this._preIdx]);
       } else {
         ComUtils.setScale(curItem, INIT_SCALE);
         ComUtils.setScale(preItem, INIT_SCALE);
@@ -228,13 +225,13 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
 
   private clearCardItem(box: BoxCard, index: number): void {
     const idx = index;
-    ComUtils.setTween(box, true, Handler.create(this, () => {
-      const curImg = box.getChildByName("img") as Image;
-      curImg.skin = "";
-      const imgSel = box.getChildByName("imgSelected") as Image;
-      imgSel.visible = false;
-      this._proxy.model.deleteCard(idx);
-    }));
+    // ComUtils.setTween(box, true, Handler.create(this, () => {
+    const curImg = box.getChildByName("img") as Image;
+    curImg.skin = "";
+    const imgSel = box.getChildByName("imgSelected") as Image;
+    imgSel.visible = false;
+    this._proxy.model.deleteCard(idx);
+    // }));
   }
 
   private setSelect(boxCard: BoxCard, isSel = false): void {
@@ -289,17 +286,26 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   private _lineSprite: Sprite;
   private _glowSprite: Sprite;
 
-  private animateDrawLine(path: { x: number, y: number }[], color: string = "#42e422"): void {
+  private animateDrawLine(path: { x: number, y: number }[], item: any[], color: string = "#42e422"): void {
     const tileWidth = 52;
     const tileHeight = 70;
     const offsetX = tileWidth / 2;
     const offsetY = tileHeight / 2;
+
     if (!this._lineSprite) {
       this._lineSprite = new Laya.Sprite();
       this._lineSprite.width = Laya.stage.width;
       this._lineSprite.height = Laya.stage.height;
     }
     this.ui.addChild(this._lineSprite);
+    if (!this._glowSprite) {
+      this._glowSprite = new Laya.Sprite();
+      this._glowSprite.alpha = 1;
+      this._glowSprite.width = this._glowSprite.height = 1;
+      this._glowSprite.name = "glow";
+    }
+    this._glowSprite.graphics.drawCircle(0, 0, 10, "#FFFF00"); // 黄色发光球
+    this.ui.addChild(this._glowSprite);
 
     let i = 0;
     const lineLayer = this._lineSprite;
@@ -308,12 +314,21 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     gPoint.y = this._list.y;
     const time = this.getEffectTime(path);
 
+    const _this = this;
+    const glowPoints: Laya.Point[] = path.map(p => new Laya.Point(
+      gPoint.x + p.x * tileWidth + offsetX + 4 + p.x * 3,
+      gPoint.y + p.y * tileHeight + offsetY + 4 + p.y * 3)
+    );
+
     function drawNextSegment(): void {
       if (i >= path.length - 1) {
         // 所有段绘制完成后清除
         Laya.timer.once(100, null, () => {
+          _this._glowSprite.removeSelf();
           lineLayer.removeSelf();
           lineLayer.removeChildren();
+          _this.clearCardItem(item[0], item[1]);
+          _this.clearCardItem(item[2], item[3]);
         });
         return;
       }
@@ -332,10 +347,14 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       const tempLine = new Laya.Sprite();
       lineLayer.addChild(tempLine);
 
+      const from1 = glowPoints[i];
+      const to1 = glowPoints[i + 1];
+      _this._glowSprite.pos(from1.x, from1.y);
+      Laya.Tween.to(_this._glowSprite, { x: to1.x, y: to1.y }, time, null, null, 0, true);
       Laya.Tween.to(progress, { x: toX, y: toY }, time, null, Laya.Handler.create(null, () => {
         i++;
         drawNextSegment();
-      }), 0, true); // true 表示使用帧率模式
+      }), 0, true);
 
       // 每帧重绘当前段的动态线条
       tempLine.frameLoop(1, null, () => {
@@ -345,51 +364,6 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     }
 
     drawNextSegment();
-  }
-
-
-  private createGlowEffect(path: { x: number, y: number }[]): void {
-    if (!this._glowSprite) {
-      this._glowSprite = new Laya.Sprite();
-      this._glowSprite.alpha = 1;
-      this._glowSprite.width = this._glowSprite.height = 1;
-      this._glowSprite.name = "glow";
-    }
-    this._glowSprite.graphics.drawCircle(0, 0, 10, "#FFFF00"); // 黄色发光球
-    this.ui.addChild(this._glowSprite);
-
-    const tileWidth = 52;
-    const tileHeight = 70;
-    const offsetX = tileWidth / 2;
-    const offsetY = tileHeight / 2;
-    const gPoint = Point.create();
-    gPoint.x = this._list.x;
-    gPoint.y = this._list.y;
-
-    const points: Laya.Point[] = path.map(p => new Laya.Point(
-      gPoint.x + p.x * tileWidth + offsetX + 4 + p.x * 3,
-      gPoint.y + p.y * tileHeight + offsetY + 4 + p.y * 3)
-    );
-    let index = 0;
-    const glow = this._glowSprite;
-    const time = this.getEffectTime(path);
-
-    function moveNext(): void {
-      if (index >= points.length - 1) {
-        glow.removeSelf();
-        return;
-      }
-
-      const from = points[index];
-      const to = points[index + 1];
-      glow.pos(from.x, from.y);
-      Laya.Tween.to(glow, { x: to.x, y: to.y }, time, null, Laya.Handler.create(null, () => {
-        index++;
-        moveNext();
-      }));
-    }
-
-    moveNext();
   }
 
   private getEffectTime(path: { x: number, y: number }[]): number {
