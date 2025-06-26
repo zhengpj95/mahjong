@@ -245,6 +245,7 @@ interface _vibrateShortObject {
    */
   complete: () => void;
 }
+
 interface _vibrateLongObject {
   /**
    * 接口调用成功的回调函数
@@ -261,6 +262,7 @@ interface _vibrateLongObject {
    */
   complete: () => void;
 }
+
 interface _uploadFileObject {
   /**
    * 开发者服务器 url
@@ -302,6 +304,7 @@ interface _uploadFileObject {
    */
   complete: () => void;
 }
+
 interface _uploadFileSuccessObject {
   /**
    * 开发者服务器返回的数据
@@ -335,6 +338,7 @@ interface _updateShareMenuObject {
    */
   complete: () => void;
 }
+
 interface _switchTabObject {
   /**
    * 需要跳转的 tabBar 页面的路径（需在 app.json 的 [tabBar](../framework/config.md#tabbar) 字段定义的页面），路径后不能带参数
@@ -356,6 +360,7 @@ interface _switchTabObject {
    */
   complete: () => void;
 }
+
 interface _stopWifiObject {
   /**
    * 接口调用成功的回调函数
@@ -372,6 +377,7 @@ interface _stopWifiObject {
    */
   complete: () => void;
 }
+
 interface _stopHCEObject {
   /**
    * 接口调用成功的回调函数
@@ -388,6 +394,7 @@ interface _stopHCEObject {
    */
   complete: () => void;
 }
+
 interface _stopHCESuccessObject {
   /**
    * 错误信息
@@ -416,6 +423,7 @@ interface _stopCompassObject {
    */
   complete: () => void;
 }
+
 interface _stopBluetoothDevicesDiscoveryObject {
   /**
    * 成功则返回本机蓝牙适配器状态
@@ -432,6 +440,7 @@ interface _stopBluetoothDevicesDiscoveryObject {
    */
   complete: () => void;
 }
+
 interface _stopBluetoothDevicesDiscoverySuccessObject {
   /**
    * 成功：ok，错误：详细信息
@@ -455,6 +464,7 @@ interface _stopBeaconDiscoveryObject {
    */
   complete: () => void;
 }
+
 interface _stopBeaconDiscoverySuccessObject {
   /**
    * 调用结果
@@ -478,6 +488,7 @@ interface _stopAccelerometerObject {
    */
   complete: () => void;
 }
+
 interface _startWifiObject {
   /**
    * 接口调用成功的回调函数
@@ -494,6 +505,7 @@ interface _startWifiObject {
    */
   complete: () => void;
 }
+
 interface _startSoterAuthenticationObject {
   /**
    * 请求使用的可接受的生物认证方式
@@ -525,6 +537,7 @@ interface _startSoterAuthenticationObject {
    */
   complete: () => void;
 }
+
 interface _startSoterAuthenticationSuccessObject {
   /**
    * 错误码
@@ -568,6 +581,7 @@ interface _startRecordObject {
    */
   complete: () => void;
 }
+
 interface _startRecordSuccessObject {
   /**
    * 录音文件的临时路径
@@ -591,6 +605,7 @@ interface _startPullDownRefreshObject {
    */
   complete: () => void;
 }
+
 interface _startPullDownRefreshSuccessObject {
   /**
    * 接口调用结果
@@ -619,6 +634,7 @@ interface _startHCEObject {
    */
   complete: () => void;
 }
+
 interface _startHCESuccessObject {
   /**
    * 错误信息
@@ -647,6 +663,7 @@ interface _startCompassObject {
    */
   complete: () => void;
 }
+
 interface _startBluetoothDevicesDiscoveryObject {
   /**
    * 蓝牙设备主 service 的 uuid 列表
@@ -678,6 +695,7 @@ interface _startBluetoothDevicesDiscoveryObject {
    */
   complete: () => void;
 }
+
 interface _startBluetoothDevicesDiscoverySuccessObject {
   /**
    * 成功：ok，错误：详细信息
@@ -706,6 +724,7 @@ interface _startBeaconDiscoveryObject {
    */
   complete: () => void;
 }
+
 interface _startBeaconDiscoverySuccessObject {
   /**
    * 调用结果
@@ -729,6 +748,7 @@ interface _startAccelerometerObject {
    */
   complete: () => void;
 }
+
 interface _showToastObject {
   /**
    * 提示的内容
@@ -770,6 +790,7 @@ interface _showToastObject {
    */
   complete: () => void;
 }
+
 interface _showTabBarRedDotObject {
   /**
    * tabBar的哪一项，从左边算起
@@ -791,6 +812,7 @@ interface _showTabBarRedDotObject {
    */
   complete: () => void;
 }
+
 interface _showTabBarObject {
   /**
    * 是否需要动画效果，默认无
@@ -812,6 +834,7 @@ interface _showTabBarObject {
    */
   complete: () => void;
 }
+
 interface _showShareMenuObject {
   /**
    * 是否使用带 shareTicket 的转发[详情](./share.md#获取更多转发信息)
@@ -832,7 +855,10 @@ interface _showShareMenuObject {
    * 接口调用结束的回调函数（调用成功、失败都会执行）
    */
   complete: () => void;
+
+  menus: string[];
 }
+
 interface _showModalObject {
   /**
    * 提示的标题
@@ -884,6 +910,7 @@ interface _showModalObject {
    */
   complete: () => void;
 }
+
 interface _showModalSuccessObject {
   /**
    * 为 true 时，表示用户点击了确定按钮
@@ -922,6 +949,7 @@ interface _showLoadingObject {
    */
   complete: () => void;
 }
+
 interface _showActionSheetObject {
   /**
    * 按钮的文字数组，数组长度最大为6个
@@ -948,6 +976,7 @@ interface _showActionSheetObject {
    */
   complete: () => void;
 }
+
 interface _showActionSheetSuccessObject {
   /**
    * 用户点击的按钮，从上到下的顺序，从0开始
@@ -976,6 +1005,7 @@ interface _setWifiListObject {
    */
   complete: () => void;
 }
+
 interface _setTopBarTextObject {
   /**
    * 置顶栏文字内容
@@ -997,6 +1027,7 @@ interface _setTopBarTextObject {
    */
   complete: () => void;
 }
+
 interface _setTabBarStyleObject {
   /**
    * tab 上的文字默认颜色
@@ -1033,6 +1064,7 @@ interface _setTabBarStyleObject {
    */
   complete: () => void;
 }
+
 interface _setTabBarItemObject {
   /**
    * tabBar 的哪一项，从左边算起
@@ -1069,6 +1101,7 @@ interface _setTabBarItemObject {
    */
   complete: () => void;
 }
+
 interface _setTabBarBadgeObject {
   /**
    * tabBar的哪一项，从左边算起
@@ -1095,6 +1128,7 @@ interface _setTabBarBadgeObject {
    */
   complete: () => void;
 }
+
 interface _setStorageObject {
   /**
    * 本地缓存中的指定的 key
@@ -1121,6 +1155,7 @@ interface _setStorageObject {
    */
   complete: () => void;
 }
+
 interface _setScreenBrightnessObject {
   /**
    * 屏幕亮度值，范围 0~1，0 最暗，1 最亮
@@ -1142,6 +1177,7 @@ interface _setScreenBrightnessObject {
    */
   complete: () => void;
 }
+
 interface _setNavigationBarTitleObject {
   /**
    * 页面标题
@@ -1163,6 +1199,7 @@ interface _setNavigationBarTitleObject {
    */
   complete: () => void;
 }
+
 interface _setNavigationBarColorObject {
   /**
    * 前景颜色值，包括按钮、标题、状态栏的颜色，仅支持 #ffffff 和 #000000
@@ -1194,6 +1231,7 @@ interface _setNavigationBarColorObject {
    */
   complete: () => void;
 }
+
 interface _setNavigationBarColorSuccessObject {
   /**
    * 调用结果
@@ -1222,6 +1260,7 @@ interface _setKeepScreenOnObject {
    */
   complete: () => void;
 }
+
 interface _setKeepScreenOnSuccessObject {
   /**
    * 调用结果
@@ -1250,6 +1289,7 @@ interface _setEnableDebugObject {
    */
   complete: () => void;
 }
+
 interface _setEnableDebugSuccessObject {
   /**
    * 调用结果
@@ -1278,6 +1318,7 @@ interface _setClipboardDataObject {
    */
   complete: () => void;
 }
+
 interface _sendSocketMessageObject {
   /**
    * 需要发送的内容
@@ -1299,6 +1340,7 @@ interface _sendSocketMessageObject {
    */
   complete: () => void;
 }
+
 interface _sendHCEMessageObject {
   /**
    * 二进制数据
@@ -1320,6 +1362,7 @@ interface _sendHCEMessageObject {
    */
   complete: () => void;
 }
+
 interface _sendHCEMessageSuccessObject {
   /**
    * 错误信息
@@ -1353,6 +1396,7 @@ interface _seekBackgroundAudioObject {
    */
   complete: () => void;
 }
+
 interface _scanCodeObject {
   /**
    * 是否只能从相机扫码，不允许从相册选择图片
@@ -1379,6 +1423,7 @@ interface _scanCodeObject {
    */
   complete: () => void;
 }
+
 interface _scanCodeSuccessObject {
   /**
    * 所扫码的内容
@@ -1422,6 +1467,7 @@ interface _saveVideoToPhotosAlbumObject {
    */
   complete: () => void;
 }
+
 interface _saveVideoToPhotosAlbumSuccessObject {
   /**
    * 调用结果
@@ -1450,6 +1496,7 @@ interface _saveImageToPhotosAlbumObject {
    */
   complete: () => void;
 }
+
 interface _saveImageToPhotosAlbumSuccessObject {
   /**
    * 调用结果
@@ -1478,6 +1525,7 @@ interface _saveFileObject {
    */
   complete: () => void;
 }
+
 interface _saveFileSuccessObject {
   /**
    * 文件的保存路径
@@ -1526,6 +1574,7 @@ interface _requestPaymentObject {
    */
   complete: () => void;
 }
+
 interface _requestObject {
   /**
    * 开发者服务器接口地址
@@ -1572,6 +1621,7 @@ interface _requestObject {
    */
   complete: () => void;
 }
+
 interface _requestSuccessObject {
   /**
    * 开发者服务器返回的数据
@@ -1610,6 +1660,7 @@ interface _removeTabBarBadgeObject {
    */
   complete: () => void;
 }
+
 interface _removeStorageObject {
   /**
    * 本地缓存中的指定的 key
@@ -1631,6 +1682,7 @@ interface _removeStorageObject {
    */
   complete: () => void;
 }
+
 interface _removeSavedFileObject {
   /**
    * 需要删除的文件路径
@@ -1652,6 +1704,7 @@ interface _removeSavedFileObject {
    */
   complete: () => void;
 }
+
 interface _redirectToObject {
   /**
    * 需要跳转的应用内非 tabBar 的页面的路径，路径后可以带参数。参数与路径之间使用`?`分隔，参数键与参数值用`=`相连，不同参数用`&`分隔；如 'path?key=value&key2=value2'
@@ -1673,6 +1726,7 @@ interface _redirectToObject {
    */
   complete: () => void;
 }
+
 interface _readBLECharacteristicValueObject {
   /**
    * 蓝牙设备 id，参考 device 对象
@@ -1704,6 +1758,7 @@ interface _readBLECharacteristicValueObject {
    */
   complete: () => void;
 }
+
 interface _readBLECharacteristicValueSuccessObject {
   /**
    * 错误码
@@ -1737,6 +1792,7 @@ interface _reLaunchObject {
    */
   complete: () => void;
 }
+
 interface _previewImageObject {
   /**
    * 当前显示图片的链接，不填则默认为 urls 的第一张
@@ -1763,6 +1819,7 @@ interface _previewImageObject {
    */
   complete: () => void;
 }
+
 interface _playVoiceObject {
   /**
    * 需要播放的语音文件的文件路径
@@ -1789,6 +1846,7 @@ interface _playVoiceObject {
    */
   complete: () => void;
 }
+
 interface _playBackgroundAudioObject {
   /**
    * 音乐链接，目前支持的格式有 m4a, aac, mp3, wav
@@ -1820,6 +1878,7 @@ interface _playBackgroundAudioObject {
    */
   complete: () => void;
 }
+
 interface _pageScrollToObject {
   /**
    * 滚动到页面的目标位置（单位px）
@@ -1831,6 +1890,7 @@ interface _pageScrollToObject {
    */
   duration: number;
 }
+
 interface _openSettingObject {
   /**
    * 接口调用成功的回调函数，返回内容详见返回参数说明。
@@ -1847,6 +1907,7 @@ interface _openSettingObject {
    */
   complete: () => void;
 }
+
 interface _openSettingSuccessObject {
   /**
    * 用户授权结果，其中 key 为 scope 值，value 为 Bool 值，表示用户是否允许授权，详见 [scope 列表](./authorize-index.md#scope-列表)
@@ -1895,6 +1956,7 @@ interface _openLocationObject {
    */
   complete: () => void;
 }
+
 interface _openDocumentObject {
   /**
    * 文件路径，可通过 downFile 获得
@@ -1921,6 +1983,7 @@ interface _openDocumentObject {
    */
   complete: any;
 }
+
 interface _openCardObject {
   /**
    * 需要打开的卡券列表，列表内参数详见[openCard 请求对象说明](#opencard-请求对象说明)
@@ -1942,6 +2005,7 @@ interface _openCardObject {
    */
   complete: () => void;
 }
+
 interface _openBluetoothAdapterObject {
   /**
    * 成功则返回成功初始化信息
@@ -1958,19 +2022,24 @@ interface _openBluetoothAdapterObject {
    */
   complete: () => void;
 }
+
 interface _onWifiConnectedCallbackResult {
   /**
    * Wi-Fi 信息
    */
   wifi: object;
 }
-interface _onUserCaptureScreenCallbackResult {}
+
+interface _onUserCaptureScreenCallbackResult {
+}
+
 interface _onSocketMessageCallbackResult {
   /**
    * 服务器返回的消息
    */
   data: any;
 }
+
 interface _onNetworkStatusChangeCallbackResult {
   /**
    * 当前是否有网络连接
@@ -1982,6 +2051,7 @@ interface _onNetworkStatusChangeCallbackResult {
    */
   networkType: string;
 }
+
 interface _onHCEMessageCallbackResult {
   /**
    * 消息类型
@@ -1998,30 +2068,35 @@ interface _onHCEMessageCallbackResult {
    */
   reason: number;
 }
+
 interface _onGetWifiListCallbackResult {
   /**
    * Wi-Fi 列表数据
    */
   wifiList: any;
 }
+
 interface _onEvaluateWifiCallbackResult {
   /**
    * Wi-Fi 信息
    */
   wifi: object;
 }
+
 interface _onCompassChangeCallbackResult {
   /**
    * 面对的方向度数
    */
   direction: number;
 }
+
 interface _onBluetoothDeviceFoundCallbackResult {
   /**
    * 新搜索到的设备列表
    */
   devices: any;
 }
+
 interface _onBluetoothAdapterStateChangeCallbackResult {
   /**
    * 蓝牙适配器是否可用
@@ -2033,12 +2108,14 @@ interface _onBluetoothAdapterStateChangeCallbackResult {
    */
   discovering: boolean;
 }
+
 interface _onBeaconUpdateCallbackResult {
   /**
    * 当前搜寻到的所有 iBeacon 设备列表
    */
   beacons: any;
 }
+
 interface _onBeaconServiceChangeCallbackResult {
   /**
    * 服务目前是否可用
@@ -2050,6 +2127,7 @@ interface _onBeaconServiceChangeCallbackResult {
    */
   discovering: boolean;
 }
+
 interface _onBLEConnectionStateChangeCallbackResult {
   /**
    * 蓝牙设备 id，参考 device 对象
@@ -2061,6 +2139,7 @@ interface _onBLEConnectionStateChangeCallbackResult {
    */
   connected: boolean;
 }
+
 interface _onBLECharacteristicValueChangeCallbackResult {
   /**
    * 蓝牙设备 id，参考 device 对象
@@ -2082,6 +2161,7 @@ interface _onBLECharacteristicValueChangeCallbackResult {
    */
   value: any;
 }
+
 interface _onAccelerometerChangeCallbackResult {
   /**
    * X 轴
@@ -2098,6 +2178,7 @@ interface _onAccelerometerChangeCallbackResult {
    */
   z: number;
 }
+
 interface _notifyBLECharacteristicValueChangeObject {
   /**
    * 蓝牙设备 id，参考 device 对象
@@ -2134,6 +2215,7 @@ interface _notifyBLECharacteristicValueChangeObject {
    */
   complete: () => void;
 }
+
 interface _notifyBLECharacteristicValueChangeSuccessObject {
   /**
    * 成功：ok，错误：详细信息
@@ -2177,6 +2259,7 @@ interface _navigateToMiniProgramObject {
    */
   complete: () => void;
 }
+
 interface _navigateToMiniProgramSuccessObject {
   /**
    * 调用结果
@@ -2205,6 +2288,7 @@ interface _navigateToObject {
    */
   complete: () => void;
 }
+
 interface _navigateBackMiniProgramObject {
   /**
    * 需要返回给上一个小程序的数据，上一个小程序可在 `App.onShow()` 中获取到这份数据。[详情](../framework/app-service/app.md)
@@ -2226,6 +2310,7 @@ interface _navigateBackMiniProgramObject {
    */
   complete: () => void;
 }
+
 interface _navigateBackMiniProgramSuccessObject {
   /**
    * 调用结果
@@ -2239,6 +2324,7 @@ interface _navigateBackObject {
    */
   delta: number;
 }
+
 interface _makeVoIPCallObject {
   /**
    * 是否展示切换按钮以允许用户转换到后置摄像头
@@ -2275,6 +2361,7 @@ interface _makeVoIPCallObject {
    */
   complete: () => void;
 }
+
 interface _makePhoneCallObject {
   /**
    * 需要拨打的电话号码
@@ -2296,6 +2383,7 @@ interface _makePhoneCallObject {
    */
   complete: () => void;
 }
+
 interface _loginObject {
   /**
    * 接口调用成功的回调函数
@@ -2312,6 +2400,7 @@ interface _loginObject {
    */
   complete: () => void;
 }
+
 interface _loginSuccessObject {
   /**
    * 调用结果
@@ -2345,6 +2434,7 @@ interface _hideTabBarRedDotObject {
    */
   complete: () => void;
 }
+
 interface _hideTabBarObject {
   /**
    * 是否需要动画效果，默认无
@@ -2366,6 +2456,7 @@ interface _hideTabBarObject {
    */
   complete: () => void;
 }
+
 interface _hideShareMenuObject {
   /**
    * 接口调用成功的回调函数
@@ -2382,6 +2473,7 @@ interface _hideShareMenuObject {
    */
   complete: () => void;
 }
+
 interface _getWifiListObject {
   /**
    * 接口调用成功的回调函数
@@ -2398,6 +2490,7 @@ interface _getWifiListObject {
    */
   complete: () => void;
 }
+
 interface _getWeRunDataObject {
   /**
    * 接口调用成功的回调函数
@@ -2414,6 +2507,7 @@ interface _getWeRunDataObject {
    */
   complete: () => void;
 }
+
 interface _getWeRunDataSuccessObject {
   /**
    * 调用结果
@@ -2457,6 +2551,7 @@ interface _getUserInfoObject {
    */
   complete: () => void;
 }
+
 interface _getUserInfoSuccessObject {
   /**
    * 用户信息对象，不包含 openid 等敏感信息
@@ -2572,6 +2667,7 @@ interface _getSystemInfoObject {
    */
   complete: () => void;
 }
+
 interface _getSystemInfoSuccessObject {
   /**
    * 手机品牌
@@ -2660,6 +2756,7 @@ interface _getStorageInfoObject {
    */
   complete: () => void;
 }
+
 interface _getStorageInfoSuccessObject {
   /**
    * 当前storage中所有的key
@@ -2698,6 +2795,7 @@ interface _getStorageObject {
    */
   complete: () => void;
 }
+
 interface _getStorageSuccessObject {
   /**
    * key对应的内容
@@ -2726,6 +2824,7 @@ interface _getShareInfoObject {
    */
   complete: () => void;
 }
+
 interface _getShareInfoSuccessObject {
   /**
    * 错误信息
@@ -2759,6 +2858,7 @@ interface _getSettingObject {
    */
   complete: () => void;
 }
+
 interface _getSettingSuccessObject {
   /**
    * 用户授权结果，其中 key 为 scope 值，value 为 Bool 值，表示用户是否允许授权，详见 [scope 列表](./authorize-index.md#scope-列表)
@@ -2782,6 +2882,7 @@ interface _getScreenBrightnessObject {
    */
   complete: () => void;
 }
+
 interface _getScreenBrightnessSuccessObject {
   /**
    * 屏幕亮度值，范围 0~1，0 最暗，1 最亮
@@ -2805,6 +2906,7 @@ interface _getSavedFileListObject {
    */
   complete: () => void;
 }
+
 interface _getSavedFileListSuccessObject {
   /**
    * 接口调用结果
@@ -2838,6 +2940,7 @@ interface _getSavedFileInfoObject {
    */
   complete: () => void;
 }
+
 interface _getSavedFileInfoSuccessObject {
   /**
    * 接口调用结果
@@ -2871,6 +2974,7 @@ interface _getOpenDeviceIdObject {
    */
   complete: () => void;
 }
+
 interface _getOpenDeviceIdSuccessObject {
   /**
    * 接口调用结果
@@ -2904,6 +3008,7 @@ interface _getNetworkTypeObject {
    */
   complete: () => void;
 }
+
 interface _getNetworkTypeSuccessObject {
   /**
    * 网络类型
@@ -2937,6 +3042,7 @@ interface _getLocationObject {
    */
   complete: () => void;
 }
+
 interface _getLocationSuccessObject {
   /**
    * 纬度，浮点数，范围为-90~90，负数表示南纬
@@ -2995,6 +3101,7 @@ interface _getImageInfoObject {
    */
   complete: () => void;
 }
+
 interface _getImageInfoSuccessObject {
   /**
    * 图片宽度，单位px
@@ -3028,6 +3135,7 @@ interface _getHCEStateObject {
    */
   complete: () => void;
 }
+
 interface _getHCEStateSuccessObject {
   /**
    * 错误信息
@@ -3066,6 +3174,7 @@ interface _getFileInfoObject {
    */
   complete: () => void;
 }
+
 interface _getFileInfoSuccessObject {
   /**
    * 文件大小，单位：B
@@ -3106,6 +3215,7 @@ interface _getExtConfigObject {
    */
   complete: () => void;
 }
+
 interface _getExtConfigSuccessObject {
   /**
    * 调用结果
@@ -3134,6 +3244,7 @@ interface _getConnectedWifiObject {
    */
   complete: () => void;
 }
+
 interface _getConnectedWifiSuccessObject {
   /**
    * Wi-Fi 信息
@@ -3162,6 +3273,7 @@ interface _getConnectedBluetoothDevicesObject {
    */
   complete: () => void;
 }
+
 interface _getConnectedBluetoothDevicesSuccessObject {
   /**
    * 搜索到的设备列表
@@ -3190,6 +3302,7 @@ interface _getClipboardDataObject {
    */
   complete: () => void;
 }
+
 interface _getClipboardDataSuccessObject {
   /**
    * 剪贴板的内容
@@ -3213,6 +3326,7 @@ interface _getBluetoothDevicesObject {
    */
   complete: () => void;
 }
+
 interface _getBluetoothDevicesSuccessObject {
   /**
    * uuid 对应的的已连接设备列表
@@ -3241,6 +3355,7 @@ interface _getBluetoothAdapterStateObject {
    */
   complete: () => void;
 }
+
 interface _getBluetoothAdapterStateSuccessObject {
   /**
    * 是否正在搜索设备
@@ -3274,6 +3389,7 @@ interface _getBeaconsObject {
    */
   complete: () => void;
 }
+
 interface _getBeaconsSuccessObject {
   /**
    * iBeacon 设备列表
@@ -3302,6 +3418,7 @@ interface _getBackgroundAudioPlayerStateObject {
    */
   complete: () => void;
 }
+
 interface _getBackgroundAudioPlayerStateSuccessObject {
   /**
    * 选定音频的长度（单位：s），只有在当前有音乐播放时返回
@@ -3477,6 +3594,7 @@ interface _getBLEDeviceServicesObject {
    */
   complete: () => void;
 }
+
 interface _getBLEDeviceServicesSuccessObject {
   /**
    * 设备服务列表
@@ -3515,6 +3633,7 @@ interface _getBLEDeviceCharacteristicsObject {
    */
   complete: () => void;
 }
+
 interface _getBLEDeviceCharacteristicsSuccessObject {
   /**
    * 设备特征值列表
@@ -3553,6 +3672,7 @@ interface _downloadFileObject {
    */
   complete: () => void;
 }
+
 interface _downloadFileSuccessObject {
   /**
    * 临时文件路径，下载后的文件会存储到一个临时文件
@@ -3586,6 +3706,7 @@ interface _createBLEConnectionObject {
    */
   complete: () => void;
 }
+
 interface _createBLEConnectionSuccessObject {
   /**
    * 成功：ok，错误：详细信息
@@ -3614,6 +3735,7 @@ interface _createAnimationObject {
    */
   transformOrigin: string;
 }
+
 interface _connectWifiObject {
   /**
    * Wi-Fi 设备ssid
@@ -3645,6 +3767,7 @@ interface _connectWifiObject {
    */
   complete: () => void;
 }
+
 interface _connectSocketObject {
   /**
    * 开发者服务器接口地址，必须是 wss 协议，且域名必须是后台配置的合法域名
@@ -3681,6 +3804,7 @@ interface _connectSocketObject {
    */
   complete: () => void;
 }
+
 interface _closeSocketObject {
   /**
    * 一个数字值表示关闭连接的状态号，表示连接被关闭的原因。如果这个参数没有被指定，默认的取值是1000 （表示正常连接关闭）
@@ -3707,6 +3831,7 @@ interface _closeSocketObject {
    */
   complete: () => void;
 }
+
 interface _closeBluetoothAdapterObject {
   /**
    * 成功则返回成功关闭模块信息
@@ -3723,6 +3848,7 @@ interface _closeBluetoothAdapterObject {
    */
   complete: () => void;
 }
+
 interface _closeBLEConnectionObject {
   /**
    * 蓝牙设备 id，参考 getDevices 接口
@@ -3744,6 +3870,7 @@ interface _closeBLEConnectionObject {
    */
   complete: () => void;
 }
+
 interface _closeBLEConnectionSuccessObject {
   /**
    * 成功：ok，错误：详细信息
@@ -3782,6 +3909,7 @@ interface _chooseVideoObject {
    */
   complete: () => void;
 }
+
 interface _chooseVideoSuccessObject {
   /**
    * 选定视频的临时文件路径
@@ -3825,6 +3953,7 @@ interface _chooseLocationObject {
    */
   complete: () => void;
 }
+
 interface _chooseLocationSuccessObject {
   /**
    * 位置名称
@@ -3863,6 +3992,7 @@ interface _chooseInvoiceTitleObject {
    */
   complete: () => void;
 }
+
 interface _chooseInvoiceTitleSuccessObject {
   /**
    * 抬头类型（0：单位，1：个人）
@@ -3936,6 +4066,7 @@ interface _chooseImageObject {
    */
   complete: () => void;
 }
+
 interface _chooseImageSuccessObject {
   /**
    * 图片的本地文件路径列表
@@ -3964,6 +4095,7 @@ interface _chooseContactObject {
    */
   complete: () => void;
 }
+
 interface _chooseContactSuccessObject {
   /**
    * 电话号码
@@ -3992,6 +4124,7 @@ interface _chooseAddressObject {
    */
   complete: () => void;
 }
+
 interface _chooseAddressSuccessObject {
   /**
    * 调用结果
@@ -4055,6 +4188,7 @@ interface _checkSessionObject {
    */
   complete: () => void;
 }
+
 interface _checkIsSupportSoterAuthenticationObject {
   /**
    * 接口调用成功的回调函数
@@ -4071,6 +4205,7 @@ interface _checkIsSupportSoterAuthenticationObject {
    */
   complete: () => void;
 }
+
 interface _checkIsSupportSoterAuthenticationSuccessObject {
   /**
    * 该设备支持的可被SOTER识别的生物识别方式
@@ -4104,6 +4239,7 @@ interface _checkIsSoterEnrolledInDeviceObject {
    */
   complete: () => void;
 }
+
 interface _checkIsSoterEnrolledInDeviceSuccessObject {
   /**
    * 是否已录入信息
@@ -4177,6 +4313,7 @@ interface _canvasToTempFilePathObject {
    */
   complete: () => void;
 }
+
 interface _canvasPutImageDataObject {
   /**
    * 画布标识，传入 [`<canvas />`](../../component/canvas.md) 的 canvas-id
@@ -4223,6 +4360,7 @@ interface _canvasPutImageDataObject {
    */
   complete: () => void;
 }
+
 interface _canvasGetImageDataObject {
   /**
    * 画布标识，传入 [`<canvas />`](../../component/canvas.md) 的 canvas-id
@@ -4264,6 +4402,7 @@ interface _canvasGetImageDataObject {
    */
   complete: () => void;
 }
+
 interface _canvasGetImageDataSuccessObject {
   /**
    *
@@ -4307,6 +4446,7 @@ interface _authorizeObject {
    */
   complete: () => void;
 }
+
 interface _authorizeSuccessObject {
   /**
    * 调用结果
@@ -4490,6 +4630,7 @@ interface _addPhoneContactObject {
    */
   complete: () => void;
 }
+
 interface _addCardObject {
   /**
    * 需要添加的卡券列表，列表内对象说明请参见[请求对象说明](#请求对象说明)
@@ -4511,6 +4652,7 @@ interface _addCardObject {
    */
   complete: () => void;
 }
+
 interface _addCardSuccessObject {
   /**
    * 卡券添加结果列表，列表内对象说明请详见[返回对象说明](#返回对象说明)
@@ -5472,6 +5614,10 @@ declare namespace wx {
    */
   export function showShareMenu(object: _showShareMenuObject): void;
 
+  export function onShareAppMessage(listener: () => Object): void;
+
+  export function onShareTimeline(listener: () => Object): void;
+
   /**
    * 显示 tabBar
    */
@@ -5620,16 +5766,19 @@ declare namespace wx {
   /***
    * 监听主域发送的消息
    */
-  export function onMessage(callback:Function):void;
+  export function onMessage(callback: Function): void;
+
   /**
    * 拉取当前用户所有同玩好友的托管数据。该接口只可在开放数据域下使用
    */
-  export function getFriendCloudStorage(object):void;
+  export function getFriendCloudStorage(object): void;
+
   /**
    * 对用户托管数据进行写数据操作。允许同时写多组 KV 数据。
-   * @param object 
+   * @param object
    */
-  export function setUserCloudStorage(object):void;
+  export function setUserCloudStorage(object): void;
+
   /**
    * 向低功耗蓝牙设备特征值中写入二进制数据。注意：必须设备的特征值支持`write`才可以成功调用，具体参照 characteristic 的 properties 属性
    */

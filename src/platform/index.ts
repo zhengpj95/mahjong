@@ -6,3 +6,4 @@
 import { AdapterFactory } from "./AdapterFactory";
 
 export const globalAdapter = AdapterFactory.getAdapter();
+globalAdapter?.share();

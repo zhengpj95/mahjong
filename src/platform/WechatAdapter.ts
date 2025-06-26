@@ -13,6 +13,33 @@ export class WechatAdapter implements IPlatformAdapter {
     return this._storage;
   }
 
+  public share(): void {
+    console.log(`wx adapter start share menu...`);
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ["shareAppMessage", "shareTimeline"],
+      fail: () => {
+        //
+      },
+      success: () => {
+        console.log(`wx adapter start share menu success!`);
+      },
+      complete: () => {
+        //
+      }
+    });
+    wx.onShareAppMessage(() => {
+      console.log(`11111 onShareAppMessage`);
+      return {
+        title: "雀神连连，超级给力，快来享受吧",
+      };
+    });
+    wx.onShareTimeline(() => {
+      return {
+        title: "雀神连连，超级给力，快来享受吧！！"
+      };
+    });
+  }
 }
 
 export class WechatPlatformStorage implements IPlatformStorage {
