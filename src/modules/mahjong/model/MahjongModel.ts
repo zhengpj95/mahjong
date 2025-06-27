@@ -186,7 +186,6 @@ export class MahjongModel {
     if (!this._dataMap.size) {
       return [];
     }
-    let rst: MahjongCardData[] = [];
     const checkSet = new Set<string>();
     const list = this._dataMap.entries();
     for (let [_, item] of list) {
@@ -203,13 +202,12 @@ export class MahjongModel {
           if (!cardJ || !cardJ.isValid()) continue;
           const paths = this.findPath(cardI, cardJ);
           if (paths.length) {
-            rst = [cardI, cardJ];
-            break;
+            return [cardI, cardJ];
           }
         }
       }
     }
-    return rst;
+    return [];
   }
 
   // 洗牌

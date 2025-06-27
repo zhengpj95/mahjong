@@ -17,9 +17,6 @@ export class AStarMgr {
   }
 
   public findPath(start: GridPoint, end: GridPoint): GridPoint[] {
-    if (this._astar) {
-      return this._astar.findPath(start, end);
-    }
-    return [];
+    return this._astar?.findPath(start, end) || [];
   }
 }

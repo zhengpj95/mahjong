@@ -14,6 +14,10 @@ export class Grid {
     this._gridData = gridData;
   }
 
+  public get gridData(): CellType[][] {
+    return this._gridData;
+  }
+
   /**
    * 检查一个点是否在网格内且可通行
    * @param x - 点的 x 坐标

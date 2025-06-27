@@ -1,12 +1,12 @@
 import { Grid } from "./Grid";
-import { GridPoint } from "./AStarConst";
+import { CellType, GridPoint } from "./AStarConst";
 import { DebugUtils } from "@base/utils/DebugUtils";
 
 /** 默认拐点数 */
 const DEFAULT_TURN_COUNT = 2;
-/** 方向 */
+/** 方向（下 右 上 左） */
 const DIRECTION: number[][] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
-const DIRECTION_NAME = ["right", "down", "left", "up"];
+const DIRECTION_NAME = ["down", "right", "up", "left"];
 
 /**
  * 表示路径搜索中的节点信息
@@ -195,4 +195,112 @@ export class AStar {
     // 如果打开列表为空且未找到路径，则返回空数组
     return [];
   }
+
+  public findPath2(start: GridPoint, end: GridPoint): GridPoint[] {
+    const linePath = isLinePath(start[0], start[1], end[0], end[1], this._grid.gridData);
+    if (linePath?.length > 1) {
+      return linePath.map(value => [value.x, value.y]);
+    }
+    const lPath = connectLPath({ x: start[0], y: start[1] }, {
+      x: end[0],
+      y: end[1]
+    }, this._grid.gridData);
+    if (lPath?.length > 1) {
+      return lPath.map(value => [value.x, value.y]);
+    }
+    const turnsPath = connect2TurnsPath({ x: start[0], y: start[1] }, {
+      x: end[0],
+      y: end[1]
+    }, this._grid.gridData);
+    if (turnsPath?.length > 1) {
+      return turnsPath.map(value => [value.x, value.y]);
+    }
+    return [];
+  }
 }
+
+// 点坐标定义
+interface Point {
+  x: number;
+  y: number;
+}
+
+// 判断两个点之间直线是否无障碍，并返回路径
+function isLinePath(x1: number, y1: number, x2: number, y2: number, grid: CellType[][]): Point[] | null {
+  const path: Point[] = [{ x: x1, y: y1 }];
+  if (x1 === x2) {
+    const [start, end] = [y1, y2].sort((a, b) => a - b);
+    for (let y = start + 1; y < end; y++) {
+      if (grid[x1][y] !== CellType.WALKABLE) return null;
+      path.push({ x: x1, y });
+    }
+    path.push({ x: x2, y: y2 });
+    return path;
+  } else if (y1 === y2) {
+    const [start, end] = [x1, x2].sort((a, b) => a - b);
+    for (let x = start + 1; x < end; x++) {
+      if (grid[x][y1] !== CellType.WALKABLE) return null;
+      path.push({ x, y: y1 });
+    }
+    path.push({ x: x2, y: y2 });
+    return path;
+  }
+  return null;
+}
+
+// 判断是否可通过一次转折相连，并返回路径
+function connectLPath(a: Point, b: Point, grid: CellType[][]): Point[] | null {
+  const { x: x1, y: y1 } = a;
+  const { x: x2, y: y2 } = b;
+
+  if (grid[x2][y1] === CellType.WALKABLE) {
+    const path1 = isLinePath(x1, y1, x2, y1, grid);
+    const path2 = isLinePath(x2, y1, x2, y2, grid);
+    if (path1 && path2) return [...path1, ...path2.slice(1)];
+  }
+  if (grid[x1][y2] === CellType.WALKABLE) {
+    const path1 = isLinePath(x1, y1, x1, y2, grid);
+    const path2 = isLinePath(x1, y2, x2, y2, grid);
+    if (path1 && path2) return [...path1, ...path2.slice(1)];
+  }
+  return null;
+}
+
+// 判断是否可通过最多两次转折连接，并返回路径
+function connect2TurnsPath(a: Point, b: Point, grid: CellType[][]): Point[] | null {
+  const { x: x1, y: y1 } = a;
+  const { x: x2, y: y2 } = b;
+  const rows = grid.length;
+  const cols = grid[0].length;
+
+  const visited = Array.from({ length: rows }, () => Array(cols).fill(Infinity));
+  const queue: { x: number; y: number; path: Point[]; turn: number; dir: number }[] = [];
+
+  for (let d = 0; d < DIRECTION.length; d++) {
+    queue.push({ x: x1, y: y1, path: [{ x: x1, y: y1 }], turn: 0, dir: d });
+  }
+
+  while (queue.length > 0) {
+    const { x, y, path, turn, dir } = queue.shift();
+    const dx = x + DIRECTION[dir][0];
+    const dy = y + DIRECTION[dir][1];
+
+    if (turn > DEFAULT_TURN_COUNT || dy < 0 || dx >= rows || dx < 0 || dy >= cols) continue;
+    if ((dx !== x2 || dy !== y2) && grid[dx][dy] !== CellType.WALKABLE) continue;
+    if (visited[dx][dy] <= turn) continue;
+
+    visited[dx][dy] = turn;
+    const newPath = [...path, { x: dx, y: dy }];
+    if (dx === x2 && dy === y2) {
+      return newPath;
+    }
+
+    for (let d2 = 0; d2 < DIRECTION.length; d2++) {
+      const isTurn = d2 === dir ? 0 : 1;
+      queue.push({ x: dx, y: dy, path: newPath, turn: turn + isTurn, dir: d2 });
+    }
+  }
+
+  return null;
+}
+

@@ -140,7 +140,6 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       img.skin = "";
       return;
     }
-    // item.tag = data;
     img.skin = data.getIcon();
     ComUtils.setScale(boxCard, INIT_SCALE);
     this.setSelect(boxCard, false);
@@ -252,20 +251,19 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
         }
       }
     } else {
-      this.emit(MiscEvent.SHOW_TIPS, "无可消除的卡牌，请洗牌!");
       this._autoRefresh = true;
-      this.onBtnRefresh(); // 主动洗牌
+      this.onBtnRefresh(`没有可消除的麻将，主动洗牌成功!`); // 主动洗牌
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
   }
 
 
   // noinspection JSUnusedGlobalSymbols 洗牌
-  public onBtnRefresh(): void {
+  public onBtnRefresh(tips?: string): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
     this._list.array = this._proxy.model.getRefreshCardDataList();
     this._list.refresh();
-    this.emit(MiscEvent.SHOW_TIPS, "洗牌成功!");
+    this.emit(MiscEvent.SHOW_TIPS, tips ?? "洗牌成功!");
     if (!this._autoRefresh) {
       this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
     }
@@ -366,6 +364,6 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   }
 
   private getEffectTime(path: { x: number, y: number }[]): number {
-    return path.length > 15 ? 8 : (path.length >= 10 ? 15 : (path.length >= 5 ? 30 : 120));
+    return path.length > 15 ? 8 : (path.length >= 10 ? 15 : (path.length >= 5 ? 30 : 50));
   }
 }
