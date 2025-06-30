@@ -4,6 +4,11 @@
       "name": "DEBUG",
       "debugValue": "true",
       "releaseValue": "false"
+    },
+    {
+      "name": "REVIEW_VERSION",
+      "debugValue": "\"2.0.2\"",
+      "releaseValue": "\"2.0.2\""
     }
   ],
   "entries": [],

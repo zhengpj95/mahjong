@@ -225,6 +225,15 @@ interface Point {
   y: number;
 }
 
+function mergePath(p1: Point[], p2: Point[]): Point[] {
+  if (p1.length === 0) return p2;
+  if (p2.length === 0) return p1;
+  if (p1[p1.length - 1].x === p2[0].x && p1[p1.length - 1].y === p2[0].y) {
+    return [...p1, ...p2.slice(1)];
+  }
+  return [...p1, ...p2];
+}
+
 // 判断两个点之间直线是否无障碍，并返回路径
 function isLinePath(x1: number, y1: number, x2: number, y2: number, grid: CellType[][]): Point[] | null {
   const path: Point[] = [{ x: x1, y: y1 }];
@@ -256,12 +265,12 @@ function connectLPath(a: Point, b: Point, grid: CellType[][]): Point[] | null {
   if (grid[x2][y1] === CellType.WALKABLE) {
     const path1 = isLinePath(x1, y1, x2, y1, grid);
     const path2 = isLinePath(x2, y1, x2, y2, grid);
-    if (path1 && path2) return [...path1, ...path2.slice(1)];
+    if (path1 && path2) return mergePath(path1, path2);
   }
   if (grid[x1][y2] === CellType.WALKABLE) {
     const path1 = isLinePath(x1, y1, x1, y2, grid);
     const path2 = isLinePath(x1, y2, x2, y2, grid);
-    if (path1 && path2) return [...path1, ...path2.slice(1)];
+    if (path1 && path2) return mergePath(path1, path2);
   }
   return null;
 }

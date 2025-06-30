@@ -252,18 +252,17 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       }
     } else {
       this._autoRefresh = true;
-      this.onBtnRefresh(`没有可消除的麻将，主动洗牌成功!`); // 主动洗牌
+      this.onBtnRefresh(null, `没有可消除的麻将，主动洗牌成功!`); // 主动洗牌
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
   }
 
-
   // noinspection JSUnusedGlobalSymbols 洗牌
-  public onBtnRefresh(tips?: string): void {
+  public onBtnRefresh(img: Image, tips?: string): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
     this._list.array = this._proxy.model.getRefreshCardDataList();
     this._list.refresh();
-    this.emit(MiscEvent.SHOW_TIPS, tips ?? "洗牌成功!");
+    this.emit(MiscEvent.SHOW_TIPS, tips || "洗牌成功!");
     if (!this._autoRefresh) {
       this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
     }

@@ -29,6 +29,16 @@ export class LoginMdr extends BaseMediator<LoginView> {
     tweenMgr.remove(this.ui.$ProgressBar);
     const randomTime = (Math.random() * 500 + 1500) >> 0;
     tweenMgr.get(this.ui.$ProgressBar).to({ value: 1 }, randomTime, null, CallBack.alloc(this, this.onLoadComplete));
+
+    if (_REVIEW_VERSION_) {
+      const versionLabel = new Laya.Label();
+      versionLabel.text = `审核版本：v${_REVIEW_VERSION_}`;
+      versionLabel.fontSize = 22;
+      versionLabel.color = "#ff0000";
+      versionLabel.right = 20;
+      versionLabel.bottom = 15;
+      this.ui.addChild(versionLabel);
+    }
   }
 
   protected onClose(): void {

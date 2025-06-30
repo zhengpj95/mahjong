@@ -5,7 +5,9 @@
 
 declare interface Window {
   _DEBUG_: boolean;
+  _REVIEW_VERSION_: string;
 }
 
 /** 开发环境 */
 declare const _DEBUG_: boolean = false;
+declare const _REVIEW_VERSION_: string = "";

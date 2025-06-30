@@ -11,6 +11,8 @@ import facade = base.facade;
 function initDebug(): void {
   // @ts-ignore 宏定义
   window._DEBUG_ = DEBUG;
+  // @ts-ignore 宏定义
+  window._REVIEW_VERSION_ = REVIEW_VERSION;
 }
 
 /**
