@@ -267,43 +267,46 @@ function connectLPath(a: Point, b: Point, grid: CellType[][]): Point[] | null {
 }
 
 // 判断是否可通过最多两次转折连接，并返回路径
-function connect2TurnsPath(a: Point, b: Point, grid: CellType[][]): Point[] | null {
-  const { x: x1, y: y1 } = a;
-  const { x: x2, y: y2 } = b;
-  const rows = grid.length;
-  const cols = grid[0].length;
+function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[] | null {
+  const tryConnect = (a: Point, b: Point): Point[] | null => {
+    const { x: x1, y: y1 } = a;
+    const { x: x2, y: y2 } = b;
+    const rows = grid.length;
+    const cols = grid[0].length;
 
-  const visited = Array.from({ length: rows }, () => Array(cols).fill(Infinity));
-  const queue: { x: number; y: number; path: Point[]; turn: number; dir: number }[] = [];
+    const visited = Array.from({ length: rows }, () => Array(cols).fill(Infinity));
+    const queue: { x: number; y: number; path: Point[]; turn: number; dir: number }[] = [];
 
-  for (let d = 0; d < DIRECTION.length; d++) {
-    queue.push({ x: x1, y: y1, path: [{ x: x1, y: y1 }], turn: 0, dir: d });
-  }
-
-  while (queue.length > 0) {
-    const { x, y, path, turn, dir } = queue.shift();
-    const dx = x + DIRECTION[dir][0];
-    const dy = y + DIRECTION[dir][1];
-
-    if (turn > DEFAULT_TURN_COUNT || dx < 0 || dx >= rows || dy < 0 || dy >= cols) continue;
-    if (!(dx === x2 && dy === y2) && grid[dx][dy] !== CellType.WALKABLE) continue;
-    if (visited[dx][dy] <= turn) continue;
-
-    visited[dx][dy] = turn;
-    const newPath = [...path, { x: dx, y: dy }];
-    if (dx === x2 && dy === y2) {
-      return newPath;
+    for (let d = 0; d < DIRECTION.length; d++) {
+      queue.push({ x: x1, y: y1, path: [{ x: x1, y: y1 }], turn: 0, dir: d });
     }
 
-    for (let d1 = 0; d1 < DIRECTION.length; d1++) {
-      const isTurn = d1 === dir ? 0 : 1;
-      const dx1 = x + DIRECTION[d1][0];
-      const dy1 = y + DIRECTION[d1][1];
-      if (dx1 < 0 || dx1 >= rows || dy1 < 0 || dy1 >= cols || d1 + dir === DIRECTION.length) continue;
-      queue.push({ x: dx, y: dy, path: newPath, turn: turn + isTurn, dir: d1 });
-    }
-  }
+    while (queue.length > 0) {
+      const { x, y, path, turn, dir } = queue.shift();
+      const dx = x + DIRECTION[dir][0];
+      const dy = y + DIRECTION[dir][1];
 
-  return null;
+      if (turn > DEFAULT_TURN_COUNT || dx < 0 || dx >= rows || dy < 0 || dy >= cols) continue;
+      if (!(dx === x2 && dy === y2) && grid[dx][dy] !== CellType.WALKABLE) continue;
+      if (visited[dx][dy] <= turn) continue;
+
+      visited[dx][dy] = turn;
+      const last = path[path.length - 1];
+      const newPath = last.x === dx && last.y === dy ? [...path] : [...path, { x: dx, y: dy }];
+      if (dx === x2 && dy === y2) {
+        return newPath;
+      }
+
+      for (let d1 = 0; d1 < DIRECTION.length; d1++) {
+        const isTurn = d1 === dir ? 0 : 1;
+        const dx1 = x + DIRECTION[d1][0];
+        const dy1 = y + DIRECTION[d1][1];
+        if (dx1 < 0 || dx1 >= rows || dy1 < 0 || dy1 >= cols) continue;
+        queue.push({ x: dx, y: dy, path: newPath, turn: turn + isTurn, dir: d1 });
+      }
+    }
+
+    return null;
+  };
+  return tryConnect(start, end) || tryConnect(end, start);
 }
-
