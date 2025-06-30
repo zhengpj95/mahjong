@@ -4,9 +4,9 @@ import { DebugUtils } from "@base/utils/DebugUtils";
 
 /** 默认拐点数 */
 const DEFAULT_TURN_COUNT = 2;
-/** 方向（下 右 上 左） */
-const DIRECTION: number[][] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
-const DIRECTION_NAME = ["down", "right", "up", "left"];
+/** 方向（下 右 左 上） */
+const DIRECTION: number[][] = [[0, 1], [1, 0], [-1, 0], [0, -1]];
+const DIRECTION_NAME = ["down", "right", "left", "up"];
 
 /**
  * 表示路径搜索中的节点信息
@@ -285,8 +285,8 @@ function connect2TurnsPath(a: Point, b: Point, grid: CellType[][]): Point[] | nu
     const dx = x + DIRECTION[dir][0];
     const dy = y + DIRECTION[dir][1];
 
-    if (turn > DEFAULT_TURN_COUNT || dy < 0 || dx >= rows || dx < 0 || dy >= cols) continue;
-    if ((dx !== x2 || dy !== y2) && grid[dx][dy] !== CellType.WALKABLE) continue;
+    if (turn > DEFAULT_TURN_COUNT || dx < 0 || dx >= rows || dy < 0 || dy >= cols) continue;
+    if (!(dx === x2 && dy === y2) && grid[dx][dy] !== CellType.WALKABLE) continue;
     if (visited[dx][dy] <= turn) continue;
 
     visited[dx][dy] = turn;
@@ -295,9 +295,12 @@ function connect2TurnsPath(a: Point, b: Point, grid: CellType[][]): Point[] | nu
       return newPath;
     }
 
-    for (let d2 = 0; d2 < DIRECTION.length; d2++) {
-      const isTurn = d2 === dir ? 0 : 1;
-      queue.push({ x: dx, y: dy, path: newPath, turn: turn + isTurn, dir: d2 });
+    for (let d1 = 0; d1 < DIRECTION.length; d1++) {
+      const isTurn = d1 === dir ? 0 : 1;
+      const dx1 = x + DIRECTION[d1][0];
+      const dy1 = y + DIRECTION[d1][1];
+      if (dx1 < 0 || dx1 >= rows || dy1 < 0 || dy1 >= cols || d1 + dir === DIRECTION.length) continue;
+      queue.push({ x: dx, y: dy, path: newPath, turn: turn + isTurn, dir: d1 });
     }
   }
 
