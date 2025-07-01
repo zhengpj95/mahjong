@@ -250,9 +250,10 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
           ComUtils.setTween(cardItem);
         }
       }
+      this._autoRefresh = false;
     } else {
       this._autoRefresh = true;
-      this.onBtnRefresh(null, `没有可消除的麻将，主动洗牌成功!`); // 主动洗牌
+      this.onBtnRefreshFunc(`没有可消除的麻将，主动洗牌成功!`); // 主动洗牌
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
   }
@@ -260,9 +261,13 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   // noinspection JSUnusedGlobalSymbols 洗牌
   public onBtnRefresh(img: Image, tips?: string): void {
     // 检查次数，有就继续，没有则拉起广告，给予次数 todo
+    this.onBtnRefreshFunc(tips);
+  }
+
+  private onBtnRefreshFunc(tips?: string): void {
     this._list.array = this._proxy.model.getRefreshCardDataList();
     this._list.refresh();
-    this.emit(MiscEvent.SHOW_TIPS, tips || "洗牌成功!");
+    this.emit(MiscEvent.SHOW_TIPS, tips ?? "洗牌成功!");
     if (!this._autoRefresh) {
       this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
     }
@@ -326,6 +331,9 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
           _this.clearCardItem(item[0], item[1]);
           _this.clearCardItem(item[2], item[3]);
         });
+        if (!_this._proxy.model.getTipsCardDataList()?.length) {
+          _this.onBtnRefreshFunc();
+        }
         return;
       }
 

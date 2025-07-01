@@ -223,6 +223,8 @@ export class AStar {
 interface Point {
   x: number;
   y: number;
+  dir?: number;
+  dirName?: string;
 }
 
 function mergePath(p1: Point[], p2: Point[]): Point[] {
@@ -238,18 +240,30 @@ function mergePath(p1: Point[], p2: Point[]): Point[] {
 function isLinePath(x1: number, y1: number, x2: number, y2: number, grid: CellType[][]): Point[] | null {
   const path: Point[] = [{ x: x1, y: y1 }];
   if (x1 === x2) {
-    const [start, end] = [y1, y2].sort((a, b) => a - b);
-    for (let y = start + 1; y < end; y++) {
-      if (grid[x1][y] !== CellType.WALKABLE) return null;
-      path.push({ x: x1, y });
+    if (y1 > y2) {
+      for (let y = y1 - 1; y > y2; y--) {
+        if (grid[x1][y] !== CellType.WALKABLE) return null;
+        path.push({ x: x1, y });
+      }
+    } else {
+      for (let y = y1 + 1; y < y2; y++) {
+        if (grid[x1][y] !== CellType.WALKABLE) return null;
+        path.push({ x: x1, y });
+      }
     }
     path.push({ x: x2, y: y2 });
     return path;
   } else if (y1 === y2) {
-    const [start, end] = [x1, x2].sort((a, b) => a - b);
-    for (let x = start + 1; x < end; x++) {
-      if (grid[x][y1] !== CellType.WALKABLE) return null;
-      path.push({ x, y: y1 });
+    if (x1 > x2) {
+      for (let x = x1 - 1; x > x2; x--) {
+        if (grid[x][y1] !== CellType.WALKABLE) return null;
+        path.push({ x, y: y1 });
+      }
+    } else {
+      for (let x = x1 + 1; x < x2; x++) {
+        if (grid[x][y1] !== CellType.WALKABLE) return null;
+        path.push({ x, y: y1 });
+      }
     }
     path.push({ x: x2, y: y2 });
     return path;
@@ -283,25 +297,34 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
     const rows = grid.length;
     const cols = grid[0].length;
 
-    const visited = Array.from({ length: rows }, () => Array(cols).fill(Infinity));
+    const visited = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => Array(4).fill(Infinity))
+    );
     const queue: { x: number; y: number; path: Point[]; turn: number; dir: number }[] = [];
 
     for (let d = 0; d < DIRECTION.length; d++) {
-      queue.push({ x: x1, y: y1, path: [{ x: x1, y: y1 }], turn: 0, dir: d });
+      visited[x1][y1][d] = 0;
+      queue.push({ x: x1, y: y1, path: [{ x: x1, y: y1, dir: d, dirName: DIRECTION_NAME[d] }], turn: 0, dir: d });
     }
 
     while (queue.length > 0) {
       const { x, y, path, turn, dir } = queue.shift();
+      console.log(dir, DIRECTION_NAME[dir], path);
       const dx = x + DIRECTION[dir][0];
       const dy = y + DIRECTION[dir][1];
 
       if (turn > DEFAULT_TURN_COUNT || dx < 0 || dx >= rows || dy < 0 || dy >= cols) continue;
       if (!(dx === x2 && dy === y2) && grid[dx][dy] !== CellType.WALKABLE) continue;
-      if (visited[dx][dy] <= turn) continue;
+      if (visited[dx][dy][dir] <= turn) continue;
 
-      visited[dx][dy] = turn;
+      visited[dx][dy][dir] = turn;
       const last = path[path.length - 1];
-      const newPath = last.x === dx && last.y === dy ? [...path] : [...path, { x: dx, y: dy }];
+      const newPath = last.x === dx && last.y === dy ? [...path] : [...path, {
+        x: dx,
+        y: dy,
+        dir: dir,
+        dirName: DIRECTION_NAME[dir]
+      }];
       if (dx === x2 && dy === y2) {
         return newPath;
       }
@@ -311,6 +334,7 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
         const dx1 = x + DIRECTION[d1][0];
         const dy1 = y + DIRECTION[d1][1];
         if (dx1 < 0 || dx1 >= rows || dy1 < 0 || dy1 >= cols) continue;
+        if (last.x === dx1 && last.y === dy1) continue;
         queue.push({ x: dx, y: dy, path: newPath, turn: turn + isTurn, dir: d1 });
       }
     }
@@ -319,3 +343,6 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
   };
   return tryConnect(start, end) || tryConnect(end, start);
 }
+
+// @ts-ignore
+window["connect2TurnsPath"] = connect2TurnsPath;
