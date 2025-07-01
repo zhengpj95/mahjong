@@ -3,7 +3,7 @@ import Long from "long";
 import { initModules } from "./modules/index";
 import { ModuleName } from "@def/module-name";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { UpdateMgr } from "@base/UpdateMgr";
+import { FrameUpdateMgr } from "@base/FrameUpdateMgr";
 import { initEnhancedConsole } from "@base/logger";
 import { LoginViewType } from "@def/login";
 import facade = base.facade;
@@ -64,7 +64,7 @@ function _loop(): boolean {
     console.log(e);
   }
   base.baseLoop();
-  UpdateMgr.ins().update(elapsed);
+  FrameUpdateMgr.ins().update(elapsed);
   return true;
 }
 

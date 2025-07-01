@@ -5,7 +5,7 @@ import { SceneMonster } from "@base/entity/SceneMonster";
 import { SceneEntity } from "@base/entity/SceneEntity";
 import { ComponentType } from "@base/component/ComponentConst";
 import { SceneEvent } from "@def/scene";
-import { UpdateMgr } from "@base/UpdateMgr";
+import { FrameUpdateMgr } from "@base/FrameUpdateMgr";
 import Sprite = Laya.Sprite;
 import Handler = Laya.Handler;
 import BaseMediator = base.BaseMediator;
@@ -116,7 +116,7 @@ export class SceneMdr extends BaseMediator {
     monster.init(monsterVo);
     monster.addPath({ x: 150, y: 100 });
     this._player.battle = monster;
-    UpdateMgr.ins().addTimer(this, this.update);
+    FrameUpdateMgr.ins().addTimer(this, this.update);
   }
 
   private onAddEntity(e: EventVo<SceneEntity>): void {
