@@ -6,8 +6,8 @@ export class DebugUtils {
     if (!key || !cls) {
       return;
     }
-    if (window) {
-      (window as any)[key] = cls;
+    if (globalThis) {
+      (globalThis as any)[key] = cls;
     }
   }
 
@@ -16,16 +16,8 @@ export class DebugUtils {
       return;
     }
     const name = cls.constructor && cls.constructor.name;
-    if (window && name) {
-      window[name] = cls;
-    }
-  }
-
-  public static showDebug = false;
-
-  public static debugLog(str: string | number | any): void {
-    if (this.showDebug) {
-      console.log(`DebugLog: `, str);
+    if (globalThis && name) {
+      (globalThis as any)[name] = cls;
     }
   }
 }

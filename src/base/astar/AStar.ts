@@ -1,6 +1,5 @@
 import { Grid } from "./Grid";
 import { CellType, GridPoint } from "./AStarConst";
-import { DebugUtils } from "@base/utils/DebugUtils";
 
 /** 默认拐点数 */
 const DEFAULT_TURN_COUNT = 2;
@@ -147,7 +146,6 @@ export class AStar {
       if (excludeSet.has(currentNode.pathStr)) {
         continue;
       }
-      DebugUtils.debugLog(currentNode.pathStr);
 
       // 如果到达终点，则回溯路径
       if (currentNode.position[0] === end[0] && currentNode.position[1] === end[1]) {
@@ -343,6 +341,3 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
   };
   return tryConnect(start, end) || tryConnect(end, start);
 }
-
-// @ts-ignore
-window["connect2TurnsPath"] = connect2TurnsPath;
