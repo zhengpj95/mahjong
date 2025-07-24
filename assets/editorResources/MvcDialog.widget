@@ -4,7 +4,7 @@
   "_$type": "Widget",
   "name": "Root",
   "width": 400,
-  "height": 400,
+  "height": 200,
   "childrenRenderOrder": 1,
   "_$child": [
     {
@@ -13,7 +13,7 @@
       "name": "btnConfirm",
       "active": true,
       "x": 246,
-      "y": 341,
+      "y": 150,
       "visible": true,
       "touchable": true,
       "title": "构建"
@@ -24,7 +24,7 @@
       "name": "btnCancel",
       "active": true,
       "x": 80,
-      "y": 340,
+      "y": 150,
       "visible": true,
       "touchable": true,
       "title": "取消",

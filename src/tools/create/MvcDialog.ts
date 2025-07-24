@@ -19,14 +19,24 @@ export class MmvDialog extends IEditor.Dialog {
     textInput.text = "";
     this.contentPane.getChild("btnCancel").on("click", () => {
       this.hide();
-    });
+    }, this);
     this.contentPane.getChild("btnConfirm").on("click", () => {
       this.createModule(textInput.text);
-    });
+    }, this);
+
+    // // 打开文件选择对话框
+    // this.contentPane.getChild("btnFile").on("click", () => {
+    //   console.log(`show open dialog`);
+    //   Editor.showOpenDialog({ title: "select file" }).then(value => {
+    //     console.log(value);
+    //   });
+    // }, this);
   }
 
   onHide() {
-    //
+    this.contentPane.getChild("btnCancel").offAllCaller(this);
+    this.contentPane.getChild("btnConfirm").offAllCaller(this);
+    // this.contentPane.getChild("btnFile").offAllCaller(this);
   }
 
   private createModule(moduleName: string): void {
