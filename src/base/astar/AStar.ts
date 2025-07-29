@@ -307,7 +307,9 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
 
     while (queue.length > 0) {
       const { x, y, path, turn, dir } = queue.shift();
-      console.log(dir, DIRECTION_NAME[dir], path);
+      // if (_DEBUG_) {
+      //   console.log(dir, DIRECTION_NAME[dir], path);
+      // }
       const dx = x + DIRECTION[dir][0];
       const dy = y + DIRECTION[dir][1];
 
