@@ -18,6 +18,7 @@ import Point = Laya.Point;
 import Sprite = Laya.Sprite;
 import Tween = Laya.Tween;
 import LayerIndex = base.LayerIndex;
+import Label = Laya.Label;
 
 type BoxRender = Box & {
   boxCard: BoxCard
@@ -37,6 +38,14 @@ const ruleDesc = `
 3.⚡连击加分，消除间隔越短，分数加成越高！\n
 4.用 提示（扣5分），显示可消的一对牌\n
 5.用 洗牌（扣10分），重置剩余牌位置`;
+
+function resetLabel(lab: Label): void {
+  lab.centerX = lab.centerY = NaN;
+  lab.alpha = 1;
+  lab.fitContent = "no";
+  lab.font = null;
+  lab.fontSize = Laya.Config.defaultFontSize;
+}
 
 /**
  * @date 2024/12/22
@@ -208,12 +217,29 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     }
     this._lastScoreTime = now;
     this._proxy.model.updateScore(score);
-    this.updateScore();
+    this.updateScoreTip(score);
   }
 
   private updateScore(): void {
     const lab = this.ui.$labScore;
     lab.text = "得分：" + `[color=#${this._proxy.model.levelScore >= 0 ? "42e422" : "ff4646"}]${this._proxy.model.levelScore}[/color]`;
+  }
+
+  // 分数变化飘字提示
+  private updateScoreTip(score: number): void {
+    const label = base.poolMgr.alloc(Label);
+    label.font = `resources/fnt/num${score > 0 ? "01" : "02"}.fnt`;
+    label.fitContent = "yes";
+    label.text = `${score > 0 ? "+" : "-"}${Math.abs(score)}`;
+    label.centerX = 0;
+    label.color = "#FFFFFF";
+    label.y = 200;
+    this.ui.addChild(label);
+    base.tweenMgr.get(label).to({ y: 80, alpha: 0.4 }, 800, null, CallBack.alloc(null, () => {
+      resetLabel(label);
+      label.removeSelf();
+      base.poolMgr.free(label);
+    }, true));
   }
 
   private resetScore(): void {
@@ -256,6 +282,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       this.onBtnRefreshFunc(`没有可消除的麻将，主动洗牌成功!`); // 主动洗牌
     }
     this._proxy.model.updateScore(-MahjongScoreType.TIPS);
+    this.updateScoreTip(-MahjongScoreType.TIPS);
   }
 
   // noinspection JSUnusedGlobalSymbols 洗牌
@@ -270,6 +297,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     this.emit(MiscEvent.SHOW_TIPS, tips ?? "洗牌成功!");
     if (!this._autoRefresh) {
       this._proxy.model.updateScore(-MahjongScoreType.REFRESH);
+      this.updateScoreTip(-MahjongScoreType.REFRESH);
     }
   }
 
