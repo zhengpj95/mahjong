@@ -1,0 +1,250 @@
+{
+  "_$ver": 1,
+  "_$id": "vlvu2dm5",
+  "_$type": "Widget",
+  "name": "Root",
+  "width": 500,
+  "height": 250,
+  "_$child": [
+    {
+      "_$id": "txbcb4m7",
+      "_$prefab": "38b67dfb-cb57-14d2-6a55-ace1d3585b0c",
+      "name": "InfoField",
+      "active": true,
+      "x": 20,
+      "y": 6,
+      "width": 460,
+      "visible": true,
+      "touchable": true,
+      "grayed": false,
+      "asGroup": false,
+      "height": 30,
+      "_$child": [
+        {
+          "_$override": "n31_9deq",
+          "name": "title",
+          "text": "输入文件夹必须是图集文件或图片，输出目录会以图集名生成子文件夹",
+          "style": {
+            "fontSize": 13
+          }
+        }
+      ]
+    },
+    {
+      "_$id": "9zqpmmem",
+      "_$type": "Label",
+      "name": "boxInput",
+      "x": 20,
+      "y": 60,
+      "width": 100,
+      "height": 20,
+      "title": "输入目录",
+      "titleColor": 16777215,
+      "titleFontSize": 16,
+      "titleWidget": {
+        "_$ref": "37pocme5"
+      },
+      "_$child": [
+        {
+          "_$id": "37pocme5",
+          "_$type": "TextField",
+          "name": "title",
+          "width": 80,
+          "height": 20,
+          "relations": [
+            {
+              "_$type": "Relation",
+              "target": {
+                "_$ref": "9zqpmmem"
+              },
+              "data": [
+                1,
+                0,
+                2,
+                0
+              ]
+            }
+          ],
+          "text": "输入目录",
+          "style": {
+            "fontSize": 16,
+            "valign": 1
+          }
+        },
+        {
+          "_$id": "u8cmrwrj",
+          "_$prefab": "25b38c03-cefe-a4c8-cad2-9f64513caa90",
+          "name": "textInput",
+          "active": true,
+          "x": 100,
+          "y": 0,
+          "width": 330,
+          "height": 20,
+          "visible": true,
+          "touchable": true
+        },
+        {
+          "_$id": "xegbkcgi",
+          "_$prefab": "f3318a8f-335c-64de-ab3c-748f5497b68e",
+          "name": "IconButton",
+          "active": true,
+          "x": 437,
+          "y": -1,
+          "visible": true,
+          "touchable": true,
+          "icon": "res://c7efce74-55d8-14cf-1a50-1dd788a30aee"
+        }
+      ]
+    },
+    {
+      "_$id": "uk8r8lfb",
+      "_$type": "Label",
+      "name": "boxOutput",
+      "x": 20,
+      "y": 100,
+      "width": 100,
+      "height": 20,
+      "title": "输出目录",
+      "titleColor": 16777215,
+      "titleFontSize": 16,
+      "titleWidget": {
+        "_$ref": "5up9l90n"
+      },
+      "_$child": [
+        {
+          "_$id": "5up9l90n",
+          "_$type": "TextField",
+          "name": "title",
+          "width": 80,
+          "height": 20,
+          "relations": [
+            {
+              "_$type": "Relation",
+              "target": {
+                "_$ref": "uk8r8lfb"
+              },
+              "data": [
+                1,
+                0,
+                2,
+                0
+              ]
+            }
+          ],
+          "text": "输出目录",
+          "style": {
+            "fontSize": 16,
+            "valign": 1
+          }
+        },
+        {
+          "_$id": "ynuohira",
+          "_$prefab": "25b38c03-cefe-a4c8-cad2-9f64513caa90",
+          "name": "textInput",
+          "active": true,
+          "x": 100,
+          "y": 0,
+          "width": 330,
+          "height": 20,
+          "visible": true,
+          "touchable": true
+        },
+        {
+          "_$id": "lsdxgmtq",
+          "_$prefab": "f3318a8f-335c-64de-ab3c-748f5497b68e",
+          "name": "IconButton",
+          "active": true,
+          "x": 437,
+          "y": -1,
+          "visible": true,
+          "touchable": true,
+          "icon": "res://c7efce74-55d8-14cf-1a50-1dd788a30aee"
+        }
+      ]
+    },
+    {
+      "_$id": "sgtljuwi",
+      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
+      "name": "btnCancel",
+      "active": true,
+      "x": 80,
+      "y": 200,
+      "visible": true,
+      "touchable": true,
+      "title": "取消"
+    },
+    {
+      "_$id": "gbo0wume",
+      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
+      "name": "btnConfirm",
+      "active": true,
+      "x": 246,
+      "y": 200,
+      "visible": true,
+      "touchable": true,
+      "title": "构建"
+    },
+    {
+      "_$id": "euth9emw",
+      "_$type": "Label",
+      "name": "boxSplitType",
+      "x": 20,
+      "y": 140,
+      "width": 100,
+      "height": 20,
+      "title": "切割方式",
+      "titleColor": 16777215,
+      "titleFontSize": 16,
+      "titleWidget": {
+        "_$ref": "lta60ylr"
+      },
+      "_$child": [
+        {
+          "_$id": "lta60ylr",
+          "_$type": "TextField",
+          "name": "title",
+          "width": 80,
+          "height": 20,
+          "relations": [
+            {
+              "_$type": "Relation",
+              "target": {
+                "_$ref": "euth9emw"
+              },
+              "data": [
+                1,
+                0,
+                2,
+                0
+              ]
+            }
+          ],
+          "text": "切割方式",
+          "style": {
+            "fontSize": 16,
+            "valign": 1
+          }
+        },
+        {
+          "_$id": "my4wehdw",
+          "_$prefab": "ed2708d4-ee8f-2474-e9d7-ec7a657dd734",
+          "name": "ComboBox",
+          "active": true,
+          "x": 100,
+          "y": 0,
+          "width": 330,
+          "visible": true,
+          "touchable": true,
+          "titleFontSize": 14,
+          "items": [
+            "Atlas",
+            "Json",
+            "Array"
+          ],
+          "popupDirection": 0,
+          "visibleItemCount": 3
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,5 @@
-import * as fs from "node:fs";
-
 /**
+ * 配置方式处理
  * @author zpj
  * @date 2025/7/1
  */
@@ -9,28 +8,30 @@ export class SplitAtlasDialog extends IEditor.Dialog {
   async create() {
     let panel = IEditor.GUIUtils.createInspectorPanel();
     let data = Editor.getSettings("SplitAtlasSetting").data;
+    panel.allowUndo = true;
     panel.inspect(data, "SplitAtlasSetting");
     this.contentPane = panel;
-
-    panel.on("click_start_gen", this.startGen, this);
+    this.title = "图集分割工具";
   }
 
   protected onShown() {
     (this.contentPane as IEditor.InspectorPanel).resetDefault();
-    this.title = "图集分割工具";
-    this.setSize(450, 180);
+    this.setSize(500, 250);
+
+    this.contentPane.on("click_start_gen", this.startGen, this);
+    this.contentPane.on("click_cancel_gen", () => {
+      this.hide();
+    }, this);
+
+    // 获取配置创建的组件 todo
   }
 
   protected onHide() {
     super.onHide();
+    this.contentPane.offAllCaller(this);
   }
 
   private startGen(): void {
-    let data = Editor.getSettings("SplitAtlasSetting").data;
-    if (!data.outputPath || !fs.existsSync(data.outputPath)) {
-      alert("需要设置正确的输出目录。\n输出目录设置在：私人>图集分割工具");
-      return;
-    }
     // todo
   }
 }
@@ -48,7 +49,7 @@ class SplitAtlasSetting {
             caption: "提示",
             inspector: "Info",
             type: "string",
-            default: "输入文件夹中需要有图集文件，输出目录会生成分割后的图片。",
+            default: "输入文件夹必须是图集文件或图片，输出目录会以图集名生成子文件夹",
           },
           {
             name: "inputPath",
@@ -56,7 +57,7 @@ class SplitAtlasSetting {
             inspector: "File",
             options: {
               absolutePath: true,
-              properties: ["openDirectory"]
+              properties: ["openFile"]
             },
             type: "string",
           },
@@ -71,9 +72,26 @@ class SplitAtlasSetting {
             type: "string",
           },
           {
-            name: "",
+            name: "splitMode",
+            caption: "分割模式",
+            inspector: "RadioGroup",
+            type: "string",
+            options: {
+              ComboBox: { // 使用ComboBox显示，没办法直接展示出来 todo 待研究
+                items: ["Array", "Atlas", "Json"],
+                visibleItemCount: 3,
+              }
+            }
+          },
+          {
+            name: "buttons",
             inspector: "Buttons",
-            options: { buttons: [{ caption: "生成", event: "click_start_gen" }] }
+            options: {
+              buttons: [
+                { caption: "取消", event: "click_cancel_gen" },
+                { caption: "生成", event: "click_start_gen" }
+              ]
+            }
           }
         ]
       }
@@ -82,11 +100,11 @@ class SplitAtlasSetting {
   }
 }
 
-class SplitPngMenu {
+class SplitAtlasMenu {
   @IEditor.menu("App/私人/图集分割工具")
-  static showSplitPngDialog(): void {
+  static showSplitAtlasDialog(): void {
     Editor.showDialog(SplitAtlasDialog, null).catch(err => {
-      console.error(`❌ SplitPng 弹出失败`, err);
+      console.error(`❌ SplitAtlas 弹出失败`, err);
     });
   }
 }
