@@ -1,7 +1,8 @@
 {
   "name": "mahjong",
+  "displayName": "雀神连连",
   "icon": "",
-  "useCompressedEngine": false,
+  "minifyJS": true,
   "sourcesContent": true,
   "startupScene": "res://92d06b4e-a1c1-4fff-a692-993d94b4bc86",
   "includedScenes": [],
@@ -10,6 +11,7 @@
     "prefab",
     "scene"
   ],
+  "enableVersion": true,
   "subpackages": [],
   "android": {
     "targetArchitectures": {
