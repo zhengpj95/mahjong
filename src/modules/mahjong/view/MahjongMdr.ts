@@ -6,6 +6,7 @@ import { ModuleName, ProxyType } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
 import { MahjongView } from "@3rd-types/mahjong";
 import { TimeUtils } from "@base/utils/TimeUtils";
+import { UIColorBlackStr } from "@def/color";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -222,7 +223,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
 
   private updateScore(): void {
     const lab = this.ui.$labScore;
-    lab.text = "得分：" + `[color=#${this._proxy.model.levelScore >= 0 ? "42e422" : "ff4646"}]${this._proxy.model.levelScore}[/color]`;
+    lab.text = "得分：" + `[color=${this._proxy.model.levelScore >= 0 ? UIColorBlackStr.GREEN : UIColorBlackStr.RED}]${this._proxy.model.levelScore}[/color]`;
   }
 
   // 分数变化飘字提示
