@@ -6,7 +6,7 @@ import { ModuleName, ProxyType } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
 import { MahjongView } from "@3rd-types/mahjong";
 import { TimeUtils } from "@base/utils/TimeUtils";
-import { UIColorBlackStr } from "@def/color";
+import { UIColorBlackStr, UIColorStr } from "@def/color";
 import List = Laya.List;
 import Handler = Laya.Handler;
 import Box = Laya.Box;
@@ -233,7 +233,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     label.fitContent = "yes";
     label.text = `${score > 0 ? "+" : "-"}${Math.abs(score)}`;
     label.centerX = 0;
-    label.color = "#FFFFFF";
+    label.color = UIColorStr.WHITE;
     label.y = 200;
     this.ui.addChild(label);
     base.tweenMgr.get(label).to({ y: 80, alpha: 0.4 }, 800, null, CallBack.alloc(null, () => {
@@ -245,7 +245,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
 
   private resetScore(): void {
     this._lastScoreTime = 0;
-    this.ui.$labScore.text = "得分：[color=#42e422]0[/color]";
+    this.ui.$labScore.text = `得分：[color=${UIColorBlackStr.GREEN}]0[/color]`;
   }
 
   private clearCardItem(box: BoxCard, index: number): void {
