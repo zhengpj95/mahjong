@@ -1,7 +1,7 @@
-import { FsUtils } from "./FsUtils";
+import { FsUtils } from "../FsUtils";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { toolsObj, toPascalCase } from "./index";
+import { toolsObj, toPascalCase } from "../index";
 
 interface NodeInfo {
   type?: string;
@@ -242,7 +242,7 @@ export class GenUIDts {
     if (!scriptPath) return [];
     const basename = path.basename(scriptPath);
     const compName = basename.replace(".ts", "");
-    const prefabUIContent = await fs.readFile(path.join(toolsObj.ProjectRoot, "src/tools", "PrefabUI.json"), { encoding: "utf-8" });
+    const prefabUIContent = await fs.readFile(path.join(toolsObj.ProjectRoot, "src/tools", "genUI/PrefabUI.json"), { encoding: "utf-8" });
     return JSON.parse(prefabUIContent)[compName] ?? [];
   }
 

@@ -1,6 +1,6 @@
 import * as path from "path";
 import { GenUIDts } from "./GenUIDts";
-import { toolsObj } from "./index";
+import { toolsObj } from "../index";
 
 interface SceneStructure {
   name: string;
