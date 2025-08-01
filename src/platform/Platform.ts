@@ -5,7 +5,7 @@ import { PlatformType } from "./PlatformConst";
 
 export class Platform {
   public static get platform(): PlatformType {
-    if (typeof wx !== "undefined" && wx.getSystemInfoSync) {
+    if (typeof wx !== "undefined" && wx.getSystemSetting) {
       return PlatformType.WX;
     } else if (typeof window !== "undefined") {
       return PlatformType.WEB;
