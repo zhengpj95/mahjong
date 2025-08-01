@@ -1290,6 +1290,13 @@ declare global {
              * @returns The settings.
              */
             getSettings(name: string): ISettings;
+
+            /**
+             * Query the settings type name.
+             * @param name The name of the settings.
+             * @returns The type name of the settings.
+             */
+            getSettingsType(name: string): string;
         }
         export interface IServiceProvider {
             /**
@@ -2821,6 +2828,14 @@ declare global {
             removeComponent(node: IMyNode, compId: string): Promise<void>;
 
             /**
+             * Move a component up or down in the component list of a node.
+             * @param node The node.
+             * @param compId The id of the component. 
+             * @param deltaIndex Integer to indicate how many positions to move the component. Positive value means moving down, negative value means moving up.
+             */
+            moveComponent(node: IMyNode, compId: string, deltaIndex: number): Promise<void>;
+
+            /**
              * Change the type of a node or multiple nodes.
              * @param nodes a node or an array of nodes.
              * @param nodeType The new type of the node. 
@@ -3062,7 +3077,7 @@ declare global {
 
             /**
              * Get the component by type.
-             * @param type The type of the component. 
+             * @param type The type of the component. If finding a script component, the type should be the uuid of the script file, or the script class name.
              * @param allowDerives If true, the returned component type must be exactly the same as the type; otherwise, the returned component type can be a derived class of the type. Default is false.
              * @returns The component if found; otherwise, null.
              */
@@ -3727,6 +3742,31 @@ declare global {
              * ```
              */
             t(name: string, defaultValue: string, options: Record<string, any>): string;
+        }
+        /**
+         * Serialization interface for JSON binary data.
+         */
+        export interface IJsonBin {
+            /**
+             * Deserializes binary data into a JavaScript object.
+             * @param data The binary data to parse.
+             * @param createObjWithClass Optional function to create objects with a specific class.
+             */
+            parse(data: ArrayBufferLike, createObjWithClass?: Function): any;
+
+            /**
+             * Serializes a JavaScript object into binary data.
+             * @param o The object to serialize. 
+             * @param enableClass Optional flag to enable class serialization. 
+             */
+            write(o: any, enableClass?: boolean): ArrayBuffer;
+
+            /**
+             * Checks if the provided binary data is in JSON binary format.
+             * @param data The binary data to check.
+             * @returns True if the data is in JSON binary format, false otherwise. 
+             */
+            isJsonBin(data: ArrayBufferLike): boolean;
         }
         export type CommonPathName = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe'
             | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'recent' | 'logs' | 'crashDumps';
@@ -6575,6 +6615,11 @@ declare global {
             caption?: string;
 
             /**
+             * The icon path of the build target. 
+             */
+            icon?: string;
+
+            /**
              * The settings panel id of the build target. The panel will be integrated into the build settings panel.
              * Be aware that the panel usage should be "build-settings".
              * @example
@@ -6613,6 +6658,13 @@ declare global {
              * Whether the build target is a mini-game platform, e.g. WeChat Mini Game, Oppo Mini Game, etc.
              */
             isMiniGame?: boolean;
+
+            /**
+             * Sets the position of the build target in the build settings panel. 
+             * 
+             * Supported syntax: "first" / "last" / "before id" / "after id". e.g. "before web" or "after android".
+             */
+            position?: string;
         }
 
         /**
@@ -7279,11 +7331,6 @@ declare global {
             refreshFolder(folderAsset: IAssetInfo): void;
 
             /**
-             * Sync the i18n settings with AssetManager.
-             */
-            syncI18nSettings(): Promise<void>;
-
-            /**
              * Check if the asset type matches the specified types.
              * @param assetId The id of the asset.
              * @param types The types to be matched. 
@@ -7858,6 +7905,11 @@ declare global {
              * ```
              */
             toTemplate?: string;
+
+            /**
+             * Applicable to properties of type Node or Component. It sets a filter for the node/component types that can be selected. If not provided, all node types can be selected.
+             */
+            nodeTypeFilter?: Array<string>;
 
             /**
              * Indicates whether the property is writable. The default is true. If set to false, the property is read-only.
@@ -8928,6 +8980,8 @@ declare global {
             pasteData(): void;
             resetComponentDefault(): Promise<void>;
             removeComponent(): void;
+            moveUp(): void;
+            moveDown(): void;
             resetDefault(): void;
             copyComponent(): void;
             pasteComponent(): Promise<void>;
@@ -8941,6 +8995,10 @@ declare global {
              * Whether to eliminate default values. Default is false. If true, a value that is equal to the default value will not be written to the file.
              */
             protected _eliminateDefaults: boolean;
+            /**
+             * Write "_$type" field in the object. Default is false.
+             */
+            protected _writeType: boolean;
             constructor(type: string | Function);
             accept(asset: IAssetInfo): boolean;
             onApply(): Promise<void>;
@@ -9261,6 +9319,11 @@ declare global {
          * The `RelectUtils` class is used to manage metadata.
          */
         const ReflectUtils: typeof IReflectUtils;
+
+        /**
+         * The `JsonBin` object is used to serialize and deserialize objects into binary data.
+         */
+        const JsonBin: IJsonBin;
 
         /**
          * References a commonjs module. You can import built-in Node.js modules such as: path, fs, child_process, etc. 

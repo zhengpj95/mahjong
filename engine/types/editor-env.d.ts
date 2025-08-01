@@ -3756,6 +3756,12 @@ declare global {
             findFileInBuildTemplate(filePath: string): string;
 
             /**
+             * Load the index.html template file. This method is used to load the index.html template file for web platforms.
+             * @returns The content of the index.html template file.
+             */
+            loadIndexHTMLTemplate(): Promise<string>;
+
+            /**
              * Get a module location by its ID.
              * @param moduleId The ID of the module.
              * @returns The absolute path of the module. 
@@ -3846,58 +3852,58 @@ declare global {
              * The modifications to these configurations are only effective for this task and will not affect the project.
              * @param task The build task.
              */
-            onSetup?(task: IBuildTask): Promise<void>;
+            onSetup?(task: IBuildTask): void | Promise<void>;
 
             /**
              * Build task start event. You can initialize the structure of the output folder, perform necessary checks, and module installations in this event.
              * @param task The build task.
              */
-            onStart?(task: IBuildTask): Promise<void>;
+            onStart?(task: IBuildTask): void | Promise<void>;
 
             /**
              * Collecting assets required for the build. The assets set is collected based on dependencies, rules of the resources directory, and all other valid rules. You can add more assets to the set.
              * @param task The build task.
              * @param assets The set of assets to be exported. 
              */
-            onCollectAssets?(task: IBuildTask, assets: Set<IAssetInfo>): Promise<void>;
+            onCollectAssets?(task: IBuildTask, assets: Set<IAssetInfo>): void | Promise<void>;
 
             /**
              * Assets are ready to be written to the output directory. The exportInfoMap contains information about all the resources to be written, including the output path, etc. You can modify outPath to customize the output path of the asset.
              * @param task The build task.
              * @param exportInfoMap The information of all the assets to be written. 
              */
-            onBeforeExportAssets?(task: IBuildTask, exportInfoMap: Map<IAssetInfo, IAssetExportInfo>): Promise<void>;
+            onBeforeExportAssets?(task: IBuildTask, exportInfoMap: Map<IAssetInfo, IAssetExportInfo>): void | Promise<void>;
 
             /**
              * Script generation completed. If developers need to modify the generated code files, e.g. minify, obsfucate, etc., they can handle it in this event.
              * @param task The build task.
              */
-            onExportScripts?(task: IBuildTask): Promise<void>;
+            onExportScripts?(task: IBuildTask): void | Promise<void>;
 
             /**
              * Assets writing completed. If developers need to add their own files, or perform operations such as file compression, they can handle it in this event.
              * @param task The build task.
              */
-            onAfterExportAssets?(task: IBuildTask): Promise<void>;
+            onAfterExportAssets?(task: IBuildTask): void | Promise<void>;
 
             /**
              * The build is complete. You can generate some manifest files, configuration files, etc. in this event.
              * Common examples include generating the index.html file for web platforms, manifest.json files for mini-game platforms, etc.
              * @param task The build task.
              */
-            onCreateManifest?(task: IBuildTask): Promise<void>;
+            onCreateManifest?(task: IBuildTask): void | Promise<void>;
 
             /**
              * If there is a native packaging process, handle it here. e.g. apk, ipa, etc.
              * @param task The build task.
              */
-            onCreatePackage?(task: IBuildTask): Promise<void>;
+            onCreatePackage?(task: IBuildTask): void | Promise<void>;
 
             /**
              * Event triggered when the build task is completed.
              * @param task The build task.
              */
-            onEnd?(task: IBuildTask): Promise<void>;
+            onEnd?(task: IBuildTask): void | Promise<void>;
         }
 
         export enum BuildTaskStatus {
@@ -3945,6 +3951,13 @@ declare global {
              * @param platform The platform. For example, "android", "ios", "web", etc.
              */
             getTargetInfo(platform: string): IBuildTargetInfo;
+
+            /**
+             * Get the default build plugin for the specified platform.
+             * @param targetName The name of the target platform, such as "web", "android", "ios", etc.
+             * @returns The default build plugin class for the specified platform.
+             */
+            getDefaultPlugin(targetName: string): new () => IBuildPlugin;
         }
         export interface IBuildConfig {
             /**
@@ -4152,6 +4165,7 @@ declare global {
              * { serve: "abc", open: "test.html" } // Open the test.html page of the website, the root directory is abc.
              * { serve: "", QRCode: "abc.apk" } // Open the test.apk page of the website by scanning the QR code.
              * { open: "https://example.com" } // Open an url.
+             * { open: "index.html" } // Open an local file in the release folder.
              * { runInTerminal: "{projectPath}/abc.exe" } // Open the abc.exe in the project folder.
              * ```
              */
@@ -4583,6 +4597,16 @@ declare global {
              * How many tasks of this importer can be executed in parallel. Default is 100.
              */
             numParallelTasks?: number;
+
+            /**
+             * Reimport the asset when the name of the asset is changed. Default is false.
+             */
+            runAfterRenaming?: boolean;
+
+            /**
+             * Reimport the asset when the path of the asset is changed. Default is false.
+             */
+            runAfterMoving?: boolean;
         }
 
         export interface IAssetImporter {
@@ -5212,6 +5236,11 @@ declare global {
              * ```
              */
             toTemplate?: string;
+
+            /**
+             * Applicable to properties of type Node or Component. It sets a filter for the node/component types that can be selected. If not provided, all node types can be selected.
+             */
+            nodeTypeFilter?: Array<string>;
 
             /**
              * Indicates whether the property is writable. The default is true. If set to false, the property is read-only.
@@ -6663,6 +6692,13 @@ declare global {
              * @returns The settings.
              */
             getSettings(name: string): ISettings;
+
+            /**
+             * Query the settings type name.
+             * @param name The name of the settings.
+             * @returns The type name of the settings.
+             */
+            getSettingsType(name: string): string;
         }
         export const ShaderTypePrefix = "Shader.";
         /**
@@ -7605,6 +7641,11 @@ declare global {
             caption?: string;
 
             /**
+             * The icon path of the build target. 
+             */
+            icon?: string;
+
+            /**
              * The settings panel id of the build target. The panel will be integrated into the build settings panel.
              * Be aware that the panel usage should be "build-settings".
              * @example
@@ -7643,6 +7684,13 @@ declare global {
              * Whether the build target is a mini-game platform, e.g. WeChat Mini Game, Oppo Mini Game, etc.
              */
             isMiniGame?: boolean;
+
+            /**
+             * Sets the position of the build target in the build settings panel. 
+             * 
+             * Supported syntax: "first" / "last" / "before id" / "after id". e.g. "before web" or "after android".
+             */
+            position?: string;
         }
 
         /**
@@ -8165,6 +8213,31 @@ declare global {
             function getOwnMetadata(key: string, target: any, propertyName?: string): any;
         }
 
+        /**
+         * Serialization interface for JSON binary data.
+         */
+        export interface IJsonBin {
+            /**
+             * Deserializes binary data into a JavaScript object.
+             * @param data The binary data to parse.
+             * @param createObjWithClass Optional function to create objects with a specific class.
+             */
+            parse(data: ArrayBufferLike, createObjWithClass?: Function): any;
+
+            /**
+             * Serializes a JavaScript object into binary data.
+             * @param o The object to serialize. 
+             * @param enableClass Optional flag to enable class serialization. 
+             */
+            write(o: any, enableClass?: boolean): ArrayBuffer;
+
+            /**
+             * Checks if the provided binary data is in JSON binary format.
+             * @param data The binary data to check.
+             * @returns True if the data is in JSON binary format, false otherwise. 
+             */
+            isJsonBin(data: ArrayBufferLike): boolean;
+        }
         export class CustomEditor {
             /**
              * Owner node.
@@ -8714,6 +8787,11 @@ declare global {
          * The `RelectUtils` class is used to manage metadata.
          */
         const ReflectUtils: typeof IReflectUtils;
+
+        /**
+         * The `JsonBin` object is used to serialize and deserialize objects into binary data.
+         */
+        const JsonBin: IJsonBin;
         /**
          * References a commonjs module. You can import built-in Node.js modules such as: path, fs, child_process, etc. 
          * The IDE also includes some third-party modules, including: electron, @svgdotjs, sharp, glob, qrcode, typescript, etc.

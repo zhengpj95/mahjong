@@ -634,6 +634,11 @@ declare module Laya {
          */
         customAssetFilter: string;
         /**
+         * @en Applicable to properties of type Node or Component. It sets a filter for the node/component types that can be selected. If not provided, all node types can be selected.
+         * @zh 对类型是Node或者Component的属性适用。设置可以选择的节点/组件类型过滤器。如果不提供，则可以选择所有节点类型。
+         */
+        nodeTypeFilter: Array<string>;
+        /**
          * @en Applicable to properties of type Node or Component. If not null, when deserialization is performed in the actual runtime environment, the referenced object is no longer instantiated, but its serialized data is saved as-is to the specified property.
          * @zh 对类型是Node或者Component的属性适用。如果不为null，当在实际运行环境里执行反序列化时，引用对象不再实例化，而是将它的序列化数据原样保存到指定的属性中。
          */
@@ -16438,7 +16443,7 @@ declare module Laya {
      * @zh CharacterController 类用于创建角色控制器。
      */
     class CharacterController extends PhysicsColliderComponent {
-        protected _onAdded(): void;
+        protected _onEnable(): void;
         /**
          * @ignore
          * @en The frame loop.
@@ -16554,6 +16559,13 @@ declare module Laya {
          * @param velocity 跳跃向量，各轴的方向与高度。
          */
         jump(velocity?: Vector3): void;
+        /**
+         * @en Whether the character is on the ground.
+         * @returns Whether the character is on the ground.
+         * @zh 是否在地面上。
+         * @returns 是否在地面上。
+         */
+        isGrounded(): boolean;
     }
     /**
      * @en The Collision class is used to create physical collision information.
@@ -16888,6 +16900,7 @@ declare module Laya {
      * @zh ConstraintComponent 类用于创建约束的父类。
      */
     class ConstraintComponent extends Component {
+        private _isJointInit;
         /**
          * @en Initializes the joint instance.
          * @zh 初始化关节实例。
@@ -17053,6 +17066,8 @@ declare module Laya {
      * @zh `SpringConstraint` 类表示一种在物理模拟中模拟弹簧行为的约束类型。
      */
     class SpringConstraint extends ConstraintComponent {
+        protected _onEnable(): void;
+        protected _onDisable(): void;
         /**
          * @en the minimum distance at which a spring constraint begins to exert a separating force when the distance between objects reaches or falls below this value.
          * If the objects get closer than this, the spring applies a separating force to push them apart to a safe distance. When the distance is at or above the set value, the spring doesn't exert any stretching force.
@@ -17168,7 +17183,7 @@ declare module Laya {
     class PhysicsCollider extends PhysicsColliderComponent {
         /** @ignore */
         constructor();
-        _onAdded(): void;
+        _onEnable(): void;
         /**
          * @en If this collider is a trigger. A trigger will trigger events but not produce actual physical blocking effects.
          * @zh 此碰撞器是否为触发器。触发器会触发事件但不会产生实际的物理阻挡效果。
@@ -17229,6 +17244,8 @@ declare module Laya {
      * @zh PhysicsColliderComponent 类用于创建物理组件的父类。
      */
     class PhysicsColliderComponent extends Component {
+        private _isColliderInit;
+        owner: Sprite3D;
         /**
          * @en The collider object. Used to access the underlying physics engine's collider object and directly operate on the underlying physics engine's collision characteristics.
          * @zh 碰撞器对象。用于访问底层物理引擎的碰撞器对象，直接操作底层物理引擎的碰撞特性。
@@ -17443,6 +17460,12 @@ declare module Laya {
          */
         get sleepThreshold(): number;
         set sleepThreshold(value: number);
+        /**
+         * @en The angular velocity threshold below which the rigidbody will go to sleep.
+         * @zh 刚体进入睡眠状态的角速度阈值。
+         */
+        get sleepAngularThreshold(): number;
+        set sleepAngularThreshold(value: number);
         /**
          * @en Directly sets the physical position of the rigidbody.
          * @zh 直接设置刚体的物理位置。
@@ -22437,16 +22460,6 @@ declare module Laya {
          */
         color: number;
         /**
-         * @en Create a FillTextureCmd instance
-         * @param texture The texture to be filled
-         * @param x X-axis offset
-         * @param y Y-axis offset
-         * @param width Width of the filled area
-         * @param height Height of the filled area
-         * @param type Fill type
-         * @param offset Texture offset
-         * @param color Drawing color
-         * @returns FillTextureCmd instance
          * @zh 创建绘制填充贴图的命令实例
          * @param texture 要填充的纹理
          * @param x X轴偏移量
@@ -22456,9 +22469,21 @@ declare module Laya {
          * @param type 填充类型
          * @param offset 贴图纹理偏移
          * @param color 绘图颜色
+         * @param percent 宽高是否采用百分比
          * @returns FillTextureCmd实例
+         * @en Create a FillTextureCmd instance
+         * @param texture The texture to be filled
+         * @param x X-axis offset
+         * @param y Y-axis offset
+         * @param width Width of the filled area
+         * @param height Height of the filled area
+         * @param type Fill type
+         * @param offset Texture offset
+         * @param color Drawing color
+         * @param percent Whether the width and height are percentages?
+         * @returns FillTextureCmd instance
          */
-        static create(texture: Texture, x: number, y: number, width: number, height: number, type: string, offset: Point, color: string): FillTextureCmd;
+        static create(texture: Texture, x: number, y: number, width: number, height: number, type: string, offset: Point, color: string, percent?: boolean): FillTextureCmd;
         /**
          * @en Recycle to the object pool
          * @zh 回收到对象池
@@ -23219,8 +23244,12 @@ declare module Laya {
         get cmds(): IGraphicCMD[];
         set cmds(value: IGraphicCMD[]);
         /**
-         * @en Save to the command stream.
          * @zh 添加到命令流。
+         * @param cmd 要被添加的命令。
+         * @param index （可选）插入的索引。
+         * @en Save to the command stream.
+         * @param cmd Add the command to the command stream.
+         * @param index (Optional) The index to be inserted.
          */
         addCmd(cmd: any): any;
         /**
@@ -23355,15 +23384,6 @@ declare module Laya {
          */
         drawTriangles(texture: Texture, x: number, y: number, vertices: Float32Array, uvs: Float32Array, indices: Uint16Array, matrix?: Matrix | null, alpha?: number, color?: string | number, blendMode?: string | null): DrawTrianglesCmd;
         /**
-         * @en Fill with texture
-         * @param texture The texture to use for filling
-         * @param x X-axis offset
-         * @param y Y-axis offset
-         * @param width (Optional) Width. Default is 0.
-         * @param height (Optional) Height. Default is 0.
-         * @param type (Optional) Fill type: 'repeat', 'repeat-x', 'repeat-y', or 'no-repeat'. Default is 'repeat'.
-         * @param offset (Optional) Texture offset. Default is null.
-         * @param color (Optional) Color. Default is null.
          * @zh 用纹理填充
          * @param texture 用于填充的纹理
          * @param x X轴偏移量
@@ -23373,8 +23393,19 @@ declare module Laya {
          * @param type （可选）填充类型：'repeat'、'repeat-x'、'repeat-y'或'no-repeat'。默认为'repeat'。
          * @param offset （可选）贴图纹理偏移。默认为null。
          * @param color （可选）颜色。默认为null。
+         * @param percent （可选）是否采用百分比。默认为false。
+         * @en Fill with texture
+         * @param texture The texture to use for filling
+         * @param x X-axis offset
+         * @param y Y-axis offset
+         * @param width (Optional) Width. Default is 0.
+         * @param height (Optional) Height. Default is 0.
+         * @param type (Optional) Fill type: 'repeat', 'repeat-x', 'repeat-y', or 'no-repeat'. Default is 'repeat'.
+         * @param offset (Optional) Texture offset. Default is null.
+         * @param color (Optional) Color. Default is null.
+         * @param percent (Optional) Whether to use percentage. Default is false.
          */
-        fillTexture(texture: Texture, x: number, y: number, width?: number, height?: number, type?: string, offset?: Point | null, color?: string): FillTextureCmd | null;
+        fillTexture(texture: Texture, x: number, y: number, width?: number, height?: number, type?: string, offset?: Point | null, color?: string, percent?: boolean): FillTextureCmd | null;
         /**
          * @en Set the clipping area. Coordinates outside the clipping area will not be displayed.
          * @param x X-axis offset
@@ -25712,15 +25743,6 @@ declare module Laya {
         static REPAINT_ALL: number;
     }
     /**
-     * @en Stage is the root node of the display list. All display objects are shown on the stage. It can be accessed through the Laya.stage singleton.
-     * Stage provides several adaptation modes. Different adaptation modes will produce different canvas sizes. The larger the canvas, the greater the rendering pressure, so it's important to choose an appropriate adaptation scheme.
-     * Stage provides different frame rate modes. The higher the frame rate, the greater the rendering pressure and power consumption. Reasonable use of frame rates or even dynamic changes in frame rates can help improve mobile phone power consumption.
-     * - Event.RESIZE("resize"): Discheduled when the stage size is resized.
-     * - Event.FOCUS("focus"): Dispatched when the stage gains focus. For example, when the browser or current tab is switched back from the background.
-     * - Event.BLUR("blur"): Dispatched when the stage loses focus. For example, when the browser or current tab is switched to the background.
-     * - Event.FOCUS_CHANGE("focuschange"): Dispatched when the stage focus changes. Use Laya.stage.isFocused to get whether the current stage has focus.
-     * - Event.VISIBILITY_CHANGE("visibilitychange"): Dispatched when the stage visibility changes (e.g., when the browser or current tab is switched to the background). Use Laya.stage.isVisibility to get the current visibility state.
-     * - Event.FULL_SCREEN_CHANGE("fullscreenchange"): Discheduled when the browser fullscreen state changes, such as entering or exiting fullscreen mode.
      * @zh Stage 是舞台类，显示列表的根节点，所有显示对象都在舞台上显示。通过 Laya.stage 单例访问。
      * Stage提供几种适配模式，不同的适配模式会产生不同的画布大小，画布越大，渲染压力越大，所以要选择合适的适配方案。
      * Stage提供不同的帧率模式，帧率越高，渲染压力越大，越费电，合理使用帧率甚至动态更改帧率有利于改进手机耗电。
@@ -25730,51 +25752,59 @@ declare module Laya {
      * - Event.FOCUS_CHANGE("focuschange"): 舞台焦点变化时调度，使用Laya.stage.isFocused可以获取当前舞台是否获得焦点。
      * - Event.VISIBILITY_CHANGE("visibilitychange"): 舞台可见性发生变化时调度（比如浏览器或者当前标签被切换到后台后调度），使用Laya.stage.isVisibility可以获取当前是否处于显示状态。
      * - Event.FULL_SCREEN_CHANGE("fullscreenchange"): 浏览器全屏更改时调度，比如进入全屏或者退出全屏。
+     * @en Stage is the root node of the display list. All display objects are shown on the stage. It can be accessed through the Laya.stage singleton.
+     * Stage provides several adaptation modes. Different adaptation modes will produce different canvas sizes. The larger the canvas, the greater the rendering pressure, so it's important to choose an appropriate adaptation scheme.
+     * Stage provides different frame rate modes. The higher the frame rate, the greater the rendering pressure and power consumption. Reasonable use of frame rates or even dynamic changes in frame rates can help improve mobile phone power consumption.
+     * - Event.RESIZE("resize"): Discheduled when the stage size is resized.
+     * - Event.FOCUS("focus"): Dispatched when the stage gains focus. For example, when the browser or current tab is switched back from the background.
+     * - Event.BLUR("blur"): Dispatched when the stage loses focus. For example, when the browser or current tab is switched to the background.
+     * - Event.FOCUS_CHANGE("focuschange"): Dispatched when the stage focus changes. Use Laya.stage.isFocused to get whether the current stage has focus.
+     * - Event.VISIBILITY_CHANGE("visibilitychange"): Dispatched when the stage visibility changes (e.g., when the browser or current tab is switched to the background). Use Laya.stage.isVisibility to get the current visibility state.
+     * - Event.FULL_SCREEN_CHANGE("fullscreenchange"): Discheduled when the browser fullscreen state changes, such as entering or exiting fullscreen mode.
      */
     class Stage extends Sprite {
         /**
-         * @en No scaling is applied, and the stage is displayed at its design size. The actual width and height of the canvas are set to the design width and height. This mode is suitable for applications that want to maintain the original design ratio, but it may result in blank areas or content overflow on different devices.
-         * @zh 不进行缩放，舞台按照设计尺寸显示，画布的实际宽度和高度设置为设计宽度和高度。这种模式适合希望保持原始设计比例的应用，但在不同设备上可能会出现空白区域或内容超出屏幕的情况。
-         */
+        * @zh 不缩放模式：画布宽高等于设计宽高，不进行任何缩放，舞台按照设计尺寸显示，这种模式适合在固定像素大小的嵌入需求，如果出现在与设计宽高不同尺寸的设备上，会出现空白区域或内容超出屏幕（运行窗口）的情况。
+        * @en No Scale Mode:The canvas width and height are equal to the design resolution, with no scaling applied. The stage is rendered strictly according to the design dimensions. This mode is suitable for scenarios where a fixed-size pixel canvas is embedded in another interface. If used on devices with screen sizes different from the design resolution, blank margins may appear or content may overflow beyond the screen boundaries.
+        */
         static SCALE_NOSCALE: string;
         /**
-         * @en Scale the stage to fit the screen while maintaining the aspect ratio, ensuring that the entire design width and height remain visible. The canvas size remains equal to the design width and height, while the stage dimensions are calculated based on the design width and height multiplied by the minimum scaling factor of the physical resolution. Although this prevents content from being cropped, it may result in blank margins at the top and bottom or on the sides.
-         * @zh 保持纵横比的情况下，将舞台缩放以适应屏幕，确保整个舞台内容可见。画布的的宽高等于设计宽高，舞台的宽高根据设计宽度和高度乘以物理分辨率的最小缩放因子计算。虽然避免了内容被裁切，但可能会出现上下或左右的空白边缘。
+         * @zh 设计内容全部显示的等比缩放模式：画布宽高等于设计宽高，在确保全部设计内容可见，避免裁切的前提下，将舞台（画布适配后的逻辑宽高）等比缩放至屏幕（运行窗口）最大尺寸，缩放系数取设计宽度与屏幕宽度、设计高度与屏幕高度之间的最小缩放因子。该模式在与设计尺寸比例不同的屏幕上，会出现上下或左右的空白边缘，通常需要配合画布的对齐方式使用。
+         * @en Show All Mode: The canvas size equals the design resolution. To ensure that all design content remains visible with no cropping, the stage (i.e., the logical width and height after the canvas is adapted) is uniformly scaled to the largest size that fits inside the screen (runtime window). The scaling factor is the smaller of the two ratios: screen width ÷ design width and screen height ÷ design height. When the screen’s aspect ratio differs from the design’s, blank margins may appear at the top and bottom or the left and right edges, so this mode is typically used together with a canvas-alignment setting.
          */
         static SCALE_SHOWALL: string;
         /**
-         * @deprecated 不推荐使用
-         * @en The stage is scaled to fill the screen, with the actual width and height of the canvas calculated based on the design width and height multiplied by the maximum scale factor. This mode ensures that content fully covers the display area, but it may result in some content being cut off.
-         * @zh 将舞台缩放以填满屏幕，画布的实际宽度和高度根据设计宽度和高度乘以最大缩放因子计算。这种模式保证内容完全覆盖屏幕，但可能会导致部分设计内容被裁切。
+         * @zh 没底色边的等比缩放模式（全屏适配）：画布宽高等于设计宽高，在确保不会漏出屏幕背景颜色的前提下，将舞台（画布适配后的逻辑宽高）等比缩放至填满屏幕（运行窗口），缩放系数取设计宽度与屏幕宽度、设计高度与屏幕高度之间的最大缩放因子。该模式在与设计尺寸比例不同的屏幕上，会导致部分设计内容被裁切（舞台尺寸超出屏幕），通常用于没有边缘UI，对边缘裁切无所谓的3D场景中。
+         * @en No Border Mode: The canvas size equals the design resolution. Under the premise of ensuring that the screen background color is never exposed, the stage (i.e., the logical width and height after the canvas is adapted) is uniformly scaled to fill the entire screen (runtime window). The scaling factor is the larger of the two ratios: screen width ÷ design width and screen height ÷ design height. When the screen’s aspect ratio differs from the design’s, part of the design content may be cropped (since the stage size exceeds the screen). This mode is typically used in 3D scenes without edge UI elements, where edge cropping is not a concern.
          */
         static SCALE_NOBORDER: string;
         /**
-         * @en Set the stage and canvas directly to the screen's width and height. Other aspects are the same as the SCALE_NOSCALE mode, with no scaling applied to the design content itself. This mode is suitable for scenarios where you want to fully utilize the screen space and handle dynamic layout on the screen yourself.
-         * @zh 将舞台与画布直接设置为屏幕宽度和高度，其它方面与SCALE_NOSCALE模式一样，不对设计内容本身进行缩放。这种模式适用于希望完全利用屏幕空间，自行对屏幕动态排版的需求。
+         * @zh 画布铺满的不缩放模式：画布和舞台（即画布适配后的逻辑宽高）等于屏幕（运行窗口）的宽高，但不对设计内容本身进行缩放。如果有 UI 元素，开发者需要根据设备的 DPR（设备像素比）自行进行缩放，否则在高 DPR 设备上 UI 会显得较小。该模式通常用于以 3D 内容为主、UI 较少且采用动态相对布局的场景。
+         * @en Full Mode: The canvas and the stage (i.e., the logical width and height after adaptation) are set to match the screen (runtime window) dimensions, but the design content itself is not scaled. If there are UI elements, developers need to scale them manually according to the device's DPR (pixelRatio), otherwise the UI may appear too small on high-DPR devices. This mode is commonly used in 3D games with minimal UI that relies on dynamic or relative layout.
          */
         static SCALE_FULL: string;
         /**
-         * @en Similar to SCALE_FULL, this mode sets the stage and canvas directly to the screen width and height. However, the difference is that it scales according to DPR (pixelRatio), making it suitable for high-DPR devices.
-         * Advantages of this mode: evelopers do not need to manually scale UI elements based on DPR in their logic.
-         * Important considerations: The design width and height should not use the physical resolution of the target device. Instead, they must use the logical resolution; otherwise, content exceeding the logical resolution may be cropped.
-         *  @zh 与SCALE_FULL类似，将舞台与画布直接设置为屏幕宽度和高度，但区别是，会按 DPR(pixelRatio) 进行缩放，适合于各种高 DPR 的机型应用场景。
-         * 该模式的好处是，不需要开发者对于 UI 根据 DPR 自行在逻辑里进行缩放处理。
-         * 需要注意的是，在这种模式下，设计的宽高不能使用目标机型的物理分辨率，而是要使用目标机型的逻辑分辨率，这与其它适配模式不同，否则，会导致超出逻辑分辨率部分内容被裁切。
-         */
+         * @zh 画布铺满的缩放模式：与SCALE_FULL类似，画布和舞台（即画布适配后的逻辑宽高）等于屏幕（运行窗口）的宽高，但区别是，设计内容会按 DPR(pixelRatio) 进行缩放，适合于各种高 DPR 的机型应用场景。
+         * - 该模式的好处是，不需要开发者对于 UI 根据 DPR 自行在逻辑里进行缩放处理。
+         * - 需要注意的是，在这种模式下，设计的宽高不能使用目标机型的物理分辨率，而是要使用目标机型的逻辑分辨率（物理分辨率除以DRP），这与其它适配模式不同，否则，会导致超出逻辑分辨率部分内容被裁切。
+         * @en Full Screen Mode: Similar to SCALE_FULL, the canvas and the stage (i.e., the logical width and height after adaptation) are set to match the screen (runtime window) dimensions.  However, unlike SCALE_FULL, the design content is automatically scaled according to the device’s DPR (pixelRatio), making it suitable for applications on high-DPR devices.
+         * - One advantage of this mode is that developers do not need to manually scale UI elements based on DPR in their code.
+         * - Note: In this mode, the design width and height should be based on the device’s logical resolution (i.e., physical resolution divided by DPR), which differs from other scaling modes. Otherwise, any content exceeding the logical resolution may be clipped.
+         **/
         static SCALE_FULLSCREEN: string;
         /**
-         * @en The stage width is kept fixed, and scaling is done based on the screen height. The canvas height is calculated based on the screen height and scale factor, and the stage height is set accordingly. This mode ensures consistent width but may alter the height ratio on different devices.
-         * @zh 保持舞台的宽度固定，根据屏幕高度进行缩放。画布的高度根据屏幕高度和缩放因子计算，并设置舞台的高度。这种模式确保宽度一致，但在不同设备上可能会改变高度比例。
+         * @zh 保宽适配模式（全屏）：画布的宽等于设计宽，高度根据屏幕高度与全屏缩放因子计算得出。舞台（即画布适配后的逻辑宽高）根据画布尺寸等比缩放至填满屏幕（运行窗口）。这种模式可以确保水平方向的UI设计内容始终完全显示在屏幕内，而垂直方向的UI设计内容可能因缩放而部分超出屏幕或露出舞台背景色。但由于舞台始终填满屏幕，开发者可通过相对布局方式，使垂直方向的UI内容适配于各类屏幕，实现完美的全屏效果。
+         * @en Fixed width Mode：The canvas width is equal to the design width, while its height is calculated based on the screen height and a full-screen scaling factor. The stage (i.e., the logical width and height after canvas adaptation) is then uniformly scaled according to the canvas size to fill the entire screen (runtime window). This mode ensures that all horizontal design content is always fully visible on the screen, while vertical design content may be partially clipped or expose the stage background due to scaling. However, since the stage always fills the screen, developers can use relative layout in the vertical direction to adapt the content for various screen sizes and achieve a perfect full-screen experience.
          */
         static SCALE_FIXED_WIDTH: string;
         /**
-         * @en The stage height is kept fixed, and scaling is done based on the screen width. The canvas width is calculated based on the screen width and scale factor, and the stage width is set accordingly. This mode ensures consistent height but may alter the width ratio on different devices.
-         * @zh 保持舞台的高度固定，根据屏幕宽度进行缩放。画布的宽度根据屏幕宽度和缩放因子计算，并设置舞台的宽度。这种模式确保高度一致，但在不同设备上可能会改变宽度比例。
+         * @zh 保高适配模式（全屏）：画布的高等于设计高，宽度根据屏幕宽度与全屏缩放因子计算得出。舞台（即画布适配后的逻辑宽高）根据画布尺寸等比缩放至填满屏幕（运行窗口）。这种模式可以确保垂直方向的UI设计内容始终完全显示在屏幕内，而水平方向的UI设计内容可能因缩放而部分超出屏幕或露出舞台背景色。但由于舞台始终填满屏幕，开发者可通过相对布局方式，使水平方向的UI内容适配于各类屏幕，实现完美的全屏效果。
+         * @en Fixed height Mode：The canvas height is equal to the design height, while its width is calculated based on the screen width and a full-screen scaling factor. The stage (i.e., the logical width and height after canvas adaptation) is then uniformly scaled according to the canvas size to fill the entire screen (runtime window). This mode ensures that all vertical UI design content is always fully visible on the screen, while horizontal content may be partially clipped or expose the stage background due to scaling. However, since the stage always fills the screen, developers can use relative layout in the horizontal direction to adapt the content for various screen sizes and achieve a perfect full-screen experience.
          */
         static SCALE_FIXED_HEIGHT: string;
         /**
-         * @en The scaling method is automatically chosen based on the comparison between the screen aspect ratio and the design aspect ratio. If the screen aspect ratio is less than the design aspect ratio, the width is kept fixed with equal scale factors and the canvas height is calculated; otherwise, the height is kept fixed with equal scale factors and the canvas width is calculated. This mode flexibly adapts to different devices but may result in content being cut off or blank borders appearing.
-         * @zh 根据屏幕宽高比与设计宽高比的比较，自动选择缩放方式；如果屏幕宽高比小于设计宽高比，则保持宽度固定，缩放因子相等并计算画布高度；否则，保持高度固定，缩放因子相等并计算画布宽度。这种模式可以灵活适应不同的设备，但可能会导致内容被裁切或出现空白边缘。
+         * @zh 自动保宽高模式（全屏）：这是一种根据屏幕（运行窗口）宽高比动态选择“保宽”或“保高”策略的自适应模式。当屏幕宽高比小于设计宽高比时，采用“保宽”（fixedwidth）模式；反之，则采用“保高”（fixedheight）模式。该模式可确保UI设计内容始终处于舞台范围内，不会被裁切，但可能在水平方向或垂直方向漏出背景颜色。为实现理想的全屏效果，建议通过相对布局方式适配不同屏幕。
+         * @en Fixed Auto Mode: This is an adaptive scaling mode that dynamically selects either the "fixedwidth" or "fixedheight" strategy based on the aspect ratio of the screen (runtime window). When the screen’s aspect ratio is less than the design aspect ratio, it uses the **fixedwidth** mode; otherwise, it uses the **fixedheight** mode. This mode ensures that the UI design content always stays within the stage without being cropped, though background color may appear on the horizontal or vertical edges. For an optimal full-screen experience, it is recommended to use relative layout to adapt to various screen sizes.
          */
         static SCALE_FIXED_AUTO: string;
         /**
@@ -38803,16 +38833,20 @@ declare module Laya {
      * @zh 齿轮关节：用来模拟两个齿轮间的约束关系，齿轮旋转时，产生的动量有两种输出方式，一种是齿轮本身的角速度，另一种是齿轮表面的线速度
      */
     class GearJoint extends JointBase {
+        private _joint1;
+        private _joint2;
         /**
          * @en The first joint to be connected, which can be a RevoluteJoint or a PrismaticJoint, effective only on the first setting.
          * @zh [首次设置有效]要绑定的第一个关节，类型可以是旋转关节（RevoluteJoint）或者棱形关节（PrismaticJoint）。
          */
-        joint1: RevoluteJoint | PrismaticJoint;
+        set joint1(value: RevoluteJoint | PrismaticJoint);
+        get joint1(): RevoluteJoint | PrismaticJoint;
         /**
          * @en The second joint to be connected, which can be a RevoluteJoint or a PrismaticJoint, effective only on the first setting.
          * @zh [首次设置有效]要绑定的第二个关节，类型可以是旋转关节（RevoluteJoint）或者棱形关节（PrismaticJoint）。
          */
-        joint2: RevoluteJoint | PrismaticJoint;
+        set joint2(value: RevoluteJoint | PrismaticJoint);
+        get joint2(): RevoluteJoint | PrismaticJoint;
         /**
          * @en Specifies whether the two connected bodies should collide with each other. Default is false, effective only on the first setting.
          * @zh [首次设置有效]两个刚体是否可以发生碰撞，默认为 false。
@@ -40551,6 +40585,7 @@ declare module Laya {
          * @param velocity 跳跃速度向量。
          */
         jump(velocity: Vector3): void;
+        isGrounded(): boolean;
         /**
          * @en Set the jump speed of the character.
          * @param value The jump speed value.
@@ -40964,13 +40999,6 @@ declare module Laya {
          */
         getLinearVelocity(): Vector3;
         /**
-         * @en Set the linear velocity threshold for the rigid body.
-         * @param value The linear velocity threshold vector.
-         * @zh 设置刚体线速度阈值。
-         * @param value 线速度阈值。
-         */
-        setSleepLinearVelocity(value: Vector3): void;
-        /**
          * @en Set the angular velocity of the rigid body.
          * @param value The angular velocity vector.
          * @zh 设置刚体的角速度。
@@ -41032,7 +41060,7 @@ declare module Laya {
          * @zh 设置刚体进入睡眠状态的角速度阈值。
          * @param value 角速度阈值。
          */
-        setSleepAngularVelocity(value: number): void;
+        setSleepAngularThreshold(value: number): void;
         /**
          * @en Set the solver iterations for the rigid body.
          * @param value The number of solver iterations.
@@ -42211,6 +42239,13 @@ declare module Laya {
          * @param value 跳跃速度
          */
         setJumpSpeed?(value: number): void;
+        /**
+         * @en Whether the character is on the ground.
+         * @returns Whether the character is on the ground.
+         * @zh 是否在地面上。
+         * @returns 是否在地面上。
+         */
+        isGrounded?(): boolean;
     }
     /**
      * @en Interface for collider.
@@ -42419,6 +42454,13 @@ declare module Laya {
          * @param value 线速度睡眠阈值。
          */
         setSleepThreshold(value: number): void;
+        /**
+         * @en Set the angular velocity threshold for the rigid body to sleep.
+         * @param value The angular velocity threshold.
+         * @zh 设置刚体进入睡眠状态的角速度阈值。
+         * @param value 角速度阈值。
+         */
+        setSleepAngularThreshold?(value: number): void;
         /**
         * @en Whether it is sleeping.
         * @zh 是否处于睡眠状态。
@@ -43684,7 +43726,12 @@ declare module Laya {
          * @en Simulate gravity for the character controller.
          * @zh 模拟角色控制器的重力。
          */
-        Character_SimulateGravity = 16
+        Character_SimulateGravity = 16,
+        /**
+         * @en Whether the character is on the ground.
+         * @zh 是否在地面上。
+         */
+        Character_IsOnGround = 17
     }
     enum EColliderCapable {
         /**
@@ -44136,6 +44183,7 @@ declare module Laya {
          * @param velocity 跳跃速度。
          */
         jump?(velocity: Vector3): void;
+        isGrounded(): boolean;
         /**
          * @en Sets the step offset for the character controller.
          * @param offset The step offset value.
@@ -59657,6 +59705,11 @@ declare module Laya {
          */
         vertexCount: number;
         /**
+         * @en The number of indices in the attachment.
+         * @zh 附件中的索引数量。
+         */
+        indexCount: number;
+        /**
          * @en Indicates if normal rendering is required.
          * @zh 指示是否需要正常渲染。
          */
@@ -59858,7 +59911,7 @@ declare module Laya {
          * @en The index buffer array.
          * @zh 索引缓冲区数组。
          */
-        ib: Uint16Array;
+        ib: Uint16Array | Uint32Array;
         /**
          * @en The actual length of the index buffer.
          * @zh 索引缓冲区的实际长度。
@@ -59869,14 +59922,54 @@ declare module Laya {
          * @zh 用于多重渲染的输出渲染数据。
          */
         outRenderData: MultiRenderData;
-        private _realib;
+        /**
+         * @en The Max length of the index buffer.
+         * @zh 索引缓冲区的最大长度。
+         */
+        maxIndexCount: number;
+        /**
+         * @en The index type.
+         * @zh 索引类型。
+         */
+        type: IndexFormat;
+        /**
+         * @en The byte count of the index type.
+         * @zh 索引类型字节数量。
+         */
+        size: number;
         /**
          * @en The actual index buffer.
          * @zh 实际索引缓冲区。
          */
-        get realIb(): Uint16Array;
+        get realIb(): Uint16Array | Uint32Array;
         /** @ignore */
         constructor();
+        /**
+         *
+         * @zh 根据顶点长度设置索引类型
+         * @param vertexCount 顶点数目
+         */
+        updateFormat(vertexCount: number): void;
+        /**
+         * @en set index buffer length.
+         * @param maxIndexCount The Max length of Index count.
+         * @zh 设置索引缓冲长度。
+         * @param maxIndexCount 索引最大个数。
+         */
+        setBufferLength(maxIndexCount: number): void;
+        private _updateBuffer;
+        /**
+         * @en Create index buffer for attachments.
+         * @param attachs Array of attachment parse data.
+         * @param ibCreator Index buffer creator.
+         * @param order Optional draw order array.
+         * @zh 为附件创建索引缓冲区。
+         * @param attachs 附件解析数据数组。
+         * @param ibCreator 索引缓冲区创建器。
+         * @param order 可选的绘制顺序数组。
+         */
+        createIB(attachs: AttachmentParse[], vbCreator: VBCreator, order?: number[]): void;
+        static getIndexFormat(vertexCount: number): IndexFormat.UInt16 | IndexFormat.UInt32;
     }
     interface IChange {
         change(vb: VBCreator, slotAttachMap: Map<number, Map<string, AttachmentParse>>): boolean;
@@ -59907,7 +60000,7 @@ declare module Laya {
     }
     interface IVBIBUpdate {
         updateVB(vertexArray: Float32Array, vbLength: number): void;
-        updateIB(indexArray: Uint16Array, ibLength: number, mutiRenderData: MultiRenderData, isMuti: boolean): void;
+        updateIB(indexArray: Uint16Array | Uint32Array, type: IndexFormat, size: number, ibLength: number, mutiRenderData: MultiRenderData, isMuti: boolean): void;
     }
     type RenderData = {
         material?: Material;
@@ -60146,7 +60239,9 @@ declare module Laya {
         initAnimator(animator: AnimationRender): void;
     }
     type IBRenderData = {
-        realIb: Uint16Array;
+        realIb: Uint16Array | Uint32Array;
+        type: IndexFormat;
+        size: number;
         outRenderData: MultiRenderData;
     };
     type TSpineBakeData = {
@@ -60739,7 +60834,7 @@ declare module Laya {
          * @param mutiRenderData 多重渲染数据。
          * @param isMuti 指示是否为多重渲染。
          */
-        updateIB(indexArray: Uint16Array, ibLength: number, mutiRenderData: MultiRenderData, isMuti: boolean): void;
+        updateIB(indexArray: Uint16Array | Uint32Array, type: IndexFormat, size: number, ibLength: number, mutiRenderData: MultiRenderData, isMuti: boolean): void;
         /**
          * @en Initialize the SkinRender.
          * @param skeleton The Spine skeleton.
@@ -60835,14 +60930,21 @@ declare module Laya {
          * @zh 骨骼矩阵数据。
          */
         boneMat: Float32Array;
+        /**
+         * @en The Max Length of the vertex buffer.
+         * @zh 顶点缓冲区的最大长度。
+         */
+        maxVertexCount: number;
         private boneMaxId;
         /**
          * @en Create a new instance of the VBCreator.
          * @param autoNew Whether to automatically create a new vertex buffer. Default is true.
+         * @parma maxVertexCount The maximum number of vertices in the vertex buffer.
          * @zh 创建 VBCreator 的新实例。
          * @param autoNew 是否自动创建新的顶点缓冲区。默认为true。
+         * @param maxVertexCount 顶点缓冲区中的最大顶点数。
          */
-        constructor(autoNew?: boolean);
+        constructor(autoNew?: boolean, maxVertexCount?: number);
         /**
          * @en Initialize the VBCreator.
          * @param autoNew Whether to automatically create a new vertex buffer.
@@ -60850,6 +60952,14 @@ declare module Laya {
          * @param autoNew 是否自动创建新的顶点缓冲区。
          */
         init(autoNew: boolean): void;
+        protected _updateBuffer(): void;
+        /**
+         * @en set vertex buffer length.
+         * @param maxVertexCount The Max length of Vertex count.
+         * @zh 设置顶点缓冲长度。
+         * @param maxVertexCount 顶点缓存区最大个数。
+         */
+        setBufferLength(maxVertexCount: number): void;
         /**
          * @en The size of each vertex in the vertex buffer.
          * @zh 顶点缓冲区中每个顶点的大小。
@@ -60911,17 +61021,6 @@ declare module Laya {
          * @returns 顶点缓冲区中的偏移量。
          */
         appendVB(attach: AttachmentParse): number | TAttamentPos;
-        /**
-         * @en Create index buffer for attachments.
-         * @param attachs Array of attachment parse data.
-         * @param ibCreator Index buffer creator.
-         * @param order Optional draw order array.
-         * @zh 为附件创建索引缓冲区。
-         * @param attachs 附件解析数据数组。
-         * @param ibCreator 索引缓冲区创建器。
-         * @param order 可选的绘制顺序数组。
-         */
-        createIB(attachs: AttachmentParse[], ibCreator: IBCreator, order?: number[]): void;
         /**
          * @en Update bone matrices.
          * @param bones Array of bones.
