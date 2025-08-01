@@ -8,8 +8,6 @@
   },
   "modules": {
     "laya.ui": true,
-    "laya.legacyParser": true,
-    "laya.d3": true,
     "laya.physics2D": true
   },
   "splash": {
