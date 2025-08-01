@@ -34,7 +34,10 @@
       "@3rd-types/*": [
         "src/3rd-types/*"
       ]
-    }
+    },
+    "types": [
+      "minigame-api-typings"
+    ]
   },
   "include": [
     "./assets",
