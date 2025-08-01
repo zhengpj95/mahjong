@@ -36,7 +36,8 @@
       ]
     },
     "types": [
-      "minigame-api-typings"
+      "minigame-api-typings",
+      "node"
     ]
   },
   "include": [
