@@ -53,7 +53,7 @@ export default [
       "@typescript-eslint/no-explicit-any": "off", // 允许隐式any类型
       "@typescript-eslint/no-empty-function": "warn", // 允许空函数
       "@typescript-eslint/no-non-null-assertion": "warn", // 允许非空断言
-      "no-require-imports": "error", // 禁止使用 require 导入
+      "@typescript-eslint/no-require-imports": "error", // 禁止使用 require 导入
     },
     ignores: ["src/3rd/**", "src/3rd-types/**"], // 忽略3rd目录和src/3rd-types目录
   },
