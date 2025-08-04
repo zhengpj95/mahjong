@@ -25,8 +25,8 @@
       "@platform/*": [
         "src/platform/*"
       ],
-      "@configName": [
-        "src/3rd/config-name.ts"
+      "@config/*": [
+        "src/3rd/*"
       ],
       "~/packages/*": [
         "./library/packages/*"
