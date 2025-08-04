@@ -9,7 +9,11 @@ import Node = Laya.Node;
  */
 export default class ComUtils {
   /** 组件抖动 */
-  public static setTween(box: UIComponent, isTween = true, callback?: Handler): TimeLine | undefined {
+  public static setTween(
+    box: UIComponent,
+    isTween = true,
+    callback?: Handler,
+  ): TimeLine | undefined {
     if (!box) {
       return undefined;
     }
@@ -23,7 +27,8 @@ export default class ComUtils {
     } else {
       (box as any)["_timeLine_"] = timeLine = new TimeLine();
     }
-    timeLine.to(box, { rotation: 10 }, 100)
+    timeLine
+      .to(box, { rotation: 10 }, 100)
       .to(box, { rotation: -10 }, 100)
       .to(box, { rotation: 5 }, 100)
       .to(box, { rotation: -5 }, 100)
@@ -47,7 +52,10 @@ export default class ComUtils {
   }
 
   /**根据名称获取对应组件*/
-  public static getNodeByNameList<T extends Node>(box: Node, nameList: string | string[]): T | undefined {
+  public static getNodeByNameList<T extends Node>(
+    box: Node,
+    nameList: string | string[],
+  ): T | undefined {
     if (!box) {
       return undefined;
     }

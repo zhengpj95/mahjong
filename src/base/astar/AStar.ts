@@ -4,7 +4,12 @@ import { CellType, GridPoint } from "./AStarConst";
 /** 默认拐点数 */
 const DEFAULT_TURN_COUNT = 2;
 /** 方向（下 右 左 上） */
-const DIRECTION: number[][] = [[0, 1], [1, 0], [-1, 0], [0, -1]];
+const DIRECTION: number[][] = [
+  [0, 1],
+  [1, 0],
+  [-1, 0],
+  [0, -1],
+];
 const DIRECTION_NAME = ["down", "right", "left", "up"];
 
 /**
@@ -12,12 +17,18 @@ const DIRECTION_NAME = ["down", "right", "left", "up"];
  */
 class PathNode {
   public position: GridPoint; // 当前节点的位置 [x, y]
-  public g: number;           // 从起点到当前节点的实际代价
-  public h: number;           // 当前节点到目标节点的启发式估计代价
+  public g: number; // 从起点到当前节点的实际代价
+  public h: number; // 当前节点到目标节点的启发式估计代价
   public parent: PathNode | null; // 当前节点的父节点，用于回溯路径
   public direction: GridPoint | null; // 从父节点到当前节点的移动方向
 
-  constructor(position: GridPoint, g: number, h: number, parent: PathNode | null = null, direction: GridPoint | null = null) {
+  constructor(
+    position: GridPoint,
+    g: number,
+    h: number,
+    parent: PathNode | null = null,
+    direction: GridPoint | null = null,
+  ) {
     this.position = position;
     this.g = g;
     this.h = h;
@@ -87,7 +98,7 @@ class PathNode {
  */
 export class AStar {
   private _grid: Grid; // 网格实例
-  private _turnCount: number = 0;// 拐点数
+  private _turnCount: number = 0; // 拐点数
 
   /**
    * 构造函数
@@ -116,12 +127,23 @@ export class AStar {
    * @param end - 目标点
    * @returns 邻居节点的位置数组和方向
    */
-  private getNeighbors(node: PathNode, end: GridPoint): [GridPoint, GridPoint][] {
+  private getNeighbors(
+    node: PathNode,
+    end: GridPoint,
+  ): [GridPoint, GridPoint][] {
     const [x, y] = node.position;
-    const list = DIRECTION.map(([dx, dy]) => ([[x + dx, y + dy], [dx, dy]] as [GridPoint, GridPoint]));
-    return list.filter(([pos]) => end[0] === pos[0] && end[1] === pos[1]
-      ? this._grid.isInBounds(pos[0], pos[1])
-      : this._grid.isValid(pos[0], pos[1]));
+    const list = DIRECTION.map(
+      ([dx, dy]) =>
+        [
+          [x + dx, y + dy],
+          [dx, dy],
+        ] as [GridPoint, GridPoint],
+    );
+    return list.filter(([pos]) =>
+      end[0] === pos[0] && end[1] === pos[1]
+        ? this._grid.isInBounds(pos[0], pos[1])
+        : this._grid.isValid(pos[0], pos[1]),
+    );
   }
 
   /**
@@ -131,7 +153,7 @@ export class AStar {
    * @returns 最短路径的数组，如果无路径则返回空数组
    */
   public findPath(start: GridPoint, end: GridPoint): GridPoint[] {
-    const openList: PathNode[] = [];        // 打开列表，存储待处理的节点
+    const openList: PathNode[] = []; // 打开列表，存储待处理的节点
     const closedSet: Set<string> = new Set(); // 关闭列表，存储已处理的节点
     const excludeSet: Set<string> = new Set(); // 排除的路径
 
@@ -141,14 +163,19 @@ export class AStar {
 
     while (openList.length > 0) {
       // 按照 f 值 + 拐点数排序，选择最优的节点
-      openList.sort((a, b) => (a.f + a.getTurnCountTotal()) - (b.f + b.getTurnCountTotal()));
-      const currentNode = openList.shift()!; // 当前节点
+      openList.sort(
+        (a, b) => a.f + a.getTurnCountTotal() - (b.f + b.getTurnCountTotal()),
+      );
+      const currentNode = openList.shift(); // 当前节点
       if (excludeSet.has(currentNode.pathStr)) {
         continue;
       }
 
       // 如果到达终点，则回溯路径
-      if (currentNode.position[0] === end[0] && currentNode.position[1] === end[1]) {
+      if (
+        currentNode.position[0] === end[0] &&
+        currentNode.position[1] === end[1]
+      ) {
         const path: GridPoint[] = [];
         let node: PathNode | null = currentNode;
         while (node) {
@@ -171,12 +198,20 @@ export class AStar {
 
         const g = currentNode.g + 1; // 从起点到邻居的实际代价
         const h = this.heuristic(neighbor, end); // 邻居到目标的启发式代价
-        const neighborNode = new PathNode(neighbor, g, h, currentNode, direction);
+        const neighborNode = new PathNode(
+          neighbor,
+          g,
+          h,
+          currentNode,
+          direction,
+        );
         if (neighborNode.getTurnCountTotal() > this._turnCount) {
-          excludeSet.add(neighborPath);//排除的路径
+          excludeSet.add(neighborPath); //排除的路径
           continue;
         }
-        const existingNode = openList.find(node => node.pathStr === neighborPath);
+        const existingNode = openList.find(
+          (node) => node.pathStr === neighborPath,
+        );
 
         // 如果邻居节点不在打开列表或新的路径代价更低
         if (!existingNode || g < existingNode.g) {
@@ -195,23 +230,37 @@ export class AStar {
   }
 
   public findPath2(start: GridPoint, end: GridPoint): GridPoint[] {
-    const linePath = isLinePath(start[0], start[1], end[0], end[1], this._grid.gridData);
+    const linePath = isLinePath(
+      start[0],
+      start[1],
+      end[0],
+      end[1],
+      this._grid.gridData,
+    );
     if (linePath?.length > 1) {
-      return linePath.map(value => [value.x, value.y]);
+      return linePath.map((value) => [value.x, value.y]);
     }
-    const lPath = connectLPath({ x: start[0], y: start[1] }, {
-      x: end[0],
-      y: end[1]
-    }, this._grid.gridData);
+    const lPath = connectLPath(
+      { x: start[0], y: start[1] },
+      {
+        x: end[0],
+        y: end[1],
+      },
+      this._grid.gridData,
+    );
     if (lPath?.length > 1) {
-      return lPath.map(value => [value.x, value.y]);
+      return lPath.map((value) => [value.x, value.y]);
     }
-    const turnsPath = connect2TurnsPath({ x: start[0], y: start[1] }, {
-      x: end[0],
-      y: end[1]
-    }, this._grid.gridData);
+    const turnsPath = connect2TurnsPath(
+      { x: start[0], y: start[1] },
+      {
+        x: end[0],
+        y: end[1],
+      },
+      this._grid.gridData,
+    );
     if (turnsPath?.length > 1) {
-      return turnsPath.map(value => [value.x, value.y]);
+      return turnsPath.map((value) => [value.x, value.y]);
     }
     return [];
   }
@@ -235,7 +284,13 @@ function mergePath(p1: Point[], p2: Point[]): Point[] {
 }
 
 // 判断两个点之间直线是否无障碍，并返回路径
-function isLinePath(x1: number, y1: number, x2: number, y2: number, grid: CellType[][]): Point[] | null {
+function isLinePath(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  grid: CellType[][],
+): Point[] | null {
   const path: Point[] = [{ x: x1, y: y1 }];
   if (x1 === x2) {
     if (y1 > y2) {
@@ -288,7 +343,11 @@ function connectLPath(a: Point, b: Point, grid: CellType[][]): Point[] | null {
 }
 
 // 判断是否可通过最多两次转折连接，并返回路径
-function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[] | null {
+function connect2TurnsPath(
+  start: Point,
+  end: Point,
+  grid: CellType[][],
+): Point[] | null {
   const tryConnect = (a: Point, b: Point): Point[] | null => {
     const { x: x1, y: y1 } = a;
     const { x: x2, y: y2 } = b;
@@ -296,13 +355,25 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
     const cols = grid[0].length;
 
     const visited = Array.from({ length: rows }, () =>
-      Array.from({ length: cols }, () => Array(4).fill(Infinity))
+      Array.from({ length: cols }, () => Array(4).fill(Infinity)),
     );
-    const queue: { x: number; y: number; path: Point[]; turn: number; dir: number }[] = [];
+    const queue: {
+      x: number;
+      y: number;
+      path: Point[];
+      turn: number;
+      dir: number;
+    }[] = [];
 
     for (let d = 0; d < DIRECTION.length; d++) {
       visited[x1][y1][d] = 0;
-      queue.push({ x: x1, y: y1, path: [{ x: x1, y: y1, dir: d, dirName: DIRECTION_NAME[d] }], turn: 0, dir: d });
+      queue.push({
+        x: x1,
+        y: y1,
+        path: [{ x: x1, y: y1, dir: d, dirName: DIRECTION_NAME[d] }],
+        turn: 0,
+        dir: d,
+      });
     }
 
     while (queue.length > 0) {
@@ -313,18 +384,32 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
       const dx = x + DIRECTION[dir][0];
       const dy = y + DIRECTION[dir][1];
 
-      if (turn > DEFAULT_TURN_COUNT || dx < 0 || dx >= rows || dy < 0 || dy >= cols) continue;
-      if (!(dx === x2 && dy === y2) && grid[dx][dy] !== CellType.WALKABLE) continue;
+      if (
+        turn > DEFAULT_TURN_COUNT ||
+        dx < 0 ||
+        dx >= rows ||
+        dy < 0 ||
+        dy >= cols
+      )
+        continue;
+      if (!(dx === x2 && dy === y2) && grid[dx][dy] !== CellType.WALKABLE)
+        continue;
       if (visited[dx][dy][dir] <= turn) continue;
 
       visited[dx][dy][dir] = turn;
       const last = path[path.length - 1];
-      const newPath = last.x === dx && last.y === dy ? [...path] : [...path, {
-        x: dx,
-        y: dy,
-        dir: dir,
-        dirName: DIRECTION_NAME[dir]
-      }];
+      const newPath =
+        last.x === dx && last.y === dy
+          ? [...path]
+          : [
+              ...path,
+              {
+                x: dx,
+                y: dy,
+                dir: dir,
+                dirName: DIRECTION_NAME[dir],
+              },
+            ];
       if (dx === x2 && dy === y2) {
         return newPath;
       }
@@ -335,7 +420,13 @@ function connect2TurnsPath(start: Point, end: Point, grid: CellType[][]): Point[
         const dy1 = y + DIRECTION[d1][1];
         if (dx1 < 0 || dx1 >= rows || dy1 < 0 || dy1 >= cols) continue;
         if (last.x === dx1 && last.y === dy1) continue;
-        queue.push({ x: dx, y: dy, path: newPath, turn: turn + isTurn, dir: d1 });
+        queue.push({
+          x: dx,
+          y: dy,
+          path: newPath,
+          turn: turn + isTurn,
+          dir: d1,
+        });
       }
     }
 

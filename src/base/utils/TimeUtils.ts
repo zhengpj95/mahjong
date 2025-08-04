@@ -3,7 +3,7 @@ import { StringUtils } from "./StringUtils";
 export const Second = {
   Day: 86400,
   Hour: 3600,
-  Minute: 60
+  Minute: 60,
 };
 
 const WeekChinese = ["日", "一", "二", "三", "四", "五", "六", "日"];
@@ -34,7 +34,7 @@ const WeekName = [
   LauncherLan.Week_4,
   LauncherLan.Week_5,
   LauncherLan.Week_6,
-  LauncherLan.Week_0
+  LauncherLan.Week_0,
 ];
 
 const ZhouName = [
@@ -45,7 +45,7 @@ const ZhouName = [
   LauncherLan.Zhou_4,
   LauncherLan.Zhou_5,
   LauncherLan.Zhou_6,
-  LauncherLan.Zhou_0
+  LauncherLan.Zhou_0,
 ];
 
 /**
@@ -57,11 +57,11 @@ export class TimeUtils {
   /** @internal */ private static _tmpObj: { [key: string]: string } = {};
 
   /** @internal */ private static _tmpReplacer(k: string): string {
-    let obj = TimeUtils._tmpObj;
-    let type = k.charAt(0);
-    let v = obj[type];
+    const obj = TimeUtils._tmpObj;
+    const type = k.charAt(0);
+    const v = obj[type];
     if (type === "E") {
-      let day = WeekChinese.indexOf(v);
+      const day = WeekChinese.indexOf(v);
       return k.length <= 2 ? ZhouName[day] : WeekName[day];
     }
     if (v.length < k.length) {
@@ -76,10 +76,13 @@ export class TimeUtils {
    * @param {string} [format=yyyy-MM-dd HH:mm:ss.SSS] y年，q季，M月，E星期，d日，h时（12小时），H时，m分，s秒，S毫秒
    * @returns {string}
    */
-  public static formatTime(time: number, format: string = "yyyy-MM-dd HH:mm:ss.SSS"): string {
-    let date: Date = this._tmpDate;
+  public static formatTime(
+    time: number,
+    format: string = "yyyy-MM-dd HH:mm:ss.SSS",
+  ): string {
+    const date: Date = this._tmpDate;
     date.setTime(time);
-    let obj = this._tmpObj;
+    const obj = this._tmpObj;
     obj["y"] = "" + date.getFullYear();
     obj["q"] = "" + Math.floor((date.getMonth() + 3) / 3);
     obj["M"] = "" + (date.getMonth() + 1);
@@ -99,7 +102,10 @@ export class TimeUtils {
    * @param {string} [format=yyyy-MM-dd HH:mm:ss] y年，q季，M月，E星期，d日，h时（12小时），H时，m分，s秒，S毫秒
    * @returns {string}
    */
-  public static formatTimeSecond(second: number, format: string = "yyyy-MM-dd HH:mm:ss"): string {
+  public static formatTimeSecond(
+    second: number,
+    format: string = "yyyy-MM-dd HH:mm:ss",
+  ): string {
     return this.formatTime(second * 1000, format);
   }
 
@@ -110,14 +116,18 @@ export class TimeUtils {
    * @param {boolean} adaption 是否自适应，比如显示d日，H时的，小于一小时时显示成m分，s秒
    * @returns {string}
    */
-  public static formatSecond(second: number, format: string = "dd:HH:mm:ss", adaption: boolean = false): string {
-    let obj = this._tmpObj;
+  public static formatSecond(
+    second: number,
+    format: string = "dd:HH:mm:ss",
+    adaption: boolean = false,
+  ): string {
+    const obj = this._tmpObj;
     let remain: number = second;
     if (adaption) {
       if (remain < Second.Hour) {
-        format = "m分s秒";//转换显示文本
+        format = "m分s秒"; //转换显示文本
       } else if (remain < Second.Day) {
-        format = "H时m分";//转换显示文本
+        format = "H时m分"; //转换显示文本
       }
     }
     obj["y"] = "";
@@ -151,5 +161,4 @@ export class TimeUtils {
     obj["S"] = "";
     return format.replace(/y+|M+|d+|H+|m+|s+|S+/g, this._tmpReplacer);
   }
-
 }

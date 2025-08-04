@@ -1,6 +1,10 @@
 import { SceneEntityVO } from "./SceneEntityVO";
 import { BaseComponent } from "../component/BaseComponent";
-import { ComponentType, ComponentTypeMap, IComponentTypeMap, } from "../component/ComponentConst";
+import {
+  ComponentType,
+  ComponentTypeMap,
+  IComponentTypeMap,
+} from "../component/ComponentConst";
 import { ISceneUpdate } from "../BaseConst";
 import PoolObject = base.PoolObject;
 

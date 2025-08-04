@@ -8,7 +8,10 @@ type VoidElapsedMethod = (elapsed: number) => void;
  * @author zpj
  * @date 2025/6/9
  */
-export class FrameUpdateMgr extends Singleton<FrameUpdateMgr> implements ISceneUpdate {
+export class FrameUpdateMgr
+  extends Singleton<FrameUpdateMgr>
+  implements ISceneUpdate
+{
   private _timerList: { thisObj: any; func: VoidElapsedMethod }[] = [];
 
   public addTimer(thisObj: any, func: VoidElapsedMethod): void {
