@@ -50,9 +50,10 @@ export default [
       "linebreak-style": ["error", "unix"], // 强制使用Unix风格
       "@typescript-eslint/prefer-for-of": "warn", // 如果索引仅用于访问要迭代的数组，则优先于for循环的for-of循环
       "@typescript-eslint/prefer-enum-initializers": "error", // 最好初始化每个枚举成员值
-      "@typescript-eslint/no-explicit-any": "warn", // 允许隐式any类型
+      "@typescript-eslint/no-explicit-any": "off", // 允许隐式any类型
       "@typescript-eslint/no-empty-function": "warn", // 允许空函数
       "@typescript-eslint/no-non-null-assertion": "warn", // 允许非空断言
+      "no-require-imports": "error", // 禁止使用 require 导入
     },
     ignores: ["src/3rd/**", "src/3rd-types/**"], // 忽略3rd目录和src/3rd-types目录
   },
