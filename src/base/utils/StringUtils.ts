@@ -50,7 +50,7 @@ export class StringUtils {
     paddingChar: string = "0",
   ): string {
     let n: number = +totalLen | 0;
-    if (paddingChar == null || n === 0) {
+    if (!paddingChar || n === 0) {
       return str;
     }
     let i: number;
