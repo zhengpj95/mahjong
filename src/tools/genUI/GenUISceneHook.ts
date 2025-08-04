@@ -27,28 +27,40 @@ interface ChildStructure {
  */
 @IEditorEnv.regSceneHook()
 class GenUISceneHook implements IEditorEnv.ISceneHook {
-  onCreateNode(scene: IEditorEnv.IMyScene, node: Laya.Node): void | Promise<void> {
+  onCreateNode(
+    scene: IEditorEnv.IMyScene,
+    node: Laya.Node,
+  ): void | Promise<void> {
     if (node instanceof Laya.Image) {
       Laya.loader.load(node.skin).then((r: Laya.Texture) => {
         if (!r) {
           node.skin = ""; // 清除image的skin默认值
         }
       });
-    } else if (node instanceof Laya.FontClip || node instanceof Laya.Clip || node instanceof Laya.Button) {
+    } else if (
+      node instanceof Laya.FontClip ||
+      node instanceof Laya.Clip ||
+      node instanceof Laya.Button
+    ) {
       node.skin = "";
     }
   }
 
-  async onSaveScene(scene: IEditorEnv.IMyScene, data: SceneStructure): Promise<void> {
+  async onSaveScene(
+    scene: IEditorEnv.IMyScene,
+    data: SceneStructure,
+  ): Promise<void> {
     const scenePath: string = (scene as any)["_sceneFilePath"];
     if (!scenePath.endsWith(".ls")) {
       return; // 不是场景文件，过滤
     }
-    let filePath = path.dirname(scenePath.replace(toolsObj.ProjectRoot, ""));
-    GenUIDts.generateDts(filePath).then(() => {
-      console.log(`✅ gen ui 执行成功`);
-    }).catch((err) => {
-      console.log(`❌ gen ui 执行错误 `, err);
-    });
+    const filePath = path.dirname(scenePath.replace(toolsObj.ProjectRoot, ""));
+    GenUIDts.generateDts(filePath)
+      .then(() => {
+        console.log(`✅ gen ui 执行成功`);
+      })
+      .catch((err) => {
+        console.log(`❌ gen ui 执行错误 `, err);
+      });
   }
 }

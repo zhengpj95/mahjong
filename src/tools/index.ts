@@ -16,7 +16,8 @@ export const toolsObj = new ToolsObject();
  */
 export function toPascalCase(input: string): string {
   return input
-    .replace(/[-_\s]+(.)?/g, (_, group1) => group1 ? group1.toUpperCase() : "")
+    .replace(/[-_\s]+(.)?/g, (_, group1) =>
+      group1 ? group1.toUpperCase() : "",
+    )
     .replace(/^(.)/, (_, group1) => group1.toUpperCase());
 }
-

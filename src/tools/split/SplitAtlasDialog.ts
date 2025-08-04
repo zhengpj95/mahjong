@@ -4,10 +4,9 @@
  * @date 2025/7/1
  */
 export class SplitAtlasDialog extends IEditor.Dialog {
-
   async create() {
-    let panel = IEditor.GUIUtils.createInspectorPanel();
-    let data = Editor.getSettings("SplitAtlasSetting").data;
+    const panel = IEditor.GUIUtils.createInspectorPanel();
+    const data = Editor.getSettings("SplitAtlasSetting").data;
     panel.allowUndo = true;
     panel.inspect(data, "SplitAtlasSetting");
     this.contentPane = panel;
@@ -19,9 +18,13 @@ export class SplitAtlasDialog extends IEditor.Dialog {
     this.setSize(500, 250);
 
     this.contentPane.on("click_start_gen", this.startGen, this);
-    this.contentPane.on("click_cancel_gen", () => {
-      this.hide();
-    }, this);
+    this.contentPane.on(
+      "click_cancel_gen",
+      () => {
+        this.hide();
+      },
+      this,
+    );
 
     // 获取配置创建的组件 todo
   }
@@ -49,7 +52,8 @@ class SplitAtlasSetting {
             caption: "提示",
             inspector: "Info",
             type: "string",
-            default: "输入文件夹必须是图集文件或图片，输出目录会以图集名生成子文件夹",
+            default:
+              "输入文件夹必须是图集文件或图片，输出目录会以图集名生成子文件夹",
           },
           {
             name: "inputPath",
@@ -57,7 +61,7 @@ class SplitAtlasSetting {
             inspector: "File",
             options: {
               absolutePath: true,
-              properties: ["openFile"]
+              properties: ["openFile"],
             },
             type: "string",
           },
@@ -77,11 +81,12 @@ class SplitAtlasSetting {
             inspector: "RadioGroup",
             type: "string",
             options: {
-              ComboBox: { // 使用ComboBox显示，没办法直接展示出来 todo 待研究
+              ComboBox: {
+                // 使用ComboBox显示，没办法直接展示出来 todo 待研究
                 items: ["Array", "Atlas", "Json"],
                 visibleItemCount: 3,
-              }
-            }
+              },
+            },
           },
           {
             name: "buttons",
@@ -89,12 +94,12 @@ class SplitAtlasSetting {
             options: {
               buttons: [
                 { caption: "取消", event: "click_cancel_gen" },
-                { caption: "生成", event: "click_start_gen" }
-              ]
-            }
-          }
-        ]
-      }
+                { caption: "生成", event: "click_start_gen" },
+              ],
+            },
+          },
+        ],
+      },
     ]);
     Editor.extensionManager.createSettings("SplitAtlasSetting", "project");
   }
@@ -103,7 +108,7 @@ class SplitAtlasSetting {
 class SplitAtlasMenu {
   @IEditor.menu("App/私人/图集分割工具")
   static showSplitAtlasDialog(): void {
-    Editor.showDialog(SplitAtlasDialog, null).catch(err => {
+    Editor.showDialog(SplitAtlasDialog, null).catch((err) => {
       console.error(`❌ SplitAtlas 弹出失败`, err);
     });
   }
