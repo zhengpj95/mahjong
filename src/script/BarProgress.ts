@@ -41,7 +41,7 @@ export class BarProgress extends Script {
       },
       set: (v: number): void => {
         this.value = v;
-      }
+      },
     });
     Object.defineProperty(this.owner, "text", {
       configurable: true,
@@ -53,7 +53,7 @@ export class BarProgress extends Script {
         if (this._lab) {
           this._lab.text = v;
         }
-      }
+      },
     });
   }
 
@@ -77,7 +77,7 @@ export class BarProgress extends Script {
 
   public set value(val: number) {
     if (this._imgMask && this._imgBar) {
-      const width = val * this.getImgWidth() >> 0;
+      const width = (val * this.getImgWidth()) >> 0;
       this._imgMask.width = width;
       this._imgBar.visible = width >= 1;
     }

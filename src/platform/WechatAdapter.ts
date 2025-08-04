@@ -26,7 +26,7 @@ export class WechatAdapter implements IPlatformAdapter {
       },
       complete: () => {
         //
-      }
+      },
     });
     wx.onShareAppMessage(() => {
       console.log(`11111 onShareAppMessage`);
@@ -36,7 +36,7 @@ export class WechatAdapter implements IPlatformAdapter {
     });
     wx.onShareTimeline(() => {
       return {
-        title: "雀神连连，超级给力，快来享受吧！！"
+        title: "雀神连连，超级给力，快来享受吧！！",
       };
     });
   }
@@ -59,7 +59,7 @@ export class WechatPlatformStorage implements IPlatformStorage {
         },
         complete: () => {
           //
-        }
+        },
       });
     } catch (e) {
       return undefined;
@@ -78,7 +78,7 @@ export class WechatPlatformStorage implements IPlatformStorage {
         },
         complete: () => {
           //
-        }
+        },
       });
     } catch (e) {
       if (callback) callback(false);
@@ -98,7 +98,7 @@ export class WechatPlatformStorage implements IPlatformStorage {
         },
         complete: () => {
           //
-        }
+        },
       });
     } catch (e) {
       if (callback) callback(false);

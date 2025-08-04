@@ -6,11 +6,18 @@ import property = Laya.property;
 import findMediator = base.findMediator;
 
 const CLICK_SCALE_DOWN = 1.1;
-const CLICK_SCALE_UP = 0.90;
+const CLICK_SCALE_UP = 0.9;
 const CLICK_SCALE_TIME = 100;
 
-const CONSTRAINT_LIST = <const>["left", "right", "top", "bottom", "centerX", "centerY"];
-type ConstraintKey = typeof CONSTRAINT_LIST[number]
+const CONSTRAINT_LIST = <const>[
+  "left",
+  "right",
+  "top",
+  "bottom",
+  "centerX",
+  "centerY",
+];
+type ConstraintKey = (typeof CONSTRAINT_LIST)[number];
 
 /**
  * 按钮点击缩放效果
@@ -18,16 +25,28 @@ type ConstraintKey = typeof CONSTRAINT_LIST[number]
  */
 @regClass()
 export default class ClickScale extends Script {
-  @property({ tips: "点击不缩放效果,默认：false", type: "boolean", default: false })
+  @property({
+    tips: "点击不缩放效果,默认：false",
+    type: "boolean",
+    default: false,
+  })
   public noScale = false;
   @property({ tips: "点击事件, mdr中的方法", type: "string" })
   public mdrClickCall = "";
-  @property({ tips: "阻断点击事件上冒，与 mdrClickCall 关联", type: "boolean", default: false })
+  @property({
+    tips: "阻断点击事件上冒，与 mdrClickCall 关联",
+    type: "boolean",
+    default: false,
+  })
   public stopClickPropagation = false;
-  @property({ tips: "点击间隔，默认220毫秒，与 mdrClickCall 关联", type: "boolean", default: false })
+  @property({
+    tips: "点击间隔，默认220毫秒，与 mdrClickCall 关联",
+    type: "boolean",
+    default: false,
+  })
   public clickInterval = false;
 
-  private _originConstraint = new Map<ConstraintKey, number>;
+  private _originConstraint = new Map<ConstraintKey, number>();
 
   private _comp: UIComponent;
   private _width: number;
@@ -52,7 +71,7 @@ export default class ClickScale extends Script {
     this._isTween = false;
 
     this._originConstraint.clear();
-    CONSTRAINT_LIST.forEach(item => {
+    CONSTRAINT_LIST.forEach((item) => {
       const val = this._comp[item];
       if (!isNaN(val) && typeof val === "number") {
         this._originConstraint.set(item, this._comp[item]);
@@ -93,31 +112,46 @@ export default class ClickScale extends Script {
     if (this.noScale) return;
     this._isTween = false;
     base.tweenMgr.remove(this._comp);
-    base.tweenMgr.get(this._comp).to({ scaleX: CLICK_SCALE_DOWN, scaleY: CLICK_SCALE_DOWN }, CLICK_SCALE_TIME);
+    base.tweenMgr
+      .get(this._comp)
+      .to(
+        { scaleX: CLICK_SCALE_DOWN, scaleY: CLICK_SCALE_DOWN },
+        CLICK_SCALE_TIME,
+      );
     this.updateWidget(false);
   }
 
   private onClickMouseUp(): void {
-    if (this.noScale
-      || this._isTween
-      || (this._comp.scaleX === this._originScaleX &&
-        this._comp.scaleY === this._originScaleY)) {
+    if (
+      this.noScale ||
+      this._isTween ||
+      (this._comp.scaleX === this._originScaleX &&
+        this._comp.scaleY === this._originScaleY)
+    ) {
       return;
     }
     this._isTween = true;
     base.tweenMgr.remove(this._comp);
-    base.tweenMgr.get(this._comp).to({
-      scaleX: CLICK_SCALE_UP,
-      scaleY: CLICK_SCALE_UP
-    }, CLICK_SCALE_TIME, undefined, CallBack.alloc(this, this.onMouseUpEnd));
+    base.tweenMgr.get(this._comp).to(
+      {
+        scaleX: CLICK_SCALE_UP,
+        scaleY: CLICK_SCALE_UP,
+      },
+      CLICK_SCALE_TIME,
+      undefined,
+      CallBack.alloc(this, this.onMouseUpEnd),
+    );
   }
 
   private onMouseUpEnd(): void {
     base.tweenMgr.remove(this._comp);
-    base.tweenMgr.get(this._comp).to({
-      scaleX: this._originScaleX,
-      scaleY: this._originScaleY
-    }, CLICK_SCALE_TIME);
+    base.tweenMgr.get(this._comp).to(
+      {
+        scaleX: this._originScaleX,
+        scaleY: this._originScaleY,
+      },
+      CLICK_SCALE_TIME,
+    );
   }
 
   private onClickMdrMethod(e: Laya.Event): void {

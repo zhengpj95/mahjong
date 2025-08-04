@@ -7,7 +7,7 @@ export enum PlatformType {
   TT = "tt",
   QQ = "qq",
   WEB = "web",
-  UNKNOWN = "unknown"
+  UNKNOWN = "unknown",
 }
 
 // 平台统一接口，适配器模式
