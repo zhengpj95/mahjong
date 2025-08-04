@@ -9,19 +9,29 @@ export default [
       globals: {
         Laya: "readonly", // LayaAir 引擎全局变量
         base: "readonly", // LayaAir 引擎全局变量
-        wx: "readonly", // 微信小游戏全局变量
+
         console: "readonly",
         window: "readonly",
         module: "readonly",
+        localStorage: "readonly",
+        Console: "readonly",
+        wx: "readonly", // 微信小游戏全局变量
+        WechatMinigame: "readonly", // 微信小游戏全局变量
 
         IEditor: "readonly", // LayaAir 编辑器全局变量
-        Editor: "readonly", // LayaAir 编辑器全局变量
-        gui: "readonly", // LayaAir 编辑器全局变量
+        Editor: "readonly",
+        gui: "readonly",
+        IEditorEnv: "readonly",
+
+        DEBUG: "readonly", // 编辑器宏定义，是否开启调试模式
+        REVIEW_VERSION: "readonly", // 编辑器宏定义，代码审核版本号
+        _DEBUG_: "readonly", // 代码是否开启调试模式
+        _REVIEW_VERSION_: "readonly", // 代码审核版本号
       },
     },
   },
   {
-    files: ["src/**/*.ts"],
+    files: ["**/*.ts"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -68,6 +78,6 @@ export default [
   },
   // 全局忽略文件夹
   {
-    ignores: ["dist/**", "node_modules/**", "assets/**", "bin/**"],
+    ignores: ["dist/**", "node_modules/**", "assets/**", "bin/**", "engine/**"],
   },
 ];
