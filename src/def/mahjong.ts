@@ -5,14 +5,14 @@
 export const enum MahjongViewType {
   HOME = 1,
   MAIN = 2,
-  RESULT = 3
+  RESULT = 3,
 }
 
 export const enum CardType {
   TONG = 1, // 9*4
   TIAO = 2, // 9*4
   WAN = 3, // 9*4
-  FENG = 4 // 7*4
+  FENG = 4, // 7*4
 }
 
 export const enum FengType {
@@ -22,7 +22,7 @@ export const enum FengType {
   BEI = 4,
   ZHONG = 5,
   FA = 6,
-  BAIBAN = 7
+  BAIBAN = 7,
 }
 
 export const enum MahjongEvent {
@@ -39,5 +39,5 @@ export interface IMahjongResultParam {
 
 export const enum MahjongScoreType {
   TIPS = 5,
-  REFRESH = 10
+  REFRESH = 10,
 }

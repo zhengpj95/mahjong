@@ -9,5 +9,5 @@ declare interface Window {
 }
 
 /** 开发环境 */
-declare const _DEBUG_: boolean = false;
-declare const _REVIEW_VERSION_: string = "";
+declare const _DEBUG_: boolean;
+declare const _REVIEW_VERSION_: string;
