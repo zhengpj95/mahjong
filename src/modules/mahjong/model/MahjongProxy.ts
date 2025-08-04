@@ -23,25 +23,32 @@ export class MahjongProxy extends BaseProxy {
   }
 
   public cMahjongSuccess(): void {
-    let lev = this.model.level + 1;
-    globalAdapter.storage.setItem(MiscStorageKey.MAHJONG_LEVEL, lev, (success?: boolean) => {
-      if (success) {
-        console.log(`cMahjongSuccess setItem success: `, lev);
-      } else {
-        console.log(`cMahjongSuccess setItem fail: `, lev);
-      }
-    });
-    this.model.level += 1;// 挑战成功了，直接设置成功关卡
+    const lev = this.model.level + 1;
+    globalAdapter.storage.setItem(
+      MiscStorageKey.MAHJONG_LEVEL,
+      lev,
+      (success?: boolean) => {
+        if (success) {
+          console.log(`cMahjongSuccess setItem success: `, lev);
+        } else {
+          console.log(`cMahjongSuccess setItem fail: `, lev);
+        }
+      },
+    );
+    this.model.level += 1; // 挑战成功了，直接设置成功关卡
   }
 
   public sMahjongInfo(): void {
     this.model.clearData();
-    globalAdapter.storage.getItem(MiscStorageKey.MAHJONG_LEVEL, (data: number) => {
-      console.warn(`sMahjongInfo before getItem: ${this.model.level}`);
-      this.model.level = data || 0;
-      console.warn(`sMahjongInfo after getItem: ${this.model.level} ${data}`);
-      eventMgr.emit(MahjongEvent.UPDATE_INFO);
-    });
+    globalAdapter.storage.getItem(
+      MiscStorageKey.MAHJONG_LEVEL,
+      (data: number) => {
+        console.warn(`sMahjongInfo before getItem: ${this.model.level}`);
+        this.model.level = data || 0;
+        console.warn(`sMahjongInfo after getItem: ${this.model.level} ${data}`);
+        eventMgr.emit(MahjongEvent.UPDATE_INFO);
+      },
+    );
   }
 
   protected updateRedEvent(): string[] {
@@ -49,5 +56,6 @@ export class MahjongProxy extends BaseProxy {
   }
 
   protected updateRed() {
+    //
   }
 }

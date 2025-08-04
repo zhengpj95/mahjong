@@ -13,6 +13,7 @@ export class HoodleModule extends BaseModule {
   }
 
   protected initCmd(): void {
+    //
   }
 
   protected initMdr(): void {
@@ -20,6 +21,6 @@ export class HoodleModule extends BaseModule {
   }
 
   protected initProxy(): void {
+    //
   }
-
 }

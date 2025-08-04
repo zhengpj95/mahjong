@@ -50,7 +50,14 @@ class TipsItem extends Box implements PoolObject {
 
   public execTween(): void {
     Tween.clearAll(this);
-    Tween.to(this, { alpha: 0.8 }, 800, null, Handler.create(this, this.execTweenEnd, null, true), 800);
+    Tween.to(
+      this,
+      { alpha: 0.8 },
+      800,
+      null,
+      Handler.create(this, this.execTweenEnd, null, true),
+      800,
+    );
   }
 
   private execTweenEnd(): void {
@@ -84,7 +91,7 @@ export class TipsMdr extends Box {
 
   public addTips(str: string | string[]): void {
     if (Array.isArray(str)) {
-      for (let strItem of str) {
+      for (const strItem of str) {
         const tipsItem = poolMgr.alloc(TipsItem);
         tipsItem.text = strItem;
         this._tipsList.push(tipsItem);

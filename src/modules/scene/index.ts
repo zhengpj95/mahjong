@@ -13,6 +13,7 @@ export class SceneModule extends BaseModule {
   }
 
   protected initCmd(): void {
+    //
   }
 
   public initProxy(): void {

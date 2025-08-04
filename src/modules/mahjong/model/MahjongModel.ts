@@ -1,10 +1,16 @@
-import { CardType, IMahjongResultParam, MahjongEvent, MahjongViewType } from "@def/mahjong";
+import {
+  CardType,
+  IMahjongResultParam,
+  MahjongEvent,
+  MahjongViewType,
+} from "@def/mahjong";
 import { AStarMgr, GridPoint } from "@base/astar";
 import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "./MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { ModuleName } from "@def/module-name";
-import { ConfigName } from "@configName";
+import { LevelConfig } from "@config/config";
+import { ConfigName } from "@config/config-name";
 import poolMgr = base.poolMgr;
 import eventMgr = base.eventMgr;
 import facade = base.facade;
@@ -64,12 +70,12 @@ export class MahjongModel {
     const list: CardData[] = [];
     const cardTypeList = this.getLevelCfg().cardType || [];
     const fengTypeList = this.getLevelCfg().fengType || [];
-    for (let type of cardTypeList) {
-      for (let num of CARD_NUM_LIST) {
+    for (const type of cardTypeList) {
+      for (const num of CARD_NUM_LIST) {
         list.push([type, num]);
       }
     }
-    for (let feng of fengTypeList) {
+    for (const feng of fengTypeList) {
       list.push([CardType.FENG, feng]);
     }
     return list;
@@ -91,14 +97,14 @@ export class MahjongModel {
   // 随机位置
   private getRandomRowCol(): number[] {
     const list = this.getRowColStrList();
-    const idx = Math.random() * list.length >> 0;
+    const idx = (Math.random() * list.length) >> 0;
     const listItem = list.splice(idx, 1)[0];
-    return listItem.split("_").map(item => +item);
+    return listItem.split("_").map((item) => +item);
   }
 
   public getMahjongData(): MahjongCardData[] {
     const list = this.getMahjongCardList();
-    for (let item of list) {
+    for (const item of list) {
       for (let i = 0; i < CARD_COUNT; i++) {
         const randomItemAry = this.getRandomRowCol();
         const cardData = poolMgr.alloc(MahjongCardData);
@@ -107,19 +113,19 @@ export class MahjongModel {
         if (!this._sameMap.has(item.join("_"))) {
           this._sameMap.set(item.join("_"), new Map<string, MahjongCardData>());
         }
-        this._sameMap.get(item.join("_")).set(cardData.row + "_" + cardData.col, cardData);
+        this._sameMap
+          .get(item.join("_"))
+          .set(cardData.row + "_" + cardData.col, cardData);
       }
     }
     const rst: MahjongCardData[] = [];
-    this._dataMap.forEach(value =>
-      rst[value.row * 10 + value.col] = value
-    );
+    this._dataMap.forEach((value) => (rst[value.row * 10 + value.col] = value));
     return rst;
   }
 
   // 移除牌
   public deleteCard(index: number): boolean {
-    const row = (index / 10 >> 0);
+    const row = (index / 10) >> 0;
     const col = index % 10;
     if (!this._dataMap.has(`${row}_${col}`)) {
       return false;
@@ -144,7 +150,10 @@ export class MahjongModel {
   }
 
   // dfs检查是否可以消除
-  public findPath(startData: MahjongCardData, targetData: MahjongCardData): GridPoint[] {
+  public findPath(
+    startData: MahjongCardData,
+    targetData: MahjongCardData,
+  ): GridPoint[] {
     if (!startData || !targetData || !startData.checkSame(targetData)) {
       return [];
     }
@@ -166,7 +175,10 @@ export class MahjongModel {
       this._pathData = dfsAry;
       this._astarMgr = new AStarMgr(this._pathData);
     }
-    const paths = this._astarMgr.findPath([startData.row + 1, startData.col + 1], [targetData.row + 1, targetData.col + 1]);
+    const paths = this._astarMgr.findPath(
+      [startData.row + 1, startData.col + 1],
+      [targetData.row + 1, targetData.col + 1],
+    );
     return paths || [];
   }
 
@@ -177,7 +189,7 @@ export class MahjongModel {
     }
     const map = this._sameMap.get(cardData.cardData.join("_"));
     const rst: MahjongCardData[] = [];
-    map.forEach(value => rst.push(value));
+    map.forEach((value) => rst.push(value));
     return rst;
   }
 
@@ -188,8 +200,8 @@ export class MahjongModel {
     }
     const checkSet = new Set<string>();
     const list = this._dataMap.entries();
-    for (let [_, item] of list) {
-      if (!item || !item.cardData || !item.isValid()) continue;// 已消除
+    for (const [_, item] of list) {
+      if (!item || !item.cardData || !item.isValid()) continue; // 已消除
       if (checkSet.has(item.cardData.toString())) continue;
       checkSet.add(item.cardData.toString());
       const connectList = this.getConnectCardDataList(item);
@@ -222,7 +234,7 @@ export class MahjongModel {
     this._dataMap.clear();
     this._pathData = [];
 
-    for (let card of list) {
+    for (const card of list) {
       if (!card) {
         continue;
       }
@@ -232,9 +244,7 @@ export class MahjongModel {
     }
 
     const rst: MahjongCardData[] = [];
-    this._dataMap.forEach(value =>
-      rst[value.row * 10 + value.col] = value
-    );
+    this._dataMap.forEach((value) => (rst[value.row * 10 + value.col] = value));
     return rst;
   }
 

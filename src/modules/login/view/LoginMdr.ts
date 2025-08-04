@@ -28,7 +28,14 @@ export class LoginMdr extends BaseMediator<LoginView> {
     // 虚假进度展示
     tweenMgr.remove(this.ui.$ProgressBar);
     const randomTime = (Math.random() * 500 + 1500) >> 0;
-    tweenMgr.get(this.ui.$ProgressBar).to({ value: 1 }, randomTime, null, CallBack.alloc(this, this.onLoadComplete));
+    tweenMgr
+      .get(this.ui.$ProgressBar)
+      .to(
+        { value: 1 },
+        randomTime,
+        null,
+        CallBack.alloc(this, this.onLoadComplete),
+      );
 
     if (_REVIEW_VERSION_) {
       const versionLabel = new Laya.Label();

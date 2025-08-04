@@ -1,6 +1,6 @@
 import { CardType, FengType } from "@def/mahjong";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { ConfigName } from "@configName";
+import { ConfigName } from "@config/config-name";
 
 /**
  * @author zpj
@@ -12,7 +12,7 @@ export const CARD_COUNT = 4;
 // 非字牌的数字类型
 export const CARD_NUM_LIST: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 // 卡牌格式 [牌类型, 牌数字]
-export type CardData = [CardType, number | FengType]
+export type CardData = [CardType, number | FengType];
 
 export function getCardTypeRes(type: CardType, num: number): string {
   const cardCfg = GameCfg.getCfgByNameId(ConfigName.CARD, type);

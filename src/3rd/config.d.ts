@@ -1,7 +1,7 @@
 /** 关联配置表结构 */
 
 /** 牌资源 */
-interface CardConfig {
+export interface CardConfig {
   /** card */
   readonly card: number;
   /** res */
@@ -9,7 +9,7 @@ interface CardConfig {
 }
 
 /** 关卡 */
-interface LevelConfig {
+export interface LevelConfig {
   /** 关卡 */
   readonly level: number;
   /** 闯关时间 */

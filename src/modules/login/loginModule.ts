@@ -13,6 +13,7 @@ export class LoginModule extends BaseModule {
   }
 
   protected initCmd(): void {
+    //
   }
 
   protected initMdr(): void {
@@ -20,5 +21,6 @@ export class LoginModule extends BaseModule {
   }
 
   protected initProxy(): void {
+    //
   }
 }

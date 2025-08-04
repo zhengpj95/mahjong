@@ -22,13 +22,13 @@ import LayerIndex = base.LayerIndex;
 import Label = Laya.Label;
 
 type BoxRender = Box & {
-  boxCard: BoxCard
-}
+  boxCard: BoxCard;
+};
 
 type BoxCard = Box & {
-  img: Image
+  img: Image;
   imgSelected: Image;
-}
+};
 
 const INIT_SCALE = 0.4;
 const BIG_SCALE = 0.42;
@@ -75,7 +75,12 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     this._proxy = base.facade.getProxy(ModuleName.MAHJONG, ProxyType.MAHJONG);
 
     this._list = this.ui.$listItem;
-    this._list.renderHandler = Handler.create(this, this.onRenderListItem, undefined, false);
+    this._list.renderHandler = Handler.create(
+      this,
+      this.onRenderListItem,
+      undefined,
+      false,
+    );
   }
 
   protected onOpen(): void {
@@ -96,7 +101,9 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   }
 
   private onRefreshNext(): void {
-    console.warn(`11111 onRefreshNext cLv:${this._proxy.model.level}, nLv:${this._proxy.model.getNextLevel()}`);
+    console.warn(
+      `11111 onRefreshNext cLv:${this._proxy.model.level}, nLv:${this._proxy.model.getNextLevel()}`,
+    );
     this._proxy.model.showNext();
 
     this.resetScore();
@@ -111,17 +118,24 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   }
 
   private updateBar(): void {
-    const now = Date.now() / 1000 >> 0;
+    const now = (Date.now() / 1000) >> 0;
     this._endTime = now + this._proxy.model.getChallengeTime();
     const bar = this.ui.$bar;
     bar.value = 1;
     base.tweenMgr.remove(bar);
-    base.tweenMgr.get(bar).to({ value: 0 }, (this._endTime - now) * 1000, null, CallBack.alloc(this, this.onTimeOut, true));
+    base.tweenMgr
+      .get(bar)
+      .to(
+        { value: 0 },
+        (this._endTime - now) * 1000,
+        null,
+        CallBack.alloc(this, this.onTimeOut, true),
+      );
     this.tick();
   }
 
   private tick(): void {
-    const nowSecond = Date.now() / 1000 >> 0;
+    const nowSecond = (Date.now() / 1000) >> 0;
     const leaveTime = this._endTime - nowSecond;
     if (leaveTime <= 0) {
       this._haveTick = false;
@@ -129,7 +143,10 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       this.ui.$imgTime.$lab.text = TimeUtils.formatSecond(0, "mm:ss");
       return;
     }
-    this.ui.$imgTime.$lab.text = TimeUtils.formatSecond(leaveTime || 0, "mm:ss");
+    this.ui.$imgTime.$lab.text = TimeUtils.formatSecond(
+      leaveTime || 0,
+      "mm:ss",
+    );
   }
 
   // 展示结算弹窗时候，清除操作
@@ -160,7 +177,9 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   private onClickItem(index: number): void {
     if (this._preIdx > -1 && index === this._preIdx) {
       // 同一个牌，则清除
-      const boxCard = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
+      const boxCard = <BoxCard>(
+        this._list.getCell(index).getChildByName("boxCard")
+      );
       this._preIdx = -1;
       ComUtils.setScale(boxCard, INIT_SCALE);
       this.setSelect(boxCard, false);
@@ -171,14 +190,18 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
-      const curItem = <BoxCard>this._list.getCell(index).getChildByName("boxCard");
-      const preItem = <BoxCard>this._list.getCell(this._preIdx).getChildByName("boxCard");
+      const curItem = <BoxCard>(
+        this._list.getCell(index).getChildByName("boxCard")
+      );
+      const preItem = <BoxCard>(
+        this._list.getCell(this._preIdx).getChildByName("boxCard")
+      );
       const paths = this._proxy.model.findPath(preItemData, curItemData);
       if (curItemData && curItemData.checkSame(preItemData) && !!paths.length) {
         ComUtils.setScale(curItem, BIG_SCALE);
         this.setSelect(curItem, true);
         this.addScore();
-        const p = paths.map(item => {
+        const p = paths.map((item) => {
           return { x: item[1] - 1, y: item[0] - 1 };
         });
         this.animateDrawLine(p, [curItem, index, preItem, this._preIdx]);
@@ -223,7 +246,9 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
 
   private updateScore(): void {
     const lab = this.ui.$labScore;
-    lab.text = "得分：" + `[color=${this._proxy.model.levelScore >= 0 ? UIColorBlackStr.GREEN : UIColorBlackStr.RED}]${this._proxy.model.levelScore}[/color]`;
+    lab.text =
+      "得分：" +
+      `[color=${this._proxy.model.levelScore >= 0 ? UIColorBlackStr.GREEN : UIColorBlackStr.RED}]${this._proxy.model.levelScore}[/color]`;
   }
 
   // 分数变化飘字提示
@@ -236,11 +261,20 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     label.color = UIColorStr.WHITE;
     label.y = 200;
     this.ui.addChild(label);
-    base.tweenMgr.get(label).to({ y: 80, alpha: 0.4 }, 800, null, CallBack.alloc(null, () => {
-      resetLabel(label);
-      label.removeSelf();
-      base.poolMgr.free(label);
-    }, true));
+    base.tweenMgr.get(label).to(
+      { y: 80, alpha: 0.4 },
+      800,
+      null,
+      CallBack.alloc(
+        null,
+        () => {
+          resetLabel(label);
+          label.removeSelf();
+          base.poolMgr.free(label);
+        },
+        true,
+      ),
+    );
   }
 
   private resetScore(): void {
@@ -270,7 +304,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     const cardList = this._proxy.model.getTipsCardDataList();
     if (cardList.length) {
       const cells = this._list.cells || [];
-      for (let card of cardList) {
+      for (const card of cardList) {
         const idx = card.row * this._proxy.model.col + card.col;
         const cardItem = <BoxCard>cells[idx].getChildByName("boxCard");
         if (cardItem) {
@@ -302,12 +336,12 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     }
   }
 
-// noinspection JSUnusedGlobalSymbols
+  // noinspection JSUnusedGlobalSymbols
   public onClickRule(): void {
     facade.openView(ModuleName.MISC, MiscViewType.RULE, ruleDesc);
   }
 
-// noinspection JSUnusedGlobalSymbols
+  // noinspection JSUnusedGlobalSymbols
   public onClickBack(): void {
     this.close();
     facade.openView(ModuleName.MAHJONG, MahjongViewType.HOME);
@@ -316,7 +350,11 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   private _lineSprite: Sprite;
   private _glowSprite: Sprite;
 
-  private animateDrawLine(path: { x: number, y: number }[], item: any[], color: string = "#42e422"): void {
+  private animateDrawLine(
+    path: { x: number; y: number }[],
+    item: any[],
+    color: string = "#42e422",
+  ): void {
     const tileWidth = 52;
     const tileHeight = 70;
     const offsetX = tileWidth / 2;
@@ -345,9 +383,12 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     const time = this.getEffectTime(path);
 
     const _this = this;
-    const glowPoints: Laya.Point[] = path.map(p => new Laya.Point(
-      gPoint.x + p.x * tileWidth + offsetX + 4 + p.x * 3,
-      gPoint.y + p.y * tileHeight + offsetY + 4 + p.y * 3)
+    const glowPoints: Laya.Point[] = path.map(
+      (p) =>
+        new Laya.Point(
+          gPoint.x + p.x * tileWidth + offsetX + 4 + p.x * 3,
+          gPoint.y + p.y * tileHeight + offsetY + 4 + p.y * 3,
+        ),
     );
 
     function drawNextSegment(): void {
@@ -383,23 +424,52 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       const from1 = glowPoints[i];
       const to1 = glowPoints[i + 1];
       _this._glowSprite.pos(from1.x, from1.y);
-      Laya.Tween.to(_this._glowSprite, { x: to1.x, y: to1.y }, time, null, null, 0, true);
-      Laya.Tween.to(progress, { x: toX, y: toY }, time, null, Laya.Handler.create(null, () => {
-        i++;
-        drawNextSegment();
-      }), 0, true);
+      Laya.Tween.to(
+        _this._glowSprite,
+        { x: to1.x, y: to1.y },
+        time,
+        null,
+        null,
+        0,
+        true,
+      );
+      Laya.Tween.to(
+        progress,
+        { x: toX, y: toY },
+        time,
+        null,
+        Laya.Handler.create(null, () => {
+          i++;
+          drawNextSegment();
+        }),
+        0,
+        true,
+      );
 
       // 每帧重绘当前段的动态线条
       tempLine.frameLoop(1, null, () => {
         tempLine.graphics.clear();
-        tempLine.graphics.drawLine(fromX, fromY, progress.x, progress.y, color, 5);
+        tempLine.graphics.drawLine(
+          fromX,
+          fromY,
+          progress.x,
+          progress.y,
+          color,
+          5,
+        );
       });
     }
 
     drawNextSegment();
   }
 
-  private getEffectTime(path: { x: number, y: number }[]): number {
-    return path.length > 15 ? 8 : (path.length >= 10 ? 15 : (path.length >= 5 ? 30 : 50));
+  private getEffectTime(path: { x: number; y: number }[]): number {
+    return path.length > 15
+      ? 8
+      : path.length >= 10
+        ? 15
+        : path.length >= 5
+          ? 30
+          : 50;
   }
 }

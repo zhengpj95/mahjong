@@ -1,4 +1,5 @@
 /** 关联配置表名称 */
+import { CardConfig, LevelConfig } from "./config";
 
 // 多维表定义
 type ConfigMap2<K extends ConfigName> = Record<string, Record<string, ConfigMap[K]>>

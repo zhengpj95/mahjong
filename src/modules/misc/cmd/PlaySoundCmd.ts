@@ -12,7 +12,7 @@ import { MiscStorageKey } from "@def/misc";
 export class PlaySoundCmd extends BaseCommand {
   public exec(e: EventVo<any>): void {
     globalAdapter.storage.getItem(MiscStorageKey.PLAY_SOUND, (data: number) => {
-      if (!!data) {
+      if (data) {
         return;
       }
       SoundManager.playSound("resources/audio/mixkit-flop.wav");

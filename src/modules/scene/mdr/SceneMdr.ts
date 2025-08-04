@@ -1,5 +1,10 @@
 import { SceneMonsterVo, ScenePlayerVO } from "@base/entity/SceneEntityVO";
-import { Action, Direction, MonsterType, SceneEntityType, } from "@base/entity/EntityConst";
+import {
+  Action,
+  Direction,
+  MonsterType,
+  SceneEntityType,
+} from "@base/entity/EntityConst";
 import { ScenePlayer } from "@base/entity/ScenePlayer";
 import { SceneMonster } from "@base/entity/SceneMonster";
 import { SceneEntity } from "@base/entity/SceneEntity";

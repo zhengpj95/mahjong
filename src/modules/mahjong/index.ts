@@ -16,6 +16,7 @@ export class MahjongModule extends BaseModule {
   }
 
   protected initCmd(): void {
+    //
   }
 
   protected initMdr(): void {
@@ -27,5 +28,4 @@ export class MahjongModule extends BaseModule {
   protected initProxy(): void {
     this.regProxy(ProxyType.MAHJONG, MahjongProxy);
   }
-
 }

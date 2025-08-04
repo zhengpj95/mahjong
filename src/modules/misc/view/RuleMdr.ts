@@ -16,9 +16,11 @@ export default class RuleMdr extends BaseMediator<Sprite> {
   }
 
   protected addEvents(): void {
+    //
   }
 
   protected initUI(): void {
+    //
   }
 
   protected onClose(): void {
@@ -26,9 +28,13 @@ export default class RuleMdr extends BaseMediator<Sprite> {
   }
 
   protected onOpen(): void {
-    const labDesc = <Label>this.ui.getChildByName("boxInfo").getChildByName("labDesc");
+    const labDesc = <Label>(
+      this.ui.getChildByName("boxInfo").getChildByName("labDesc")
+    );
     labDesc.text = this.params;
-    this._btnClose = <Image>this.ui.getChildByName("boxInfo").getChildByName("btnClose");
+    this._btnClose = <Image>(
+      this.ui.getChildByName("boxInfo").getChildByName("btnClose")
+    );
     this._btnClose.once(Laya.Event.CLICK, this, this.close);
   }
 }

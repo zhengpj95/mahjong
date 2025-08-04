@@ -1,4 +1,8 @@
-import { IMahjongResultParam, MahjongEvent, MahjongViewType } from "@def/mahjong";
+import {
+  IMahjongResultParam,
+  MahjongEvent,
+  MahjongViewType,
+} from "@def/mahjong";
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { ModuleName, ProxyType } from "@def/module-name";
@@ -26,6 +30,7 @@ export default class MahjongResultMdr extends BaseMediator<Sprite> {
   }
 
   protected addEvents(): void {
+    //
   }
 
   protected initUI(): void {
@@ -70,7 +75,9 @@ export default class MahjongResultMdr extends BaseMediator<Sprite> {
 
   private onClickNext(): void {
     const challengeAgain = this._param && this._param.type === 1;
-    console.warn(`MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`);
+    console.warn(
+      `MahjongResultMdr.onClickNext... challengeAgain:${challengeAgain}`,
+    );
     eventMgr.emit(MahjongEvent.UPDATE_NEXT, challengeAgain); // true 是重新挑战
     this.close();
   }

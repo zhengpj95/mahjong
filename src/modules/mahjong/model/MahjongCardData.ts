@@ -5,7 +5,7 @@
 
 import { CardData, getCardTypeRes } from "./MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { ConfigName } from "@configName";
+import { ConfigName } from "../../../3rd/config-name";
 import PoolObject = base.PoolObject;
 
 /**单张麻将的数据*/
@@ -40,7 +40,10 @@ export class MahjongCardData implements PoolObject {
     if (!this.isValid()) {
       return false;
     }
-    return data.cardData[0] === this.cardData[0] && data.cardData[1] === this.cardData[1];
+    return (
+      data.cardData[0] === this.cardData[0] &&
+      data.cardData[1] === this.cardData[1]
+    );
   }
 
   public checkPos(data: MahjongCardData): boolean {

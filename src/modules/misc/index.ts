@@ -24,5 +24,6 @@ export class MiscModule extends BaseModule {
   }
 
   protected initProxy(): void {
+    //
   }
 }
