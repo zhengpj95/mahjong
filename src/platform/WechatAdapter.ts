@@ -45,6 +45,7 @@ export class WechatAdapter implements IPlatformAdapter {
   private _gameClubButton?: WechatMinigame.GameClubButton;
 
   public showGameClubButton(): void {
+    console.log(`wx adapter show game club button...`);
     if (!this._gameClubButton && wx.createGameClubButton) {
       this._gameClubButton = wx.createGameClubButton({
         type: "text",
@@ -52,15 +53,15 @@ export class WechatAdapter implements IPlatformAdapter {
         icon: "dark",
         style: {
           left: 10,
-          top: 10,
-          width: 100,
-          height: 40,
-          lineHeight: 40,
+          top: 180,
+          width: 80,
+          height: 25,
+          lineHeight: 25,
           backgroundColor: "#000000",
           color: "#ffffff",
           textAlign: "center",
-          fontSize: 16,
-          borderRadius: 4,
+          fontSize: 14,
+          borderRadius: 6,
         },
       });
       this._gameClubButton.onTap(this.onClickGameClub.bind(this));
@@ -68,7 +69,7 @@ export class WechatAdapter implements IPlatformAdapter {
   }
 
   private onClickGameClub(): void {
-    console.log(`wx adapter click game club button`);
+    console.log(`wx adapter click game club button...`);
     const pageManager = wx.createPageManager();
     pageManager
       .load({
@@ -89,6 +90,7 @@ export class WechatAdapter implements IPlatformAdapter {
   }
 
   public hideGameClubButton(): void {
+    console.log(`wx adapter hide game club button...`);
     if (this._gameClubButton) {
       this._gameClubButton.offTap(this.onClickGameClub);
       this._gameClubButton.hide();
