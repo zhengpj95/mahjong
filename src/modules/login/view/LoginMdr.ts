@@ -37,9 +37,9 @@ export class LoginMdr extends BaseMediator<LoginView> {
         CallBack.alloc(this, this.onLoadComplete),
       );
 
-    if (_REVIEW_VERSION_) {
+    if (REVIEW_VERSION) {
       const versionLabel = new Laya.Label();
-      versionLabel.text = `审核版本：v${_REVIEW_VERSION_}`;
+      versionLabel.text = `审核版本：v${REVIEW_VERSION}`;
       versionLabel.fontSize = 22;
       versionLabel.color = "#ff0000";
       versionLabel.right = 20;

@@ -8,21 +8,13 @@ import { initEnhancedConsole } from "@base/logger";
 import { LoginViewType } from "@def/login";
 import facade = base.facade;
 
-function initDebug(): void {
-  // @ts-ignore 宏定义
-  window._DEBUG_ = DEBUG;
-  // @ts-ignore 宏定义
-  window._REVIEW_VERSION_ = REVIEW_VERSION;
-}
-
 /**
  * @author zpj
  * @date 2025/5/16
  */
 export async function main() {
   console.log("Hello LayaAir! Game main!");
-  initDebug();
-  if (_DEBUG_) {
+  if (DEBUG) {
     initEnhancedConsole();
   }
 

@@ -16,6 +16,9 @@ export interface IPlatformAdapter {
   share?: () => void;
   pay?: () => void;
 
+  showGameClubButton?: () => void;
+  hideGameClubButton?: () => void;
+
   readonly storage: IPlatformStorage;
 }
 

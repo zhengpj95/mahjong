@@ -5,5 +5,15 @@
 
 import { AdapterFactory } from "./AdapterFactory";
 
-export const globalAdapter = AdapterFactory.getAdapter();
+export function createAdapter() {
+  const adapter = AdapterFactory.getAdapter();
+  if (adapter) {
+    console.log(`Adapter created: ${adapter.constructor.name}`);
+  } else {
+    console.error(`Failed to create adapter.`);
+  }
+  return adapter;
+}
+
+export const globalAdapter = createAdapter();
 globalAdapter?.share?.();

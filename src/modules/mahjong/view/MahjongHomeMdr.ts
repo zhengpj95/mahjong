@@ -14,9 +14,6 @@ import { MiscStorageKey } from "@def/misc";
  * @date 2025/1/21
  */
 export default class MahjongHomeMdr extends BaseMediator<MahjongHomeView> {
-  // 游戏圈按钮
-  private _gameClubButton?: WechatMinigame.GameClubButton;
-
   constructor() {
     super(LayerIndex.MAIN, "scene/mahjong/MahjongHome.ls");
   }
@@ -30,15 +27,12 @@ export default class MahjongHomeMdr extends BaseMediator<MahjongHomeView> {
   }
 
   protected onClose(): void {
-    if (this._gameClubButton) {
-      this._gameClubButton.offTap(this.onClickGameClub);
-      this._gameClubButton.hide();
-      this._gameClubButton = undefined;
-    }
+    globalAdapter?.hideGameClubButton?.();
   }
 
   protected onOpen(): void {
-    this.ui.$btnHoodle.visible = _DEBUG_ ?? false;
+    // @ts-ignore
+    this.ui.$btnHoodle.visible = DEBUG ?? false;
     const proxy = base.facade.getProxy<MahjongProxy>(
       ModuleName.MAHJONG,
       ProxyType.MAHJONG,
@@ -52,22 +46,7 @@ export default class MahjongHomeMdr extends BaseMediator<MahjongHomeView> {
       this.ui.$btnSound.dataSource = !!data;
     });
 
-    this._gameClubButton = wx.createGameClubButton({
-      type: "text",
-      text: "进入游戏圈",
-      icon: "dark",
-      style: {
-        left: 10,
-        top: 180,
-        width: 40,
-        height: 25,
-        backgroundColor: "#ffffff7f",
-        textAlign: "center",
-        fontSize: 12,
-      },
-      hasRedDot: false,
-    });
-    this._gameClubButton?.onTap(this.onClickGameClub);
+    globalAdapter?.showGameClubButton?.();
   }
 
   // noinspection JSUnusedGlobalSymbols
