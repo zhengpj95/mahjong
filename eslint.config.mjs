@@ -65,7 +65,7 @@ export default [
       "@typescript-eslint/no-non-null-assertion": "warn", // 允许非空断言
       "@typescript-eslint/no-require-imports": "error", // 禁止使用 require 导入
     },
-    ignores: ["src/3rd/**", "src/3rd-types/**"], // 忽略3rd目录和src/3rd-types目录
+    // ignores: ["src/3rd/**", "src/3rd-types/**"], // 忽略3rd目录和src/3rd-types目录
   },
   // 💅 可选：Prettier 配合使用（统一格式）
   {
@@ -78,6 +78,14 @@ export default [
   },
   // 全局忽略文件夹
   {
-    ignores: ["dist/**", "node_modules/**", "assets/**", "bin/**", "engine/**"],
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      "assets/**",
+      "bin/**",
+      "engine/**",
+      "src/3rd/*.js",
+      "src/3rd-types/**",
+    ],
   },
 ];
