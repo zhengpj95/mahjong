@@ -4,16 +4,16 @@ import LayerIndex = base.LayerIndex;
 import { ModuleName, ProxyType } from "@def/module-name";
 import { MahjongViewType } from "@def/mahjong";
 import { HoodleViewType } from "@def/hoodle";
-import { MahjongHomeView } from "@3rd-types/mahjong";
 import { MahjongProxy } from "../model/MahjongProxy";
 import { globalAdapter } from "@platform/index";
 import { MiscStorageKey } from "@def/misc";
+import { IMahjongHomeView } from "@3rd-types/mahjong";
 
 /**
  * @author zpj
  * @date 2025/1/21
  */
-export default class MahjongHomeMdr extends BaseMediator<MahjongHomeView> {
+export default class MahjongHomeMdr extends BaseMediator<IMahjongHomeView> {
   constructor() {
     super(LayerIndex.MAIN, "scene/mahjong/MahjongHome.ls");
   }

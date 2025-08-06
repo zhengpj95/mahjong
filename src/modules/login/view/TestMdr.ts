@@ -1,4 +1,4 @@
-import { TestView } from "@3rd-types/login";
+import { ITestView } from "@3rd-types/login";
 import BaseMediator = base.BaseMediator;
 import LayerIndex = base.LayerIndex;
 import Event = Laya.Event;
@@ -8,7 +8,7 @@ import ITouchInfo = Laya.ITouchInfo;
  * @author zpj
  * @date 2025/7/8
  */
-export class TestMdr extends BaseMediator<TestView> {
+export class TestMdr extends BaseMediator<ITestView> {
   public constructor() {
     super(LayerIndex.MAIN, "scene/login/Test.ls");
   }

@@ -94,7 +94,8 @@
           "_$comp": [
             {
               "_$type": "3ea598d3-269f-4c38-b159-72d3e3afa6f9",
-              "scriptPath": "../src/script/ClickScale.ts"
+              "scriptPath": "../src/script/ClickScale.ts",
+              "mdrClickCall": ""
             }
           ]
         }

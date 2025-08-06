@@ -9,7 +9,7 @@ import Sprite = Laya.Sprite;
 import CircleCollider = Laya.CircleCollider;
 import facade = base.facade;
 import BoxCollider = Laya.BoxCollider;
-import { HoodleView } from "@3rd-types/hoodle";
+import { IHoodleView } from "@3rd-types/hoodle";
 import { ModuleName } from "@def/module-name";
 import { MahjongViewType } from "@def/mahjong";
 
@@ -17,7 +17,7 @@ import { MahjongViewType } from "@def/mahjong";
  * @author zpj
  * @date 2025/5/20
  */
-export class HoodleMdr extends BaseMediator<HoodleView> {
+export class HoodleMdr extends BaseMediator<IHoodleView> {
   private _initPoint: { x: number; y: number };
 
   private _blockRectPrefab: Laya.PrefabImpl;

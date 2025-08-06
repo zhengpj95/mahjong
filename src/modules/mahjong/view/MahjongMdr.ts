@@ -4,7 +4,7 @@ import { MahjongEvent, MahjongScoreType, MahjongViewType } from "@def/mahjong";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { ModuleName, ProxyType } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
-import { MahjongListItemRender, MahjongView } from "@3rd-types/mahjong";
+import { IMahjongListItemRender, IMahjongView } from "@3rd-types/mahjong";
 import { TimeUtils } from "@base/utils/TimeUtils";
 import { UIColorBlackStr, UIColorStr } from "@def/color";
 import List = Laya.List;
@@ -41,7 +41,7 @@ function resetLabel(lab: Label): void {
 /**
  * @date 2024/12/22
  */
-export default class MahjongMdr extends BaseMediator<MahjongView> {
+export default class MahjongMdr extends BaseMediator<IMahjongView> {
   private _proxy: MahjongProxy;
   private _list: List;
   private _preIdx = -1;
@@ -149,7 +149,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     this._proxy.model.showResult({ type: 1 });
   }
 
-  private onRenderListItem(item: MahjongListItemRender, index: number): void {
+  private onRenderListItem(item: IMahjongListItemRender, index: number): void {
     const boxCard = item.$boxCard;
     const img = boxCard.$img;
     const data: MahjongCardData = item.dataSource;
@@ -167,7 +167,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   private onClickItem(index: number): void {
     if (this._preIdx > -1 && index === this._preIdx) {
       // 同一个牌，则清除
-      const boxCard = (<MahjongListItemRender>this._list.getCell(index))
+      const boxCard = (<IMahjongListItemRender>this._list.getCell(index))
         .$boxCard;
       this._preIdx = -1;
       ComUtils.setScale(boxCard, INIT_SCALE);
@@ -179,9 +179,9 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
-      const curItem = (<MahjongListItemRender>this._list.getCell(index))
+      const curItem = (<IMahjongListItemRender>this._list.getCell(index))
         .$boxCard;
-      const preItem = (<MahjongListItemRender>this._list.getCell(this._preIdx))
+      const preItem = (<IMahjongListItemRender>this._list.getCell(this._preIdx))
         .$boxCard;
       const paths = this._proxy.model.findPath(preItemData, curItemData);
       if (curItemData && curItemData.checkSame(preItemData) && !!paths.length) {
@@ -200,7 +200,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       }
       this._preIdx = -1;
     } else {
-      const item = <MahjongListItemRender>this._list.getCell(index);
+      const item = <IMahjongListItemRender>this._list.getCell(index);
       const cardData = <MahjongCardData>item.dataSource;
       if (!cardData || !cardData.isValid()) {
         this._preIdx = -1;
@@ -270,7 +270,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   }
 
   private clearCardItem(
-    box: MahjongListItemRender["$boxCard"],
+    box: IMahjongListItemRender["$boxCard"],
     index: number,
   ): void {
     const idx = index;
@@ -282,7 +282,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   }
 
   private setSelect(
-    boxCard: MahjongListItemRender["$boxCard"],
+    boxCard: IMahjongListItemRender["$boxCard"],
     isSel = false,
   ): void {
     const imgSel = boxCard?.$imgSelected;
@@ -297,7 +297,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       const cells = this._list.cells || [];
       for (const card of cardList) {
         const idx = card.row * this._proxy.model.col + card.col;
-        const cardItem = (<MahjongListItemRender>cells[idx]).$boxCard;
+        const cardItem = (<IMahjongListItemRender>cells[idx]).$boxCard;
         if (cardItem) {
           ComUtils.setTween(cardItem);
         }
