@@ -60,7 +60,7 @@ class GenUISceneHook implements IEditorEnv.ISceneHook {
         console.log(`✅ gen ui 执行成功`);
       })
       .catch((err) => {
-        console.log(`❌ gen ui 执行错误 `, err);
+        console.log(`❌ gen ui 执行错误 `, err, filePath);
       });
   }
 }

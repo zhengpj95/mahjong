@@ -3,7 +3,7 @@ import LayerIndex = base.LayerIndex;
 import tweenMgr = base.tweenMgr;
 import CallBack = base.CallBack;
 import facade = base.facade;
-import { LoginView } from "@3rd-types/login";
+import { ILoginView } from "@3rd-types/login";
 import { MahjongViewType } from "@def/mahjong";
 import { ModuleName } from "@def/module-name";
 
@@ -11,7 +11,7 @@ import { ModuleName } from "@def/module-name";
  * @author zpj
  * @date 2025/6/13
  */
-export class LoginMdr extends BaseMediator<LoginView> {
+export class LoginMdr extends BaseMediator<ILoginView> {
   constructor() {
     super(LayerIndex.MAIN, "scene/login/Login.ls");
   }

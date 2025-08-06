@@ -50,6 +50,7 @@ export class GenUIDts {
     const map = new Map<string, ViewInfo>();
     for (const file of files) {
       const content = await fs.readFile(file, { encoding: "utf-8" });
+      if (!content) continue;
       const child = (JSON.parse(content) as IChildNode)?._$child ?? [];
 
       // @ts-ignore
@@ -177,7 +178,7 @@ export class GenUIDts {
       }
       lines.push(`/** ${lsKey} */\n`);
       lines.push(
-        `export interface ${basename}${isRender ? "Render" : "View"} extends Laya.${isRender ? "Box" : "Scene"} {\n`,
+        `export interface I${basename}${isRender ? "Render" : "View"} extends Laya.${isRender ? "Box" : "Scene"} {\n`,
       );
       for (const k in view) {
         if (typeof view[k] === "string") continue;

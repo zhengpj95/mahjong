@@ -6,11 +6,11 @@ import {
 import { MahjongProxy } from "../model/MahjongProxy";
 import ComUtils from "@base/utils/ComUtils";
 import { ModuleName, ProxyType } from "@def/module-name";
+import { IMahjongResultView } from "@3rd-types/mahjong";
 import Label = Laya.Label;
 import eventMgr = base.eventMgr;
 import BaseMediator = base.BaseMediator;
 import facade = base.facade;
-import Sprite = Laya.Sprite;
 import Image = Laya.Image;
 import LayerIndex = base.LayerIndex;
 
@@ -18,7 +18,7 @@ import LayerIndex = base.LayerIndex;
  * 结算弹窗
  * @date 2025/1/19
  */
-export default class MahjongResultMdr extends BaseMediator<Sprite> {
+export default class MahjongResultMdr extends BaseMediator<IMahjongResultView> {
   private _lab: Label;
   private _proxy: MahjongProxy;
   private _param?: IMahjongResultParam;
