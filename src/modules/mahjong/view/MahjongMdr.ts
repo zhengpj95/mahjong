@@ -4,12 +4,11 @@ import { MahjongEvent, MahjongScoreType, MahjongViewType } from "@def/mahjong";
 import { MahjongCardData } from "../model/MahjongCardData";
 import { ModuleName, ProxyType } from "@def/module-name";
 import { MiscEvent, MiscViewType } from "@def/misc";
-import { MahjongView } from "@3rd-types/mahjong";
+import { MahjongListItemRender, MahjongView } from "@3rd-types/mahjong";
 import { TimeUtils } from "@base/utils/TimeUtils";
 import { UIColorBlackStr, UIColorStr } from "@def/color";
 import List = Laya.List;
 import Handler = Laya.Handler;
-import Box = Laya.Box;
 import Image = Laya.Image;
 import Event = Laya.Event;
 import BaseMediator = base.BaseMediator;
@@ -20,15 +19,6 @@ import Sprite = Laya.Sprite;
 import Tween = Laya.Tween;
 import LayerIndex = base.LayerIndex;
 import Label = Laya.Label;
-
-type BoxRender = Box & {
-  boxCard: BoxCard;
-};
-
-type BoxCard = Box & {
-  img: Image;
-  imgSelected: Image;
-};
 
 const INIT_SCALE = 0.4;
 const BIG_SCALE = 0.42;
@@ -159,9 +149,9 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     this._proxy.model.showResult({ type: 1 });
   }
 
-  private onRenderListItem(item: BoxRender, index: number): void {
-    const boxCard = <BoxCard>item.getChildByName("boxCard");
-    const img = ComUtils.getNodeByNameList<Image>(boxCard, ["img"]);
+  private onRenderListItem(item: MahjongListItemRender, index: number): void {
+    const boxCard = item.$boxCard;
+    const img = boxCard.$img;
     const data: MahjongCardData = item.dataSource;
     if (!data) {
       img.skin = "";
@@ -177,9 +167,8 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
   private onClickItem(index: number): void {
     if (this._preIdx > -1 && index === this._preIdx) {
       // 同一个牌，则清除
-      const boxCard = <BoxCard>(
-        this._list.getCell(index).getChildByName("boxCard")
-      );
+      const boxCard = (<MahjongListItemRender>this._list.getCell(index))
+        .$boxCard;
       this._preIdx = -1;
       ComUtils.setScale(boxCard, INIT_SCALE);
       this.setSelect(boxCard, false);
@@ -190,12 +179,10 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     if (this._preIdx > -1 && index !== this._preIdx) {
       const curItemData: MahjongCardData = this._list.getItem(index);
       const preItemData: MahjongCardData = this._list.getItem(this._preIdx);
-      const curItem = <BoxCard>(
-        this._list.getCell(index).getChildByName("boxCard")
-      );
-      const preItem = <BoxCard>(
-        this._list.getCell(this._preIdx).getChildByName("boxCard")
-      );
+      const curItem = (<MahjongListItemRender>this._list.getCell(index))
+        .$boxCard;
+      const preItem = (<MahjongListItemRender>this._list.getCell(this._preIdx))
+        .$boxCard;
       const paths = this._proxy.model.findPath(preItemData, curItemData);
       if (curItemData && curItemData.checkSame(preItemData) && !!paths.length) {
         ComUtils.setScale(curItem, BIG_SCALE);
@@ -213,14 +200,14 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       }
       this._preIdx = -1;
     } else {
-      const item = this._list.getCell(index);
+      const item = <MahjongListItemRender>this._list.getCell(index);
       const cardData = <MahjongCardData>item.dataSource;
       if (!cardData || !cardData.isValid()) {
         this._preIdx = -1;
         return;
       }
       this._preIdx = index;
-      const boxCard = <BoxCard>item.getChildByName("boxCard");
+      const boxCard = item.$boxCard;
       ComUtils.setScale(boxCard, BIG_SCALE);
       this.setSelect(boxCard, true);
     }
@@ -282,19 +269,23 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
     this.ui.$labScore.text = `得分：[color=${UIColorBlackStr.GREEN}]0[/color]`;
   }
 
-  private clearCardItem(box: BoxCard, index: number): void {
+  private clearCardItem(
+    box: MahjongListItemRender["$boxCard"],
+    index: number,
+  ): void {
     const idx = index;
-    // ComUtils.setTween(box, true, Handler.create(this, () => {
-    const curImg = box.getChildByName("img") as Image;
+    const curImg = box.$img;
     curImg.skin = "";
-    const imgSel = box.getChildByName("imgSelected") as Image;
+    const imgSel = box.$imgSelected;
     imgSel.visible = false;
     this._proxy.model.deleteCard(idx);
-    // }));
   }
 
-  private setSelect(boxCard: BoxCard, isSel = false): void {
-    const imgSel = ComUtils.getNodeByNameList<Image>(boxCard, ["imgSelected"]);
+  private setSelect(
+    boxCard: MahjongListItemRender["$boxCard"],
+    isSel = false,
+  ): void {
+    const imgSel = boxCard?.$imgSelected;
     if (imgSel) imgSel.visible = isSel;
   }
 
@@ -306,7 +297,7 @@ export default class MahjongMdr extends BaseMediator<MahjongView> {
       const cells = this._list.cells || [];
       for (const card of cardList) {
         const idx = card.row * this._proxy.model.col + card.col;
-        const cardItem = <BoxCard>cells[idx].getChildByName("boxCard");
+        const cardItem = (<MahjongListItemRender>cells[idx]).$boxCard;
         if (cardItem) {
           ComUtils.setTween(cardItem);
         }

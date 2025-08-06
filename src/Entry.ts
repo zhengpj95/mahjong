@@ -6,6 +6,7 @@ import { GameCfg } from "@base/cfg/GameCfg";
 import { FrameUpdateMgr } from "@base/FrameUpdateMgr";
 import { initEnhancedConsole } from "@base/logger";
 import { LoginViewType } from "@def/login";
+import { injectList } from "@base/utils/LayaUtils";
 import facade = base.facade;
 
 /**
@@ -24,6 +25,7 @@ export async function main() {
   initLoop();
   base.baseInit();
   GameCfg.init();
+  injectList();
   initModules();
 
   facade.openView(ModuleName.LOGIN, LoginViewType.LOGIN);

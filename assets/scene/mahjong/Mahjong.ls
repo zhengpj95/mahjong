@@ -273,8 +273,9 @@
           "_$child": [
             {
               "_$id": "aspmi8ku",
+              "_$var": true,
               "_$type": "Box",
-              "name": "boxCard",
+              "name": "$boxCard",
               "x": 28,
               "y": 38,
               "width": 130,
@@ -287,7 +288,7 @@
                 {
                   "_$id": "olwi7anp",
                   "_$type": "Image",
-                  "name": "img",
+                  "name": "$img",
                   "width": 130,
                   "height": 175,
                   "_mouseState": 2,
@@ -298,7 +299,7 @@
                 {
                   "_$id": "adrvim4g",
                   "_$type": "Image",
-                  "name": "imgSelected",
+                  "name": "$imgSelected",
                   "x": -6,
                   "y": -6,
                   "width": 142,
