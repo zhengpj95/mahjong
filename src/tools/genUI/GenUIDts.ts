@@ -9,6 +9,7 @@ interface NodeInfo {
   name?: string;
   node?: NodeInfo;
   comp?: string[];
+  varVal?: boolean;
 
   [key: string]: any;
 }
@@ -33,6 +34,7 @@ interface IChildNode {
   _$prefab?: string;
   _$child?: IChildNode[];
   _$comp?: IComponentNode[];
+  _$var?: boolean;
 
   _$override?: string;
 
@@ -76,6 +78,7 @@ export class GenUIDts {
       const fileName = file.replace(toolsObj.ProjectRoot, "");
       map.set(fileName, obj);
     }
+    console.log(11111, map);
     const fileContent = this.createViewStr(map);
     await this.writeDtsFile(fileContent, basename);
   }
@@ -131,7 +134,7 @@ export class GenUIDts {
       }
       return;
     }
-    if (!name?.startsWith("$") && !isPrefab) {
+    if (!name?.startsWith("$") && !child._$var && !isPrefab) {
       return;
     }
     let obj: NodeInfo = parent[name];
@@ -141,6 +144,7 @@ export class GenUIDts {
     obj.id = child._$id;
     obj.name = name;
     obj.type = `Laya.${child._$type}`;
+    obj.varVal = !!child._$var;
     if (child._$comp) {
       const compList: string[] = [];
       for (const c of child._$comp) {
@@ -156,7 +160,7 @@ export class GenUIDts {
     if (child?._$child?.length) {
       for (const c of child._$child) {
         const cname: string = c.name;
-        if (!cname?.startsWith("$")) {
+        if (!cname?.startsWith("$") && !c._$var) {
           continue;
         }
         if (!obj.node) obj.node = {};
@@ -190,7 +194,7 @@ export class GenUIDts {
   }
 
   public static createViewNode(node: NodeInfo, deep = 1): string[] {
-    if (!node?.name?.startsWith("$")) return [];
+    // if (!node?.name?.startsWith("$") && !node.varVal) return [];
     const lines: string[] = ["  ".repeat(deep) + `${node.name}: ${node.type}`];
     if (node?.node && Object.keys(node?.node).length) {
       let rst1: string[] = [];
@@ -230,6 +234,7 @@ export class GenUIDts {
     obj.id = prefabJson._$id;
     obj.type = `Laya.${prefabJson._$type}`;
     obj.name = name;
+    obj.varVal = !!prefabJson._$var;
     if (prefabJson._$child?.length) {
       obj.node = {};
       for (const c of prefabJson._$child) {
