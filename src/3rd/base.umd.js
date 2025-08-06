@@ -1312,15 +1312,29 @@
       }
       return mdr;
   }
-  function buildNodeRecursive(node, parent) {
+  function buildNodeRecursive(node, parent, rstObj) {
       var _a;
-      if (!((_a = node === null || node === undefined ? undefined : node.name) === null || _a === undefined ? undefined : _a.startsWith("$"))) {
+      if (!((_a = rstObj === null || rstObj === undefined ? undefined : rstObj.child) === null || _a === undefined ? undefined : _a[node.name])) {
           return;
       }
       parent[node.name] = node;
       const children = node["_children"];
       for (const child of children) {
-          buildNodeRecursive(child, node);
+          buildNodeRecursive(child, node, rstObj.child[node.name]);
+      }
+  }
+  function buildItemRenderRecursive(itemRender, rstObj) {
+      if (!(itemRender === null || itemRender === undefined ? undefined : itemRender.length) || !rstObj)
+          return;
+      rstObj.child = {};
+      for (const item of itemRender) {
+          if (item.name.startsWith("$") || item._$var) {
+              rstObj.child[item.name] = {};
+              rstObj.child[item.name].child = {};
+              if (item._$child) {
+                  buildItemRenderRecursive(item._$child, rstObj.child[item.name]);
+              }
+          }
       }
   }
   class BaseMediator extends BaseEmitter {
@@ -1365,10 +1379,15 @@
               Laya.loader
                   .load(this.uiUrl, Laya.Loader.HIERARCHY)
                   .then((r) => {
+                  var _a;
+                  const rstObj = {};
+                  if ((_a = r.data) === null || _a === undefined ? undefined : _a._$child) {
+                      buildItemRenderRecursive(r.data._$child, rstObj);
+                  }
                   const s = r.create();
                   const children = s["_children"];
                   for (const child of children) {
-                      buildNodeRecursive(child, s);
+                      buildNodeRecursive(child, s, rstObj);
                   }
                   this.onUILoaded(s);
               });
