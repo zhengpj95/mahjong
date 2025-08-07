@@ -1,0 +1,185 @@
+{
+  "_$ver": 1,
+  "_$id": "fp278ij1",
+  "_$type": "Widget",
+  "name": "Root",
+  "width": 500,
+  "height": 250,
+  "_$child": [
+    {
+      "_$id": "hfmd5ijg",
+      "_$prefab": "38b67dfb-cb57-14d2-6a55-ace1d3585b0c",
+      "name": "InfoField",
+      "active": true,
+      "x": 20,
+      "y": 6,
+      "width": 460,
+      "visible": true,
+      "touchable": true,
+      "grayed": false,
+      "asGroup": false,
+      "height": 30,
+      "_$child": [
+        {
+          "_$override": "n31_9deq",
+          "name": "title",
+          "text": "输入文件夹名称，生成皮肤对应的 d.ts 接口文件",
+          "style": {
+            "fontSize": 13
+          }
+        }
+      ]
+    },
+    {
+      "_$id": "b6lb3mln",
+      "_$type": "Label",
+      "name": "boxSelectFolder",
+      "x": 20,
+      "y": 60,
+      "width": 100,
+      "height": 20,
+      "title": "皮肤所在文件夹\n",
+      "titleColor": 12434877,
+      "titleFontSize": 12,
+      "titleWidget": {
+        "_$ref": "x994mz01"
+      },
+      "_$child": [
+        {
+          "_$id": "x994mz01",
+          "_$type": "TextField",
+          "name": "title",
+          "width": 100,
+          "height": 20,
+          "relations": [
+            {
+              "_$type": "Relation",
+              "target": {
+                "_$ref": "b6lb3mln"
+              },
+              "data": [
+                1,
+                0,
+                2,
+                0
+              ]
+            }
+          ],
+          "text": "皮肤所在文件夹\n",
+          "style": {
+            "fontSize": 12,
+            "color": 12434877,
+            "valign": 1
+          }
+        },
+        {
+          "_$id": "la7mtztu",
+          "_$prefab": "25b38c03-cefe-a4c8-cad2-9f64513caa90",
+          "name": "textInput",
+          "active": true,
+          "x": 130,
+          "y": 0,
+          "width": 300,
+          "height": 20,
+          "visible": true,
+          "touchable": true
+        },
+        {
+          "_$id": "pweepbx9",
+          "_$prefab": "f3318a8f-335c-64de-ab3c-748f5497b68e",
+          "name": "IconButton",
+          "active": true,
+          "x": 437,
+          "y": -1,
+          "visible": true,
+          "touchable": true,
+          "icon": "res://c7efce74-55d8-14cf-1a50-1dd788a30aee"
+        }
+      ]
+    },
+    {
+      "_$id": "9vzu88yr",
+      "_$type": "Label",
+      "name": "boxSelectAll",
+      "x": 20,
+      "y": 101,
+      "width": 100,
+      "height": 20,
+      "title": "编译全部皮肤",
+      "titleColor": 12434877,
+      "titleFontSize": 12,
+      "titleWidget": {
+        "_$ref": "dsb5x7e6"
+      },
+      "_$child": [
+        {
+          "_$id": "dsb5x7e6",
+          "_$type": "TextField",
+          "name": "title",
+          "width": 100,
+          "height": 20,
+          "relations": [
+            {
+              "_$type": "Relation",
+              "target": {
+                "_$ref": "9vzu88yr"
+              },
+              "data": [
+                1,
+                0,
+                2,
+                0
+              ]
+            }
+          ],
+          "text": "编译全部皮肤",
+          "style": {
+            "fontSize": 12,
+            "color": 12434877,
+            "valign": 1
+          }
+        },
+        {
+          "_$id": "ntnndk30",
+          "_$prefab": "9fb25abf-164e-b484-f8a9-a7f8d1dd4843",
+          "name": "Checkbox",
+          "active": true,
+          "x": 130,
+          "y": 0,
+          "width": 16,
+          "height": 19,
+          "visible": true,
+          "touchable": true,
+          "_$child": [
+            {
+              "_$override": "n5",
+              "text": "i18n:vjqof2j6:oi8rl|",
+              "width": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_$id": "xpxofcod",
+      "_$prefab": "f72410c4-a597-e4ec-2ae3-d694946af037",
+      "name": "btnClose",
+      "active": true,
+      "x": 490,
+      "y": -8,
+      "visible": true,
+      "touchable": true
+    },
+    {
+      "_$id": "q3mx0ywt",
+      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
+      "name": "btnConfirm",
+      "active": true,
+      "x": 150,
+      "y": 143,
+      "visible": true,
+      "touchable": true,
+      "title": "构建"
+    }
+  ]
+}

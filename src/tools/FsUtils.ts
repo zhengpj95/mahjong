@@ -66,4 +66,46 @@ export class FsUtils {
     const map = await this.walkPrefab();
     return map.get(uuid)?.[1] ?? "";
   }
+
+  /**
+   * 异步获取某个目录下的所有子目录
+   * @param dirPath 目标路径
+   * @param options 配置项：是否递归、是否返回完整路径
+   * @returns 子文件夹名称或路径数组
+   */
+  public static async getSubdirectories(
+    dirPath: string,
+    options: {
+      recursive?: boolean;
+      fullPath?: boolean;
+    } = {},
+  ): Promise<string[]> {
+    const { recursive = false, fullPath = false } = options;
+    const result: string[] = [];
+
+    try {
+      const entries = await fs.readdir(dirPath, {
+        withFileTypes: true,
+      });
+
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          const subPath = path.join(dirPath, entry.name);
+          result.push(fullPath ? subPath : entry.name);
+
+          if (recursive) {
+            const subDirs = await this.getSubdirectories(subPath, {
+              recursive,
+              fullPath,
+            });
+            result.push(...subDirs);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("❌ FsUtils.getSubdirectories 读取目录失败:", err);
+    }
+
+    return result;
+  }
 }

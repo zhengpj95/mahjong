@@ -78,7 +78,6 @@ export class GenUIDts {
       const fileName = file.replace(toolsObj.ProjectRoot, "");
       map.set(fileName, obj);
     }
-    console.log(11111, map);
     const fileContent = this.createViewStr(map);
     await this.writeDtsFile(fileContent, basename);
   }

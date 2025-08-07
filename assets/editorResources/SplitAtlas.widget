@@ -39,8 +39,8 @@
       "width": 100,
       "height": 20,
       "title": "输入目录",
-      "titleColor": 16777215,
-      "titleFontSize": 16,
+      "titleColor": 12434877,
+      "titleFontSize": 12,
       "titleWidget": {
         "_$ref": "37pocme5"
       },
@@ -67,7 +67,8 @@
           ],
           "text": "输入目录",
           "style": {
-            "fontSize": 16,
+            "fontSize": 12,
+            "color": 12434877,
             "valign": 1
           }
         },
@@ -105,8 +106,8 @@
       "width": 100,
       "height": 20,
       "title": "输出目录",
-      "titleColor": 16777215,
-      "titleFontSize": 16,
+      "titleColor": 12434877,
+      "titleFontSize": 12,
       "titleWidget": {
         "_$ref": "5up9l90n"
       },
@@ -133,7 +134,8 @@
           ],
           "text": "输出目录",
           "style": {
-            "fontSize": 16,
+            "fontSize": 12,
+            "color": 12434877,
             "valign": 1
           }
         },
@@ -193,8 +195,8 @@
       "width": 100,
       "height": 20,
       "title": "切割方式",
-      "titleColor": 16777215,
-      "titleFontSize": 16,
+      "titleColor": 12434877,
+      "titleFontSize": 12,
       "titleWidget": {
         "_$ref": "lta60ylr"
       },
@@ -221,7 +223,8 @@
           ],
           "text": "切割方式",
           "style": {
-            "fontSize": 16,
+            "fontSize": 12,
+            "color": 12434877,
             "valign": 1
           }
         },
@@ -235,7 +238,7 @@
           "width": 330,
           "visible": true,
           "touchable": true,
-          "titleFontSize": 14,
+          "titleFontSize": 12,
           "items": [
             "Atlas",
             "Json",
