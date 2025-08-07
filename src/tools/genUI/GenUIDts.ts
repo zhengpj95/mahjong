@@ -193,7 +193,7 @@ export class GenUIDts {
   }
 
   public static createViewNode(node: NodeInfo, deep = 1): string[] {
-    // if (!node?.name?.startsWith("$") && !node.varVal) return [];
+    if (!node?.name?.startsWith("$") && !node.varVal) return [];
     const lines: string[] = ["  ".repeat(deep) + `${node.name}: ${node.type}`];
     if (node?.node && Object.keys(node?.node).length) {
       let rst1: string[] = [];
