@@ -161,16 +161,6 @@
       ]
     },
     {
-      "_$id": "xpxofcod",
-      "_$prefab": "f72410c4-a597-e4ec-2ae3-d694946af037",
-      "name": "btnClose",
-      "active": true,
-      "x": 490,
-      "y": -8,
-      "visible": true,
-      "touchable": true
-    },
-    {
       "_$id": "q3mx0ywt",
       "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
       "name": "btnConfirm",
