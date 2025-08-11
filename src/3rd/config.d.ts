@@ -1,7 +1,7 @@
 /** 关联配置表结构 */
 
 /** 牌资源 */
-export interface CardConfig {
+export interface MahjongCardConfig {
   /** card */
   readonly card: number;
   /** res */
@@ -9,7 +9,7 @@ export interface CardConfig {
 }
 
 /** 关卡 */
-export interface LevelConfig {
+export interface MahjongLevelConfig {
   /** 关卡 */
   readonly level: number;
   /** 闯关时间 */

@@ -1,13 +1,13 @@
 /** 关联配置表名称 */
-import { CardConfig, LevelConfig } from "./config";
+import { MahjongCardConfig, MahjongLevelConfig } from "./config";
 
 /**配置表名*/
 export const enum ConfigName {
-  CARD = "CardConfig",
-  LEVEl = "LevelConfig",
+  CARD = "MahjongCardConfig",
+  LEVEl = "MahjongLevelConfig",
 }
 
 export interface ConfigMap {
-  [ConfigName.CARD]: CardConfig;
-  [ConfigName.LEVEl]: LevelConfig;
+  [ConfigName.CARD]: MahjongCardConfig;
+  [ConfigName.LEVEl]: MahjongLevelConfig;
 }

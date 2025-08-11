@@ -9,7 +9,7 @@ import { MahjongCardData } from "./MahjongCardData";
 import { CARD_COUNT, CARD_NUM_LIST, CardData } from "./MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
 import { ModuleName } from "@def/module-name";
-import { LevelConfig } from "@config/config";
+import { MahjongLevelConfig } from "@config/config";
 import { ConfigName } from "@config/config-name";
 import poolMgr = base.poolMgr;
 import eventMgr = base.eventMgr;
@@ -32,7 +32,7 @@ export class MahjongModel {
   private _pathData: number[][] = [];
   private _astarMgr: AStarMgr;
 
-  private getLevelCfg(): LevelConfig {
+  private getLevelCfg(): MahjongLevelConfig {
     const lv = this.getNextLevel();
     const list = GameCfg.getCfgListByName(ConfigName.LEVEl) || [];
     if (lv >= list.length) {
