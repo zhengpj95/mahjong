@@ -25,8 +25,6 @@ export default [
 
         DEBUG: "readonly", // 编辑器宏定义，是否开启调试模式
         REVIEW_VERSION: "readonly", // 编辑器宏定义，代码审核版本号
-        _DEBUG_: "readonly", // 代码是否开启调试模式
-        _REVIEW_VERSION_: "readonly", // 代码审核版本号
       },
     },
   },
