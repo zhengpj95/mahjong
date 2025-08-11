@@ -1,6 +1,7 @@
 import TextResource = Laya.TextResource;
 import { DebugUtils } from "@base/utils/DebugUtils";
-import { ConfigMap, ConfigMultiMap } from "@config/config-name";
+import { ConfigMap } from "@config/config-name";
+import { ConfigMultiMap } from "@config/config-map";
 
 type ConfigName = keyof ConfigMap; // 单key、多key
 type ConfigMultiName<K extends ConfigName> = keyof ConfigMultiMap<K>; // 多key

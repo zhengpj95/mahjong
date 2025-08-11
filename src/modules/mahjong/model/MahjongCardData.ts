@@ -5,7 +5,7 @@
 
 import { CardData, getCardTypeRes } from "./MahjongConst";
 import { GameCfg } from "@base/cfg/GameCfg";
-import { ConfigName } from "../../../3rd/config-name";
+import { ConfigName } from "@config/config-name";
 import PoolObject = base.PoolObject;
 
 /**单张麻将的数据*/
