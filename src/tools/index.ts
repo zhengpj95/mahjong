@@ -1,10 +1,36 @@
+import * as path from "node:path";
+import * as fs from "node:fs";
+
 /**
  * tools全局对象
  * @author zpj
  * @date 2025/5/30
  */
+function getProjectRoot(): string {
+  // eslint-disable-next-line no-undef
+  let currentDir = __dirname;
+
+  // 向上查找直到找到 package.json
+  while (currentDir !== path.parse(currentDir).root) {
+    if (fs.existsSync(path.join(currentDir, "package.json"))) {
+      return currentDir;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+
+  throw new Error("无法找到项目根目录（没有找到package.json）");
+}
+
+export let PROJECT_ROOT: string;
+
 class ToolsObject {
-  public ProjectRoot = "E:\\project_laya_3.0\\mahjong\\";
+  public get ProjectRoot(): string {
+    if (!PROJECT_ROOT) {
+      PROJECT_ROOT = getProjectRoot();
+      console.log("项目根目录:", PROJECT_ROOT);
+    }
+    return PROJECT_ROOT;
+  }
 }
 
 export const toolsObj = new ToolsObject();
