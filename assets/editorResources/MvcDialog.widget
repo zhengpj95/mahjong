@@ -3,44 +3,45 @@
   "_$id": "cqne3s0e",
   "_$type": "Widget",
   "name": "Root",
-  "width": 400,
+  "width": 500,
   "height": 200,
   "childrenRenderOrder": 1,
   "_$child": [
     {
-      "_$id": "y8twcswf",
-      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
-      "name": "btnConfirm",
+      "_$id": "e9m2ktq2",
+      "_$prefab": "38b67dfb-cb57-14d2-6a55-ace1d3585b0c",
+      "name": "InfoField",
       "active": true,
-      "x": 246,
-      "y": 150,
+      "x": 20,
+      "y": 6,
+      "width": 460,
       "visible": true,
       "touchable": true,
-      "title": "构建"
-    },
-    {
-      "_$id": "5df7otlm",
-      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
-      "name": "btnCancel",
-      "active": true,
-      "x": 80,
-      "y": 150,
-      "visible": true,
-      "touchable": true,
-      "title": "取消",
-      "selectedTitle": "确定取消吗"
+      "grayed": false,
+      "asGroup": false,
+      "height": 30,
+      "_$child": [
+        {
+          "_$override": "n31_9deq",
+          "name": "title",
+          "text": "输入模块名，自动生成模块文件夹以及相应模块代码",
+          "style": {
+            "fontSize": 13
+          }
+        }
+      ]
     },
     {
       "_$id": "kaxht0rs",
       "_$type": "Label",
       "name": "labModule",
       "x": 20,
-      "y": 50,
+      "y": 70,
       "width": 100,
       "height": 20,
       "title": "模块名：",
-      "titleColor": 16777215,
-      "titleFontSize": 16,
+      "titleColor": 12434877,
+      "titleFontSize": 12,
       "titleWidget": {
         "_$ref": "wbqgi5ue"
       },
@@ -67,7 +68,8 @@
           ],
           "text": "模块名：",
           "style": {
-            "fontSize": 16,
+            "fontSize": 12,
+            "color": 12434877,
             "valign": 1
           }
         },
@@ -76,14 +78,37 @@
           "_$prefab": "25b38c03-cefe-a4c8-cad2-9f64513caa90",
           "name": "textInput",
           "active": true,
-          "x": 83,
+          "x": 100,
           "y": 0,
-          "width": 240,
+          "width": 360,
           "height": 20,
           "visible": true,
           "touchable": true
         }
       ]
+    },
+    {
+      "_$id": "5df7otlm",
+      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
+      "name": "btnCancel",
+      "active": true,
+      "x": 140,
+      "y": 140,
+      "visible": true,
+      "touchable": true,
+      "title": "取消",
+      "selectedTitle": "确定取消吗"
+    },
+    {
+      "_$id": "y8twcswf",
+      "_$prefab": "889a3232-df74-c494-e827-ce1f557f8e85",
+      "name": "btnConfirm",
+      "active": true,
+      "x": 280,
+      "y": 140,
+      "visible": true,
+      "touchable": true,
+      "title": "构建"
     }
   ]
 }
