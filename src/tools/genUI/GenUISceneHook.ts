@@ -54,6 +54,7 @@ class GenUISceneHook implements IEditorEnv.ISceneHook {
     if (!scenePath.endsWith(".ls")) {
       return; // 不是场景文件，过滤
     }
+    toolsObj.ProjectRoot = scenePath; // ide运行，需要设置项目根目录
     const filePath = path.dirname(scenePath.replace(toolsObj.ProjectRoot, ""));
     GenUIDts.generateDts(filePath)
       .then(() => {

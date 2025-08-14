@@ -6,30 +6,43 @@ import * as fs from "node:fs";
  * @author zpj
  * @date 2025/5/30
  */
-function getProjectRoot(): string {
-  // eslint-disable-next-line no-undef
-  let currentDir = __dirname;
+class ToolsObject {
+  private _projectRoot: string;
 
-  // 向上查找直到找到 package.json
-  while (currentDir !== path.parse(currentDir).root) {
-    if (fs.existsSync(path.join(currentDir, "package.json"))) {
-      return currentDir;
+  /**
+   * 获取项目根目录
+   * 若为ide运行，则获取传入文件的路径，通过文件路径向上查找，直到找到 package.json 文件为止
+   * 若为代码运行，通过当前路径向上查找，直到找到 package.json 文件为止
+   * @param value
+   * @private
+   */
+  private getProjectRoot(value?: string): string {
+    // eslint-disable-next-line no-undef
+    let currentDir = value ?? __dirname;
+
+    // 向上查找直到找到 package.json
+    while (currentDir !== path.parse(currentDir).root) {
+      if (fs.existsSync(path.join(currentDir, "package.json"))) {
+        return currentDir;
+      }
+      currentDir = path.dirname(currentDir);
     }
-    currentDir = path.dirname(currentDir);
+
+    throw new Error("无法找到项目根目录（没有找到package.json）");
   }
 
-  throw new Error("无法找到项目根目录（没有找到package.json）");
-}
+  // ide运行时，设置项目根目录
+  public set ProjectRoot(value: string) {
+    this._projectRoot = this.getProjectRoot(value);
+    console.log("项目根目录:", this._projectRoot);
+  }
 
-export let PROJECT_ROOT: string;
-
-class ToolsObject {
   public get ProjectRoot(): string {
-    if (!PROJECT_ROOT) {
-      PROJECT_ROOT = getProjectRoot();
-      console.log("项目根目录:", PROJECT_ROOT);
+    if (!this._projectRoot) {
+      this._projectRoot = this.getProjectRoot();
+      console.log("项目根目录:", this._projectRoot);
     }
-    return PROJECT_ROOT;
+    return this._projectRoot;
   }
 }
 
