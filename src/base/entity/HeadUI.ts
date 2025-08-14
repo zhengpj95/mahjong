@@ -25,10 +25,10 @@ export class HeadUI extends Sprite implements PoolObject {
 
   public onAlloc(): void {
     this.onFree();
-    this.width = 120;
-    this.height = 22;
+    this.width = 100;
+    this.height = 12;
 
-    // const img = new Image("comp/img_blank.png");
+    // const img = new Laya.Image("atlas/common/img_blank.png");
     // img.width = this.width;
     // img.height = this.height;
     // this.addChild(img);
@@ -46,7 +46,7 @@ export class HeadUI extends Sprite implements PoolObject {
   private createName(): void {
     if (!this._lab) {
       this._lab = new Label();
-      this._lab.fontSize = 22;
+      this._lab.fontSize = 12;
       this._lab.color = "#ffffff";
       this._lab.align = "center";
       this._lab.centerX = 0;

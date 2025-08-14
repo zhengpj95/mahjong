@@ -116,11 +116,6 @@ export class SceneMdr extends BaseMediator {
     this._player = new ScenePlayer();
     this._player.init(playerVo);
 
-    const monsterVo: SceneMonsterVo = createMonster();
-    const monster = new SceneMonster();
-    monster.init(monsterVo);
-    monster.addPath({ x: 150, y: 100 });
-    this._player.battle = monster;
     FrameUpdateMgr.ins().addTimer(this, this.update);
   }
 

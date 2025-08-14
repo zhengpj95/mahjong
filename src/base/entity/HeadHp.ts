@@ -17,8 +17,8 @@ export class HeadHp extends Sprite implements PoolObject {
   public onAlloc(): void {
     if (!this._box) {
       this._box = new Box();
-      this._box.width = 134;
-      this._box.height = 14;
+      this._box.width = 80;
+      this._box.height = 8;
       this._box.x = -this._box.width / 2;
       this.addChild(this._box);
     }
@@ -35,7 +35,7 @@ export class HeadHp extends Sprite implements PoolObject {
     }
     if (!this._lab) {
       this._lab = new Label();
-      this._lab.fontSize = 14;
+      this._lab.fontSize = 10;
       this._lab.color = `#ffffff`;
       this._lab.centerX = this._lab.centerY = 0;
       this._box.addChild(this._lab);
@@ -54,7 +54,7 @@ export class HeadHp extends Sprite implements PoolObject {
         func.call(this._imgBar);
       }
     }
-    return 132;
+    return 78;
   }
 
   public setHp(hp: number, maxHp: number): void {

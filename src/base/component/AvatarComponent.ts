@@ -63,13 +63,13 @@ export class AvatarComponent extends BaseComponent {
       this._headUI = poolMgr.alloc(HeadUI);
       this._headUI.entity = this.entity;
       this.display.addChild(this._headUI);
-      this._headUI.y = -50;
+      this._headUI.y = -30;
       this._headUI.x = -(this._headUI.width / 2) + -scale.x * 20;
     }
     if (!this._headHp) {
       this._headHp = poolMgr.alloc(HeadHp);
       this._headHp.setHp(this.entity.vo.hp, this.entity.vo.maxHp);
-      this._headHp.y = -70;
+      this._headHp.y = -50;
       this._headHp.x = -(this._headHp.width / 2) + -scale.x * 20;
       this.display.addChild(this._headHp);
     }
