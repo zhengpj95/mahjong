@@ -118,7 +118,7 @@ export class AvatarComponent extends BaseComponent {
     if (vo.hp <= 0) {
       vo.hp = 0;
       vo.action = Action.DEATH;
-      console.log(`AvatarComp: ${vo.name} is death!`);
+      console.log(`11111 AvatarComponent: ${vo.name} is death!`);
     }
     this._headHp.setHp(vo.hp, vo.maxHp);
   }

@@ -64,12 +64,12 @@ export class BattleComponent extends BaseComponent {
       battleObj.battle = this.entity;
     }
     console.log(
-      `11111 BattleComp ${this.entity.vo.name} attack ${this.entity.battle.vo.name}`,
+      `11111 BattleComponent: ${this.entity.vo.name} attack ${this.entity.battle.vo.name}`,
     );
   }
 
   private stopAttack(): void {
-    this.entity.vo.action = Action.IDLE;
+    this.entity.vo.action = Action.WALK;
     this._isAttack = false;
     this.entity.battle = null;
     this._lastAttackTime = 0;
@@ -80,13 +80,8 @@ export class BattleComponent extends BaseComponent {
     if (this._lastAttackTime < 400) return;
     this._lastAttackTime = 0;
 
-    // todo
-    let randomHp = (Math.random() * 1000) >> 0;
-    if (randomHp < 100) randomHp += 100;
+    const randomHp = this.getDamage();
     this.entity.battle.vo.hp -= randomHp;
-    // console.log(
-    //   `11111 BattleComp continueAttack ${this.entity.battle.vo.hp} ${randomHp}`,
-    // );
 
     const damageItem = poolMgr.alloc(DamageHurt);
     const display = this.entity.battle.getComponent(
@@ -94,8 +89,7 @@ export class BattleComponent extends BaseComponent {
     ).display;
     display.addChild(damageItem);
     damageItem.damage = randomHp;
-    damageItem.pos(display.width / 2, 0);
-    damageItem.alpha = 1;
+    damageItem.pos(display.width / 2 + this.getRandomOffsetX(10, 15), 0);
     Tween.to(
       damageItem,
       { y: -100, alpha: 0.7 },
@@ -106,5 +100,19 @@ export class BattleComponent extends BaseComponent {
         damageItem.removeSelf();
       }),
     );
+  }
+
+  private getDamage(): number {
+    let randomHp = (Math.random() * 1000) >> 0;
+    if (randomHp < 50) {
+      randomHp += 50;
+    }
+    return randomHp;
+  }
+
+  private getRandomOffsetX(centerX: number, offsetRange: number) {
+    // 偏移范围是 [-offsetRange, offsetRange]
+    const offset = (Math.random() * 2 - 1) * offsetRange;
+    return centerX + offset;
   }
 }

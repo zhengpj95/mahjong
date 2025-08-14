@@ -25,6 +25,7 @@ export class DamageHurt extends Sprite implements PoolObject {
       this._lab.centerY = this._lab.centerX = 0;
       this.addChild(this._lab);
     }
+    this.alpha = 1;
   }
 
   public onFree(): void {

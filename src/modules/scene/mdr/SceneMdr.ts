@@ -19,19 +19,38 @@ import eventMgr = base.eventMgr;
 import poolMgr = base.poolMgr;
 import EventVo = base.EventVo;
 
+let monsterId: number = 0;
+
 function createMonster(): SceneMonsterVo {
+  monsterId++;
   return {
     entityId: 2001,
-    name: "monster" + ((Math.random() * 10) >> 0),
+    name: "monster" + monsterId,
     hp: 10000,
     maxHp: 10000,
     power: 999999,
     type: SceneEntityType.MONSTER,
-    point: { x: 550, y: 100 },
+    point: { x: 550, y: 200 },
     action: Action.WALK,
     avatarName: `resources/player/rogue`,
     monsterType: MonsterType.MONSTER,
     dir: Direction.LEFT,
+  };
+}
+
+function createPlayer(): ScenePlayerVO {
+  return {
+    entityId: 1001,
+    name: "无尽猪猪",
+    hp: 10000,
+    maxHp: 10000,
+    power: 999999,
+    type: SceneEntityType.PLAYER,
+    vip: 0,
+    point: { x: 100, y: 200 },
+    action: Action.WALK,
+    avatarName: `resources/player/knight`,
+    dir: Direction.RIGHT,
   };
 }
 
@@ -68,11 +87,6 @@ export class SceneMdr extends BaseMediator {
     //
   }
 
-  protected removeEvents(): void {
-    eventMgr.off(SceneEvent.ADD_TO_SCENE, this.onAddEntity, this);
-    eventMgr.off(SceneEvent.REMOVE_FROM_SCENE, this.onDelEntity, this);
-  }
-
   private createEntitySprite(): Sprite {
     const sprite = new Sprite();
     sprite.width = Laya.stage.width;
@@ -100,19 +114,7 @@ export class SceneMdr extends BaseMediator {
       this.ui.addChild(this._entitySprite);
     }
 
-    const playerVo: ScenePlayerVO = {
-      entityId: 1001,
-      name: "无尽猪猪",
-      hp: 10000,
-      maxHp: 10000,
-      power: 999999,
-      type: SceneEntityType.PLAYER,
-      vip: 0,
-      point: { x: 100, y: 100 },
-      action: Action.IDLE,
-      avatarName: `resources/player/knight`,
-      dir: Direction.RIGHT,
-    };
+    const playerVo = createPlayer();
     this._player = new ScenePlayer();
     this._player.init(playerVo);
 
