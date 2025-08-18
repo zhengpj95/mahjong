@@ -25,9 +25,11 @@
     "eslint": "^9.32.0",
     "eslint-plugin-prettier": "^5.5.3",
     "husky": "^9.1.7",
+    "jimp": "^1.6.0",
     "json": "^11.0.0",
     "minigame-api-typings": "^3.8.11",
     "prettier": "^3.6.2",
+    "sharp": "^0.34.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0"
   }
