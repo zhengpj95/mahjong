@@ -2,7 +2,7 @@ import ComboBox = gui.ComboBox;
 import Label = gui.Label;
 import TextInput = gui.TextInput;
 
-const SplitModeList = ["Atlas", "Json", "Array"];
+const SplitModeList = ["TexturePacker", "Atlas", "Json", "Array"];
 
 /**
  * 配置方式处理
@@ -51,34 +51,37 @@ export class SplitAtlasDialogNew extends IEditor.Dialog {
     this._comboBox.selectedIndex = 0;
 
     this._boxInput = <Label>this.contentPane.getChild("boxInput");
-    this._boxInput.getChild("IconButton").on(
-      "click",
-      () => {
-        Editor.showOpenDialog({ title: "select file" }).then((value) => {
-          this._boxInput.getChild("textInput").text = value.filePaths[0] ?? "";
-        });
-      },
-      this,
-    );
+    this._boxInput
+      .getChild("IconButton")
+      .on("click", this.openFileDialog, this);
 
     this._boxOutput = this.contentPane.getChild("boxOutput");
-    this._boxOutput.getChild("IconButton").on(
-      "click",
-      () => {
-        Editor.showOpenDialog({
-          title: "select file",
-          properties: ["openDirectory"],
-        }).then((value) => {
-          this._boxOutput.getChild("textInput").text = value.filePaths[0] ?? "";
-        });
-      },
-      this,
-    );
+    this._boxOutput
+      .getChild("IconButton")
+      .on("click", this.openFileDialog2, this);
   }
 
   protected onHide() {
     super.onHide();
     this.contentPane.offAllCaller(this);
+  }
+
+  private openFileDialog() {
+    Editor.showOpenDialog({
+      title: "select file",
+      filters: [{ extensions: ["png"], name: "" }],
+    }).then((value) => {
+      this._boxInput.getChild("textInput").text = value.filePaths[0] ?? "";
+    });
+  }
+
+  private openFileDialog2() {
+    Editor.showOpenDialog({
+      title: "select file",
+      properties: ["openDirectory"],
+    }).then((value) => {
+      this._boxOutput.getChild("textInput").text = value.filePaths[0] ?? "";
+    });
   }
 
   private btnConfirmFunc(): void {
@@ -100,5 +103,8 @@ export class SplitAtlasDialogNew extends IEditor.Dialog {
     // todo
     const splitMode = comboBox.items[comboBox.selectedIndex];
     console.log(boxInput.text, boxOutput.text, splitMode);
+    if (splitMode === "TexturePacker") {
+      // TexturePacker 模式
+    }
   }
 }
