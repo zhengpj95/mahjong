@@ -32,19 +32,19 @@ const write = (filename, content) => {
 // 生成配置文件
 const generateConfigs = () => {
   // .prettierrc
-  write(
-    ".prettierrc",
-    JSON.stringify(
-      {
-        singleQuote: true,
-        semi: true,
-        tabWidth: 2,
-        trailingComma: "all",
-      },
-      null,
-      2,
-    ),
-  );
+  // write(
+  //   ".prettierrc",
+  //   JSON.stringify(
+  //     {
+  //       singleQuote: true,
+  //       semi: true,
+  //       tabWidth: 2,
+  //       trailingComma: "all",
+  //     },
+  //     null,
+  //     2,
+  //   ),
+  // );
 
   // tsconfig.json（如果没有）
   if (!fs.existsSync("tsconfig.json")) {
