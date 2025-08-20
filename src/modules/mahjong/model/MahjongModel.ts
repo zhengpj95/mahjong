@@ -34,11 +34,11 @@ export class MahjongModel {
 
   private getLevelCfg(): MahjongLevelConfig {
     const lv = this.getNextLevel();
-    const list = GameCfg.getCfgListByName(ConfigName.LEVEl) || [];
+    const list = GameCfg.getCfgListByName(ConfigName.MAHJONG_LEVEl) || [];
     if (lv >= list.length) {
       return list[list.length - 1];
     }
-    return GameCfg.getCfgByNameId(ConfigName.LEVEl, lv || 1);
+    return GameCfg.getCfgByNameId(ConfigName.MAHJONG_LEVEl, lv || 1);
   }
 
   public updateScore(score: number): void {

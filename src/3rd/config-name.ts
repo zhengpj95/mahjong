@@ -3,11 +3,11 @@ import { MahjongCardConfig, MahjongLevelConfig } from "./config";
 
 /**配置表名*/
 export const enum ConfigName {
-  CARD = "MahjongCardConfig",
-  LEVEl = "MahjongLevelConfig",
+  MAHJONG_CARD = "MahjongCardConfig",
+  MAHJONG_LEVEl = "MahjongLevelConfig",
 }
 
 export interface ConfigMap {
-  [ConfigName.CARD]: MahjongCardConfig;
-  [ConfigName.LEVEl]: MahjongLevelConfig;
+  [ConfigName.MAHJONG_CARD]: MahjongCardConfig;
+  [ConfigName.MAHJONG_LEVEl]: MahjongLevelConfig;
 }
