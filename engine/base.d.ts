@@ -323,6 +323,7 @@ declare module base {
   function baseLoop(): void;
   function baseInit(): void;
   
-  export { BaseCommand, BaseEvent, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventVo, LayerIndex, LoadPriority, MergedBitmap, PoolObject, RpgMovieClip, Singleton, baseInit, baseLoop, createObj, eventMgr, facade, findMediator, layerMgr, poolMgr, redPointMgr, registerRed, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr, unregisterRed };
+  export { BaseCommand, BaseEvent, BaseMediator, BaseModule, BaseProxy, BitmapBase, BmpMovieClip, CallBack, Ease, EventVo, LayerIndex, LoadPriority, MergedBitmap, RpgMovieClip, Singleton, baseInit, baseLoop, createObj, eventMgr, facade, findMediator, layerMgr, poolMgr, redPointMgr, registerRed, resetDisplay, resourceMgr, socketMgr, timerMgr, tweenMgr, unregisterRed };
+  export { PoolObject };
   
 }

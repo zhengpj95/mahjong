@@ -214,9 +214,9 @@
           this.isRepeat = false;
           this.repeatCount = 0;
           this.exeTime = 0;
-          (_a = this.callBack) === null || _a === undefined ? undefined : _a.free();
+          (_a = this.callBack) === null || _a === void 0 ? void 0 : _a.free();
           this.callBack = undefined;
-          (_b = this.finishCallBack) === null || _b === undefined ? undefined : _b.free();
+          (_b = this.finishCallBack) === null || _b === void 0 ? void 0 : _b.free();
           this.finishCallBack = undefined;
           this.useFrame = false;
           this.lastExeTime = 0;
@@ -267,10 +267,10 @@
           var _a, _b, _c, _d, _e, _f, _g;
           this._curTime = Date.now();
           this._curFrame++;
-          while ((_a = this._deleteList) === null || _a === undefined ? undefined : _a.length) {
+          while ((_a = this._deleteList) === null || _a === void 0 ? void 0 : _a.length) {
               this.removeVo(this._deleteList.pop());
           }
-          if ((_b = this._frameList) === null || _b === undefined ? undefined : _b.length) {
+          if ((_b = this._frameList) === null || _b === void 0 ? void 0 : _b.length) {
               for (const vo of this._frameList) {
                   if (this._deleteList.includes(vo)) {
                       continue;
@@ -282,8 +282,8 @@
                       if (!vo.isRepeat && vo.repeatCount > 0) {
                           vo.repeatCount--;
                       }
-                      if ((!vo.isRepeat && vo.repeatCount <= 0) || !((_c = vo.callBack) === null || _c === undefined ? undefined : _c.method)) {
-                          (_d = vo.finishCallBack) === null || _d === undefined ? undefined : _d.exec(this._curFrame - vo.lastExeTime);
+                      if ((!vo.isRepeat && vo.repeatCount <= 0) || !((_c = vo.callBack) === null || _c === void 0 ? void 0 : _c.method)) {
+                          (_d = vo.finishCallBack) === null || _d === void 0 ? void 0 : _d.exec(this._curFrame - vo.lastExeTime);
                           if (!this._deleteList.includes(vo)) {
                               this._deleteList.push(vo);
                           }
@@ -291,7 +291,7 @@
                   }
               }
           }
-          if ((_e = this._timeList) === null || _e === undefined ? undefined : _e.length) {
+          if ((_e = this._timeList) === null || _e === void 0 ? void 0 : _e.length) {
               for (const vo of this._timeList) {
                   if (this._deleteList.includes(vo)) {
                       continue;
@@ -303,8 +303,8 @@
                       if (!vo.isRepeat && vo.repeatCount > 0) {
                           vo.repeatCount--;
                       }
-                      if ((!vo.isRepeat && vo.repeatCount <= 0) || !((_f = vo.callBack) === null || _f === undefined ? undefined : _f.method)) {
-                          (_g = vo.finishCallBack) === null || _g === undefined ? undefined : _g.exec(this._curFrame - vo.lastExeTime);
+                      if ((!vo.isRepeat && vo.repeatCount <= 0) || !((_f = vo.callBack) === null || _f === void 0 ? void 0 : _f.method)) {
+                          (_g = vo.finishCallBack) === null || _g === void 0 ? void 0 : _g.exec(this._curFrame - vo.lastExeTime);
                           if (!this._deleteList.includes(vo)) {
                               this._deleteList.push(vo);
                           }
@@ -360,7 +360,7 @@
       remove(cb) {
           const list = this._timeList.concat(this._frameList).slice();
           for (const vo of list) {
-              if (vo === null || vo === undefined ? undefined : vo.isEqual(cb)) {
+              if (vo === null || vo === void 0 ? void 0 : vo.isEqual(cb)) {
                   this._deleteList.push(vo);
                   break;
               }
@@ -369,7 +369,7 @@
       removeAll(caller) {
           const list = this._timeList.concat(this._frameList).slice();
           for (const vo of list) {
-              if (vo === null || vo === undefined ? undefined : vo.isEqualCaller(caller)) {
+              if (vo === null || vo === void 0 ? void 0 : vo.isEqualCaller(caller)) {
                   this._deleteList.push(vo);
                   break;
               }
@@ -377,7 +377,7 @@
       }
       isExist(cb) {
           const list = this._timeList.concat(this._frameList).slice();
-          return !!list.find((vo) => { var _a; return cb && cb.id === ((_a = vo.callBack) === null || _a === undefined ? undefined : _a.id); });
+          return !!list.find((vo) => { var _a; return cb && cb.id === ((_a = vo.callBack) === null || _a === void 0 ? void 0 : _a.id); });
       }
   }
   const timerMgr = TimerManager.ins();
@@ -408,10 +408,10 @@
       init(target, vars) {
           var _a, _b, _c, _d;
           this.target = target;
-          this.loop = (_a = vars === null || vars === undefined ? undefined : vars.loop) !== null && _a !== undefined ? _a : false;
-          this.yoyo = (_b = vars === null || vars === undefined ? undefined : vars.yoyo) !== null && _b !== undefined ? _b : false;
-          this.repeat = (_c = vars === null || vars === undefined ? undefined : vars.repeat) !== null && _c !== undefined ? _c : 0;
-          this.timeScale = (_d = vars === null || vars === undefined ? undefined : vars.scale) !== null && _d !== undefined ? _d : 1;
+          this.loop = (_a = vars === null || vars === void 0 ? void 0 : vars.loop) !== null && _a !== void 0 ? _a : false;
+          this.yoyo = (_b = vars === null || vars === void 0 ? void 0 : vars.yoyo) !== null && _b !== void 0 ? _b : false;
+          this.repeat = (_c = vars === null || vars === void 0 ? void 0 : vars.repeat) !== null && _c !== void 0 ? _c : 0;
+          this.timeScale = (_d = vars === null || vars === void 0 ? void 0 : vars.scale) !== null && _d !== void 0 ? _d : 1;
           this.ease = EaseNone;
           this.duration = 0;
           this.properties = {};
@@ -544,7 +544,7 @@
                   delList.push(tw);
               }
           }
-          if (delList === null || delList === undefined ? undefined : delList.length) {
+          if (delList === null || delList === void 0 ? void 0 : delList.length) {
               for (const tw of delList) {
                   if (tw) {
                       tw.dispose();
@@ -632,7 +632,7 @@
           }
           if (node instanceof Laya.Scene) {
               const mdr = findMediatorTemp(node);
-              if (mdr === null || mdr === undefined ? undefined : mdr.isEasyClose) {
+              if (mdr === null || mdr === void 0 ? void 0 : mdr.isEasyClose) {
                   node.mouseThrough = true;
               }
           }
@@ -675,11 +675,11 @@
       }
       onClickPopup() {
           var _a, _b;
-          const parent = (_a = this._popupSp) === null || _a === undefined ? undefined : _a.parent;
+          const parent = (_a = this._popupSp) === null || _a === void 0 ? void 0 : _a.parent;
           if (parent) {
               const mdr = findMediatorTemp(parent.getChildAt(parent.numChildren - 1));
-              if (mdr === null || mdr === undefined ? undefined : mdr.isEasyClose) {
-                  (_b = mdr === null || mdr === undefined ? undefined : mdr.close) === null || _b === undefined ? undefined : _b.call(mdr);
+              if (mdr === null || mdr === void 0 ? void 0 : mdr.isEasyClose) {
+                  (_b = mdr === null || mdr === void 0 ? void 0 : mdr.close) === null || _b === void 0 ? void 0 : _b.call(mdr);
               }
           }
       }
@@ -768,11 +768,11 @@
           }
           const list = this._messages[event];
           for (const callBack of list) {
-              if (callBack === null || callBack === undefined ? undefined : callBack.isEqual(caller, method)) {
+              if (callBack === null || callBack === void 0 ? void 0 : callBack.isEqual(caller, method)) {
                   return;
               }
           }
-          const callBack = CallBack.alloc(caller, method, (args !== null && args !== undefined ? args : []), false);
+          const callBack = CallBack.alloc(caller, method, (args !== null && args !== void 0 ? args : []), false);
           this._messages[event].push(callBack);
       }
       once(event, method, caller, args) {
@@ -789,7 +789,7 @@
           }
           for (let i = 0; i < list.length; i++) {
               const callBack = list[i];
-              if (callBack === null || callBack === undefined ? undefined : callBack.isEqual(caller, method)) {
+              if (callBack === null || callBack === void 0 ? void 0 : callBack.isEqual(caller, method)) {
                   list[i] = undefined;
                   break;
               }
@@ -1227,7 +1227,7 @@
           eventMgr.emit(event, args);
       }
       mulOn(events, method, caller) {
-          if (events === null || events === undefined ? undefined : events.length) {
+          if (events === null || events === void 0 ? void 0 : events.length) {
               for (const k of events) {
                   this.on(k, method, caller);
               }
@@ -1314,7 +1314,7 @@
   }
   function buildNodeRecursive(node, parent, rstObj) {
       var _a;
-      if (!((_a = rstObj === null || rstObj === undefined ? undefined : rstObj.child) === null || _a === undefined ? undefined : _a[node.name])) {
+      if (!((_a = rstObj === null || rstObj === void 0 ? void 0 : rstObj.child) === null || _a === void 0 ? void 0 : _a[node.name])) {
           return;
       }
       parent[node.name] = node;
@@ -1324,7 +1324,7 @@
       }
   }
   function buildItemRenderRecursive(itemRender, rstObj) {
-      if (!(itemRender === null || itemRender === undefined ? undefined : itemRender.length) || !rstObj)
+      if (!(itemRender === null || itemRender === void 0 ? void 0 : itemRender.length) || !rstObj)
           return;
       rstObj.child = {};
       for (const item of itemRender) {
@@ -1350,7 +1350,7 @@
           else {
               this.parent = parent;
           }
-          this.isEasyClose = isEasyClose !== null && isEasyClose !== undefined ? isEasyClose : false;
+          this.isEasyClose = isEasyClose !== null && isEasyClose !== void 0 ? isEasyClose : false;
       }
       setModule(module) {
           this._module = module;
@@ -1381,7 +1381,7 @@
                   .then((r) => {
                   var _a;
                   const rstObj = {};
-                  if ((_a = r.data) === null || _a === undefined ? undefined : _a._$child) {
+                  if ((_a = r.data) === null || _a === void 0 ? void 0 : _a._$child) {
                       buildItemRenderRecursive(r.data._$child, rstObj);
                   }
                   const s = r.create();
@@ -1468,7 +1468,7 @@
       }
       exeCmd(data) {
           var _a;
-          const cls = this._cmdMap[(_a = data === null || data === undefined ? undefined : data.type) !== null && _a !== undefined ? _a : ""];
+          const cls = this._cmdMap[(_a = data === null || data === void 0 ? void 0 : data.type) !== null && _a !== void 0 ? _a : ""];
           if (cls) {
               const cmd = new cls();
               cmd.exec(data);
@@ -1517,7 +1517,7 @@
   class BaseProxy extends BaseEmitter {
       initRed() {
           const events = this.updateRedEvent();
-          if (events === null || events === undefined ? undefined : events.length) {
+          if (events === null || events === void 0 ? void 0 : events.length) {
               this.mulOn(events, this.updateRed, this);
           }
       }
@@ -1661,7 +1661,7 @@
   const redPointMgr = RedPointManager.ins();
   const __RedPointPath__ = "__redPointPath__";
   function registerRed(view, paths, cb) {
-      if (!(view === null || view === undefined ? undefined : view.displayedInStage)) {
+      if (!(view === null || view === void 0 ? void 0 : view.displayedInStage)) {
           unregisterRed(view);
           return;
       }
@@ -1683,19 +1683,19 @@
       if (!view)
           return;
       const mdr = findMediator(view);
-      mdr === null || mdr === undefined ? undefined : mdr.off("common_update_red_point", onListenRedPoint, mdr);
+      mdr === null || mdr === void 0 ? void 0 : mdr.off("common_update_red_point", onListenRedPoint, mdr);
   }
   function onListenRedPoint(view, cb, ev) {
       var _a;
       const paths = view[__RedPointPath__];
-      const root = (_a = ev === null || ev === undefined ? undefined : ev.data) !== null && _a !== undefined ? _a : "";
+      const root = (_a = ev === null || ev === void 0 ? void 0 : ev.data) !== null && _a !== void 0 ? _a : "";
       if (redPointMgr.checkPath(root, paths)) {
           const redPoint = getRedPointImg(view);
           const isRed = redPointMgr.getRp(paths);
           if (redPoint) {
               redPoint.visible = isRed;
           }
-          cb === null || cb === undefined ? undefined : cb.exec(isRed);
+          cb === null || cb === void 0 ? void 0 : cb.exec(isRed);
       }
   }
   function getRedPointImg(view) {
@@ -1926,7 +1926,7 @@
           if (this._textureList)
               return this._textureList;
           this._textureList = [];
-          for (const f of (_a = this._frames) !== null && _a !== undefined ? _a : []) {
+          for (const f of (_a = this._frames) !== null && _a !== void 0 ? _a : []) {
               const txt = Laya.Texture.create(this._texture, f.frame.x, f.frame.y, f.frame.w, f.frame.h, f.spriteSourceSize.x, f.spriteSourceSize.y, f.sourceSize.w, f.sourceSize.h);
               this._textureList.push(txt);
           }
@@ -1964,8 +1964,8 @@
           this._container = container;
           this._playCnt = cnt;
           this._callBack = callBack;
-          this._remove = remove !== null && remove !== undefined ? remove : false;
-          this._removeParent = removeParent !== null && removeParent !== undefined ? removeParent : false;
+          this._remove = remove !== null && remove !== void 0 ? remove : false;
+          this._removeParent = removeParent !== null && removeParent !== void 0 ? removeParent : false;
           MergedBitmap.onLoad(url, CallBack.alloc(this, this.onLoadedMergedBitmap));
       }
       onLoadedMergedBitmap(bitmap) {
@@ -1976,8 +1976,8 @@
           this._mergedBitmap = bitmap;
           this._total = bitmap.getTextureList().length;
           this._current = 0;
-          if (!((_a = this._container) === null || _a === undefined ? undefined : _a.contains(this))) {
-              (_b = this._container) === null || _b === undefined ? undefined : _b.addChild(this);
+          if (!((_a = this._container) === null || _a === void 0 ? void 0 : _a.contains(this))) {
+              (_b = this._container) === null || _b === void 0 ? void 0 : _b.addChild(this);
           }
           Laya.timer.loop(this._interval, this, this.onUpdate);
       }
@@ -2063,7 +2063,7 @@
           this._playCnt = cnt;
           this._loadCallBack = loadCallBack;
           this._finishCallBack = finishCallback;
-          this._remove = remove !== null && remove !== undefined ? remove : false;
+          this._remove = remove !== null && remove !== void 0 ? remove : false;
           MergedBitmap.onLoad(url, CallBack.alloc(this, this.onLoadedMergedBitmap));
       }
       onLoadedMergedBitmap(bitmap) {
@@ -2082,8 +2082,8 @@
               const txt = Laya.Texture.create(texture, f.frame.x, f.frame.y, f.frame.w, f.frame.h, f.spriteSourceSize.x, f.spriteSourceSize.y, f.sourceSize.w, f.sourceSize.h);
               this._textureMap[name].push(txt);
           }
-          if (!((_a = this._container) === null || _a === undefined ? undefined : _a.contains(this))) {
-              (_b = this._container) === null || _b === undefined ? undefined : _b.addChild(this);
+          if (!((_a = this._container) === null || _a === void 0 ? void 0 : _a.contains(this))) {
+              (_b = this._container) === null || _b === void 0 ? void 0 : _b.addChild(this);
           }
           Laya.timer.loop(this._interval, this, this.onUpdate);
           if (this._loadCallBack) {
